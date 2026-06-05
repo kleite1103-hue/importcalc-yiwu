@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#07080a">
+<title>ImportCalc — Efeito Vendas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080a;--s1:#0f1014;--s2:#16181e;--s3:#1e2028;
+  --b1:#2a2d38;--b2:#363a48;
+  --ac:#ff4d1c;--ac2:#ff6b3d;--acd:rgba(255,77,28,0.12);--acg:rgba(255,77,28,0.25);
+  --gn:#22c55e;--gnd:rgba(34,197,94,0.12);
+  --yw:#eab308;--ywd:rgba(234,179,8,0.12);
+  --rd:#ef4444;--rdd:rgba(239,68,68,0.12);
+  --bl:#3b82f6;--bld:rgba(59,130,246,0.12);
+  --pu:#a855f7;--pud:rgba(168,85,247,0.12);
+  --t1:#f0f2f8;--t2:#9aa0b8;--t3:#5a6080;
+  --r:14px;--rs:10px;
+  --tap:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{font-size:16px;} /* prevent iOS zoom */
+body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+
+/* ── TELA DE LOGIN ───────────────────────────────── */
+#login-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.login-box{width:100%;max-width:400px;}
+.login-logo{text-align:center;margin-bottom:32px;}
+.login-logo-icon{width:56px;height:56px;background:var(--ac);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;margin:0 auto 12px;}
+.login-logo-text{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;}
+.login-logo-sub{font-size:13px;color:var(--t3);}
+.login-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:24px;}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:4px;}
+.login-sub{font-size:13px;color:var(--t3);margin-bottom:20px;}
+.login-tabs{display:flex;gap:6px;margin-bottom:20px;}
+.ltab{flex:1;padding:10px;border-radius:var(--rs);border:1px solid var(--b2);background:transparent;color:var(--t2);font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;}
+.ltab.active{background:var(--acd);border-color:var(--ac);color:var(--ac);}
+.login-err{font-size:13px;color:var(--rd);padding:10px 12px;background:var(--rdd);border:1px solid rgba(239,68,68,.3);border-radius:var(--rs);margin-bottom:14px;display:none;}
+
+/* ── HEADER ─────────────────────────────────────── */
+header{position:sticky;top:0;z-index:100;background:rgba(7,8,10,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--b1);padding:0 16px;height:56px;display:flex;align-items:center;gap:12px;}
+.logo{display:flex;align-items:center;gap:8px;}
+.logo-icon{width:28px;height:28px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#fff;flex-shrink:0;}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.user-btn{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;border:1px solid var(--b2);background:transparent;color:var(--t2);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;min-height:var(--tap);}
+.api-btn{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:8px;border:1px solid var(--b2);background:transparent;color:var(--t3);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;min-height:var(--tap);}
+.api-dot{width:7px;height:7px;border-radius:50%;background:var(--rd);flex-shrink:0;}
+
+/* ── BOTTOM NAV ─────────────────────────────────── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(7,8,10,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--b1);display:flex;padding-bottom:env(safe-area-inset-bottom);}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;border:none;background:transparent;color:var(--t3);font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;cursor:pointer;min-height:56px;gap:4px;transition:color .2s;}
+.bnav-btn.active{color:var(--ac);}
+.bnav-icon{font-size:20px;line-height:1;}
+.bnav-label{font-size:10px;letter-spacing:.3px;}
+
+/* ── APP LAYOUT ─────────────────────────────────── */
+.app{max-width:600px;margin:0 auto;padding:16px 16px calc(72px + env(safe-area-inset-bottom));min-height:calc(100vh - 56px);}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:2px;}
+.page-sub{font-size:13px;color:var(--t3);margin-bottom:18px;}
+
+/* ── CARDS ───────────────────────────────────────── */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;margin-bottom:14px;}
+.ch{padding:14px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;}
+.ci{width:26px;height:26px;border-radius:6px;background:var(--acd);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ct{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;}
+.cbadge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;}
+.b-bl{background:var(--bld);color:var(--bl);border:1px solid rgba(59,130,246,.3);}
+.b-gn{background:var(--gnd);color:var(--gn);border:1px solid rgba(34,197,94,.3);}
+.b-pu{background:var(--pud);color:var(--pu);border:1px solid rgba(168,85,247,.3);}
+.b-yw{background:var(--ywd);color:var(--yw);border:1px solid rgba(234,179,8,.3);}
+.cb{padding:16px;}
+
+/* ── FORM ────────────────────────────────────────── */
+.slabel{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ac);margin-bottom:10px;margin-top:4px;display:flex;align-items:center;gap:8px;}
+.slabel::after{content:'';flex:1;height:1px;background:var(--b1);}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--t2);margin-bottom:6px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+input,select,textarea{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:13px 12px;color:var(--t1);font-family:'Outfit',sans-serif;font-size:16px;transition:border-color .2s;outline:none;-webkit-appearance:none;appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acd);}
+input::placeholder,textarea::placeholder{color:var(--t3);}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6080' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
+select option{background:var(--s2);font-size:16px;}
+textarea{resize:vertical;min-height:80px;line-height:1.5;}
+.pfx{position:relative;display:flex;align-items:center;}
+.pfx span{position:absolute;left:12px;font-size:14px;color:var(--t3);pointer-events:none;z-index:1;}
+.pfx input{padding-left:28px;}
+.sfx{position:relative;display:flex;align-items:center;}
+.sfx span{position:absolute;right:12px;font-size:14px;color:var(--t3);pointer-events:none;}
+.sfx input{padding-right:36px;}
+.divider{height:1px;background:var(--b1);margin:14px 0;}
+
+/* ── BUTTONS ─────────────────────────────────────── */
+.btn-primary{width:100%;min-height:var(--tap);padding:14px;background:var(--ac);border:none;border-radius:var(--rs);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-primary:active{background:var(--ac2);transform:scale(.98);}
+.btn-primary:disabled{opacity:.5;pointer-events:none;}
+.btn-ghost{width:100%;min-height:var(--tap);padding:12px;background:transparent;border:1px solid var(--b2);border-radius:var(--rs);color:var(--t2);font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn-ghost:active{border-color:var(--ac);color:var(--ac);background:var(--acd);}
+.btn-sm{min-height:var(--tap);padding:12px 16px;background:var(--ac);border:none;border-radius:var(--rs);color:#fff;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;}
+.btn-sm:active{background:var(--ac2);}
+.btn-sm:disabled{opacity:.5;pointer-events:none;}
+
+/* ── MODAL TOGGLE ────────────────────────────────── */
+.mtoggle{display:flex;gap:8px;margin-bottom:14px;}
+.mopt{flex:1;padding:12px 10px;border-radius:var(--rs);border:1px solid var(--b2);background:var(--s2);cursor:pointer;transition:all .2s;text-align:center;min-height:var(--tap);}
+.mopt.sel{border-color:var(--ac);background:var(--acd);}
+.mopt-t{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px;}
+.mopt-s{font-size:11px;color:var(--t3);}
+
+/* ── FRETE SUB TOGGLE ────────────────────────────── */
+.ftoggle{display:flex;gap:6px;margin-bottom:12px;}
+.fsb{flex:1;min-height:var(--tap);padding:10px 6px;border-radius:8px;border:1px solid var(--b2);background:transparent;color:var(--t2);font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:all .2s;}
+.fsb.active{background:var(--s3);border-color:var(--ac);color:var(--ac);}
+
+/* ── RESULTS ─────────────────────────────────────── */
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.rc{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;}
+.rc.accent{border-color:var(--ac);background:var(--acd);}
+.rc.full{grid-column:1/-1;}
+.rl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:5px;}
+.rv{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;line-height:1;}
+.rv.xl{font-size:28px;color:var(--ac);}
+.rsub{font-size:11px;color:var(--t3);margin-top:3px;}
+
+/* ── BREAKDOWN ───────────────────────────────────── */
+.bk{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);overflow:hidden;margin-bottom:14px;}
+.bk-head{padding:10px 14px;background:var(--s3);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);display:grid;grid-template-columns:1fr auto auto;gap:10px;}
+.bk-row{padding:10px 14px;display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border-bottom:1px solid var(--b1);}
+.bk-row:last-child{border-bottom:none;}
+.bk-row.tot{background:var(--s3);border-top:1px solid var(--ac);}
+.bk-n{font-size:12px;color:var(--t2);}
+.bk-n.t{font-weight:700;color:var(--t1);font-size:13px;}
+.bk-p{font-size:11px;color:var(--t3);text-align:right;min-width:38px;}
+.bk-v{font-size:12px;font-weight:600;color:var(--t1);text-align:right;min-width:80px;}
+.bk-v.t{color:var(--ac);font-size:13px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
+
+/* ── NCM ─────────────────────────────────────────── */
+.ncm-row{display:flex;gap:8px;}
+.ncm-row input{flex:1;}
+.ncm-res{margin-top:8px;padding:12px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:13px;display:none;}
+.ncm-res.on{display:block;}
+.ncm-desc{color:var(--t2);margin-bottom:8px;line-height:1.4;}
+.ncm-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.ntag{padding:4px 9px;border-radius:5px;font-size:12px;font-weight:700;}
+.ntag.ii{background:var(--bld);color:var(--bl);}
+.ntag.ipi{background:var(--ywd);color:var(--yw);}
+.ntag.pis{background:var(--acd);color:var(--ac);}
+
+/* ── VIABILIDADE ─────────────────────────────────── */
+.vbar{margin-bottom:14px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;}
+.vbar-lbl{display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;color:var(--t2);}
+.bar-track{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+.vbadge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;margin-top:10px;}
+.vg{background:var(--gnd);color:var(--gn);border:1px solid rgba(34,197,94,.3);}
+.vy{background:var(--ywd);color:var(--yw);border:1px solid rgba(234,179,8,.3);}
+.vr{background:var(--rdd);color:var(--rd);border:1px solid rgba(239,68,68,.3);}
+
+/* ── COMUNICAÇÃO ─────────────────────────────────── */
+.lang-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.lang-flag{font-size:22px;}
+.lang-lbl{font-size:13px;font-weight:700;color:var(--t2);flex:1;}
+.swap-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.trans-out{background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;min-height:90px;font-size:18px;line-height:1.6;color:var(--t1);}
+.trans-py{font-size:12px;color:var(--t3);margin-top:6px;font-style:italic;}
+.trans-acts{display:flex;gap:8px;margin-top:10px;}
+.tts-btn{flex:1;min-height:var(--tap);padding:10px;border-radius:var(--rs);border:1px solid var(--b2);background:var(--s2);color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.tts-btn.playing{border-color:var(--gn);color:var(--gn);background:var(--gnd);}
+.pcats{display:flex;gap:6px;overflow-x:auto;padding:0 0 8px 0;margin-bottom:12px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;}
+.pcats::-webkit-scrollbar{display:none;}
+.pcat{min-height:var(--tap);padding:10px 16px;border-radius:20px;border:1px solid var(--b2);background:transparent;color:var(--t2);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.pcat.active{background:var(--ac);border-color:var(--ac);color:#fff;}
+.plist{display:flex;flex-direction:column;gap:8px;}
+.pitem{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;cursor:pointer;transition:all .2s;min-height:var(--tap);}
+.pitem:active{border-color:var(--ac);background:var(--acd);}
+.pitem-pt{font-size:12px;color:var(--t2);margin-bottom:4px;}
+.pitem-zh{font-size:16px;color:var(--t1);}
+.pitem-py{font-size:11px;color:var(--t3);margin-top:3px;font-style:italic;}
+
+/* ── CARTÃO PRODUTO ──────────────────────────────── */
+.pc-preview{background:#fff;border-radius:var(--rs);padding:18px;color:#111;margin-top:12px;}
+.pc-hdr{background:#e8001c;color:#fff;padding:8px 12px;border-radius:6px 6px 0 0;margin:-18px -18px 14px;font-size:11px;font-weight:700;letter-spacing:1px;}
+.pc-title{font-size:17px;font-weight:700;margin-bottom:10px;}
+.pc-row{display:flex;gap:8px;margin-bottom:8px;}
+.pc-lbl{font-size:11px;font-weight:700;color:#888;min-width:70px;}
+.pc-zh{font-size:14px;color:#111;font-weight:600;}
+.pc-note{font-size:11px;color:#aaa;margin-top:10px;padding-top:9px;border-top:1px solid #eee;}
+
+/* ── YIWU / STANDS ───────────────────────────────── */
+.sc{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;margin-bottom:10px;position:relative;}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.sc-stand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--ac);}
+.sc-produto{font-size:14px;font-weight:700;color:var(--t1);margin-top:2px;}
+.sc-meta{font-size:12px;color:var(--t3);margin-top:3px;}
+.sc-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.sc-badge{padding:4px 9px;border-radius:5px;font-size:11px;font-weight:700;}
+.sc-obs{font-size:12px;color:var(--t3);margin-top:8px;line-height:1.5;}
+.sc-del{width:36px;height:36px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.sc-del:active{background:var(--rdd);border-color:var(--rd);color:var(--rd);}
+
+/* ── DISTRITOS YIWU ──────────────────────────────── */
+.dc{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
+.dc.open{border-color:var(--ac);}
+.dc-hdr{display:flex;align-items:center;gap:10px;}
+.dc-num{width:30px;height:30px;border-radius:7px;background:var(--ac);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dc-name{font-size:14px;font-weight:700;color:var(--t1);}
+.dc-sub{font-size:11px;color:var(--t3);margin-top:1px;}
+.dc-body{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--b1);}
+.dc.open .dc-body{display:block;}
+.cat-tag{display:inline-flex;padding:4px 9px;border-radius:5px;font-size:12px;margin:3px;background:var(--s3);border:1px solid var(--b2);color:var(--t2);}
+.dc-tip{font-size:12px;color:var(--t3);margin-top:10px;line-height:1.5;font-style:italic;}
+
+/* ── CALCULADORA REVERSA ─────────────────────────── */
+.rev-res{background:var(--acd);border:1px solid var(--ac);border-radius:var(--rs);padding:14px;margin-top:12px;display:none;}
+.rev-res.on{display:block;}
+.rev-val{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--ac);}
+
+/* ── HISTÓRICO ───────────────────────────────────── */
+.hcard{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:12px;position:relative;}
+.hc-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.hc-name{font-weight:700;font-size:15px;color:var(--t1);}
+.hc-date{font-size:11px;color:var(--t3);margin-top:2px;}
+.hc-del{width:36px;height:36px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.hc-del:active{background:var(--rdd);border-color:var(--rd);color:var(--rd);}
+.hc-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.hm-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;}
+.hm-val{font-size:16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
+
+/* ── FOTO NCM ────────────────────────────────────── */
+.photo-zone{border:2px dashed var(--b2);border-radius:var(--r);padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;}
+.photo-zone.drag{border-color:var(--ac);background:var(--acd);}
+.photo-zone input[type=file]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;}
+.photo-zone-icon{font-size:36px;opacity:.4;}
+.photo-zone-text{font-size:14px;color:var(--t2);}
+.photo-zone-sub{font-size:12px;color:var(--t3);}
+.photo-prev{width:100%;max-height:260px;object-fit:contain;border-radius:var(--rs);border:1px solid var(--b2);margin-top:12px;display:none;}
+.vr-wrap{margin-top:14px;display:none;}
+.vr-wrap.on{display:block;}
+.vcard{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;margin-bottom:10px;}
+.vproduct{font-size:16px;font-weight:700;margin-bottom:8px;}
+.vncm{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--ac);}
+.vdesc{font-size:13px;color:var(--t2);margin-bottom:10px;}
+.vtags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.valert{padding:10px 12px;border-radius:var(--rs);font-size:13px;line-height:1.5;margin-bottom:8px;}
+.a-y{background:var(--ywd);border:1px solid rgba(234,179,8,.3);color:var(--yw);}
+.a-r{background:var(--rdd);border:1px solid rgba(239,68,68,.3);color:var(--rd);}
+.a-g{background:var(--gnd);border:1px solid rgba(34,197,94,.3);color:var(--gn);}
+.vreason{font-size:12px;color:var(--t3);font-style:italic;line-height:1.5;}
+
+/* ── OVERLAYS ────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--b2);border-radius:var(--r) var(--r) 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:600px;animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--b2);border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--t3);margin-bottom:16px;line-height:1.5;}
+.modal-acts{display:flex;gap:10px;margin-top:16px;}
+.btn-cancel{flex:1;min-height:var(--tap);padding:12px;background:transparent;border:1px solid var(--b2);border-radius:var(--rs);color:var(--t2);font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;}
+.btn-confirm{flex:1;min-height:var(--tap);padding:12px;background:var(--ac);border:none;border-radius:var(--rs);color:#fff;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-confirm:active{background:var(--ac2);}
+
+/* Display fullscreen */
+.disp-overlay{position:fixed;inset:0;background:#000;z-index:300;display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;}
+.disp-overlay.open{display:flex;}
+.disp-zh{font-size:42px;color:#fff;margin-bottom:12px;line-height:1.2;text-align:center;}
+.disp-py{font-size:18px;color:#aaa;margin-bottom:6px;text-align:center;}
+.disp-pt{font-size:14px;color:#666;margin-bottom:28px;text-align:center;}
+.disp-close{min-height:var(--tap);padding:14px 32px;background:#e8001c;border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;}
+
+/* ── MISC ────────────────────────────────────────── */
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-80px);border-radius:var(--rs);padding:12px 18px;font-size:14px;font-weight:600;z-index:400;transition:transform .3s;white-space:nowrap;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.6);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{background:#166534;border:1px solid var(--gn);color:#fff;}
+.toast.error{background:#7f1d1d;border:1px solid var(--rd);color:#fff;}
+.empty{text-align:center;padding:40px 20px;color:var(--t3);}
+.empty-icon{font-size:40px;margin-bottom:10px;opacity:.3;}
+.empty-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:4px;}
+.empty-sub{font-size:13px;}
+.sync-indicator{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px;margin-bottom:12px;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--gn);}
+.sync-dot.syncing{background:var(--yw);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     TELA DE LOGIN
+══════════════════════════════════════ -->
+<div id="login-screen" style="display:none">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">EV</div>
+      <div class="login-logo-text">ImportCalc</div>
+      <div class="login-logo-sub">Efeito Vendas · Yiwu 2025</div>
+    </div>
+    <div class="login-card">
+      <div class="login-title">ACESSO</div>
+      <div class="login-sub">Entre com seu email e senha para acessar</div>
+      <div class="login-tabs">
+        <button class="ltab active" id="ltab-login" onclick="setLoginTab('login')">Entrar</button>
+        <button class="ltab" id="ltab-register" onclick="setLoginTab('register')">Criar conta</button>
+      </div>
+      <div class="login-err" id="login-err"></div>
+      <div id="login-form">
+        <div class="field" id="field-nome" style="display:none">
+          <label>Seu nome</label>
+          <input type="text" id="inp-nome" placeholder="Ex: Karina" autocomplete="name">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="inp-email" placeholder="seu@email.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="inp-senha" placeholder="Mínimo 6 caracteres" autocomplete="current-password">
+        </div>
+        <button class="btn-primary" id="btn-login" onclick="handleAuth()">ENTRAR</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HEADER
+══════════════════════════════════════ -->
+<header id="main-header" style="display:none">
+  <div class="logo">
+    <div class="logo-icon">EV</div>
+    <div class="logo-text">ImportCalc</div>
+  </div>
+  <div class="header-right">
+    <button class="api-btn" onclick="openApiCfg()">
+      <span class="api-dot" id="api-dot"></span>
+      <span id="api-lbl">API</span>
+    </button>
+    <button class="user-btn" onclick="openUserMenu()">
+      <span id="user-name-btn">👤</span>
+    </button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     APP
+══════════════════════════════════════ -->
+<div class="app" id="main-app" style="display:none">
+
+  <!-- CALCULADORA -->
+  <div class="tab-panel active" id="tab-calc">
+    <div class="page-title">CALCULADORA</div>
+    <div class="page-sub">Custo landed completo China → Brasil</div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">🚢</div><div class="ct">MODALIDADE</div></div>
+      <div class="cb">
+        <div class="mtoggle">
+          <div class="mopt sel" id="opt-formal" onclick="setModal('formal')">
+            <div class="mopt-t">Formal Marítima</div><div class="mopt-s">CNPJ + Siscomex</div>
+          </div>
+          <div class="mopt" id="opt-simples" onclick="setModal('simples')">
+            <div class="mopt-t">Simplificada Aérea</div><div class="mopt-s">Até US$ 3.000</div>
+          </div>
+        </div>
+        <div id="modal-info" style="font-size:12px;color:var(--t3);padding:10px 12px;background:var(--s2);border-radius:8px;line-height:1.5">
+          II por NCM · IPI por NCM · PIS 2,1% · COFINS 9,65% · ICMS por dentro · AFRMM 8%
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">📦</div><div class="ct">PRODUTO & NCM</div></div>
+      <div class="cb">
+        <div class="field"><label>Nome do Produto</label><input type="text" id="nome-produto" placeholder="Ex: Caixinha acrílica 20cm…" autocomplete="off"></div>
+        <div class="field">
+          <label>Código NCM</label>
+          <div class="ncm-row">
+            <input type="text" id="ncm-input" placeholder="Ex: 94036000" inputmode="numeric" maxlength="10">
+            <button class="btn-sm" id="btn-ncm" onclick="buscarNCM()"><span id="ncm-btn-txt">Buscar</span></button>
+          </div>
+          <div class="ncm-res" id="ncm-res">
+            <div class="ncm-desc" id="ncm-desc">—</div>
+            <div class="ncm-tags" id="ncm-tags"></div>
+          </div>
+          <div id="ncm-err" style="font-size:13px;color:var(--rd);margin-top:6px;display:none">NCM não encontrado. Preencha as alíquotas manualmente.</div>
+        </div>
+        <div class="slabel">Alíquotas</div>
+        <div class="r3">
+          <div class="field"><label>II %</label><div class="sfx"><input type="number" id="aliq-ii" placeholder="0" inputmode="decimal"><span>%</span></div></div>
+          <div class="field"><label>IPI %</label><div class="sfx"><input type="number" id="aliq-ipi" placeholder="0" inputmode="decimal"><span>%</span></div></div>
+          <div class="field"><label>ICMS %</label><div class="sfx"><input type="number" id="aliq-icms" value="18" inputmode="decimal"><span>%</span></div></div>
+        </div>
+        <div class="field">
+          <label>Estado de destino</label>
+          <select id="estado-sel" onchange="setICMS()">
+            <option value="">— Selecione —</option>
+            <option value="20">AM (20%)</option><option value="19">BA (19%)</option>
+            <option value="20">CE (20%)</option><option value="18">DF (18%)</option>
+            <option value="17">ES (17%)</option><option value="17">GO (17%)</option>
+            <option value="17">MT (17%)</option><option value="17">MS (17%)</option>
+            <option value="18">MG (18%)</option><option value="19">PA (19%)</option>
+            <option value="20">PE (20%)</option><option value="12">PR (12%)</option>
+            <option value="20">RJ (20%)</option><option value="18">RS (18%)</option>
+            <option value="17">SC (17%)</option><option value="18">SP (18%)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">💰</div><div class="ct">VALORES & CÂMBIO</div></div>
+      <div class="cb">
+        <div class="r2">
+          <div class="field"><label>FOB unitário (US$)</label><div class="pfx"><span>$</span><input type="number" id="fob-unit" placeholder="0.00" inputmode="decimal"></div></div>
+          <div class="field"><label>Quantidade</label><input type="number" id="qtd" placeholder="0" inputmode="numeric"></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>Câmbio USD/BRL</label><div class="pfx"><span>R$</span><input type="number" id="cambio" value="5.85" inputmode="decimal"></div></div>
+          <div class="field"><label>Seguro s/ CIF</label><div class="sfx"><input type="number" id="seguro-pct" value="0.5" inputmode="decimal"><span>%</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">🚢</div><div class="ct">FRETE</div><div class="cbadge b-bl" id="frete-badge">Marítimo</div></div>
+      <div class="cb">
+        <div id="frete-formal">
+          <div class="slabel">Tipo de Contratação</div>
+          <div class="ftoggle">
+            <button class="fsb active" id="btn-lcl" onclick="setContainer('lcl')">LCL Compartilhado</button>
+            <button class="fsb" id="btn-fcl" onclick="setContainer('fcl')">FCL Exclusivo</button>
+          </div>
+          <div id="frete-lcl">
+            <div class="r2">
+              <div class="field"><label>Custo/CBM (US$)</label><div class="pfx"><span>$</span><input type="number" id="lcl-rate" placeholder="80" inputmode="decimal"></div></div>
+              <div class="field"><label>Mínimo (CBM)</label><input type="number" id="lcl-min" value="1" inputmode="decimal"></div>
+            </div>
+            <div class="slabel">Dimensões da Caixa</div>
+            <div class="r3">
+              <div class="field"><label>C (cm)</label><input type="number" id="lcl-c" placeholder="30" inputmode="decimal"></div>
+              <div class="field"><label>L (cm)</label><input type="number" id="lcl-l" placeholder="20" inputmode="decimal"></div>
+              <div class="field"><label>A (cm)</label><input type="number" id="lcl-a" placeholder="15" inputmode="decimal"></div>
+            </div>
+            <div class="r2">
+              <div class="field"><label>Unid/caixa</label><input type="number" id="lcl-qtd-cx" value="1" inputmode="numeric"></div>
+              <div class="field"><label>Peso cx (kg)</label><input type="number" id="lcl-peso" placeholder="5" inputmode="decimal"></div>
+            </div>
+          </div>
+          <div id="frete-fcl" style="display:none">
+            <div class="r2">
+              <div class="field"><label>Custo container (US$)</label><div class="pfx"><span>$</span><input type="number" id="fcl-total" placeholder="2500" inputmode="decimal"></div></div>
+              <div class="field"><label>Tipo</label><select id="fcl-tipo"><option value="28">20' (28 CBM)</option><option value="58">40' (58 CBM)</option><option value="60">40'HC (60 CBM)</option></select></div>
+            </div>
+            <div class="r3">
+              <div class="field"><label>C (cm)</label><input type="number" id="fcl-c" placeholder="30" inputmode="decimal"></div>
+              <div class="field"><label>L (cm)</label><input type="number" id="fcl-l" placeholder="20" inputmode="decimal"></div>
+              <div class="field"><label>A (cm)</label><input type="number" id="fcl-a" placeholder="15" inputmode="decimal"></div>
+            </div>
+            <div class="field"><label>Unid/caixa</label><input type="number" id="fcl-qtd-cx" value="1" inputmode="numeric"></div>
+          </div>
+        </div>
+        <div id="frete-simples" style="display:none">
+          <div class="field"><label>Frete aéreo total (US$)</label><div class="pfx"><span>$</span><input type="number" id="frete-aereo" placeholder="350" inputmode="decimal"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">🔧</div><div class="ct">CUSTOS OPERACIONAIS</div></div>
+      <div class="cb">
+        <div class="r2">
+          <div class="field"><label>Despachante (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-desp" value="1200" inputmode="decimal"></div></div>
+          <div class="field"><label>Taxa Siscomex (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-sis" value="214.50" inputmode="decimal"></div></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>Armazém (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-arm" placeholder="400" inputmode="decimal"></div></div>
+          <div class="field"><label>Frete interno (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-fint" placeholder="800" inputmode="decimal"></div></div>
+        </div>
+        <div class="field"><label>Outros (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-outros" placeholder="0" inputmode="decimal"></div></div>
+        <div class="divider"></div>
+        <div class="field"><label>Consultoria (% sobre landed)</label><div class="sfx"><input type="number" id="pct-consult" value="0" inputmode="decimal"><span>%</span></div></div>
+        <div class="divider"></div>
+        <div class="field"><label>Preço de venda Shopee (R$)</label><div class="pfx"><span>R$</span><input type="number" id="preco-venda" placeholder="0.00" inputmode="decimal"></div></div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="calcular()">CALCULAR VIABILIDADE</button>
+
+    <div id="results-empty" style="display:none"></div>
+    <div id="results-panel" style="display:none;margin-top:16px">
+      <div class="rgrid">
+        <div class="rc accent full">
+          <div class="rl">Custo Landed Total</div>
+          <div class="rv xl" id="res-landed">R$ —</div>
+          <div class="rsub" id="res-landed-sub">— por unidade</div>
+        </div>
+        <div class="rc"><div class="rl">FOB Total</div><div class="rv" id="res-fob">—</div></div>
+        <div class="rc"><div class="rl">Total Impostos</div><div class="rv" id="res-imp">—</div><div class="rsub" id="res-imp-pct">—</div></div>
+        <div class="rc"><div class="rl">Custo/Unidade</div><div class="rv" id="res-unit">—</div></div>
+        <div class="rc"><div class="rl">Frete/Unidade</div><div class="rv" id="res-fret-unit">—</div><div class="rsub" id="res-fret-sub">—</div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ci">🧾</div><div class="ct">COMPOSIÇÃO</div></div>
+        <div style="padding:0"><div class="bk"><div class="bk-head"><span>COMPONENTE</span><span>%</span><span>VALOR</span></div><div id="bk-rows"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ci">📈</div><div class="ct">VIABILIDADE</div></div>
+        <div class="cb">
+          <div class="vbar">
+            <div class="vbar-lbl"><span>Markup sobre custo</span><span id="v-markup">—</span></div>
+            <div class="bar-track"><div class="bar-fill" id="v-bar" style="width:0%"></div></div>
+            <div id="v-badge"></div>
+          </div>
+          <div id="v-no-preco" style="font-size:13px;color:var(--t3)">Informe o preço de venda para ver a margem.</div>
+          <div id="v-metrics" style="display:none">
+            <div class="rgrid" style="grid-template-columns:1fr 1fr 1fr;margin-top:10px">
+              <div class="rc"><div class="rl">Margem</div><div class="rv" id="v-margem" style="font-size:18px">—</div></div>
+              <div class="rc"><div class="rl">Lucro/Un.</div><div class="rv" id="v-lucro" style="font-size:18px">—</div></div>
+              <div class="rc"><div class="rl">Break-even</div><div class="rv" id="v-be" style="font-size:18px">—</div><div class="rsub">unidades</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-ghost" onclick="openSave()" style="margin-top:4px">💾 Salvar simulação</button>
+    </div>
+  </div>
+
+  <!-- NCM POR FOTO -->
+  <div class="tab-panel" id="tab-ncm">
+    <div class="page-title">NCM POR FOTO</div>
+    <div class="page-sub">Fotografe o produto — Claude identifica NCM e alertas</div>
+    <div class="card">
+      <div class="ch"><div class="ci">📸</div><div class="ct">FOTO DO PRODUTO</div></div>
+      <div class="cb">
+        <div class="photo-zone" id="photo-zone">
+          <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="onPhotoSelected(event)">
+          <div class="photo-zone-icon">📷</div>
+          <div class="photo-zone-text">Toque para fotografar</div>
+          <div class="photo-zone-sub" id="photo-zone-sub">ou selecione da galeria</div>
+        </div>
+        <img id="photo-prev" class="photo-prev" alt="Preview">
+        <div class="field" style="margin-top:12px">
+          <label>Descrição adicional (opcional)</label>
+          <textarea id="photo-desc" placeholder="Ex: produto plástico, usado em escritório…" style="min-height:60px"></textarea>
+        </div>
+        <button class="btn-primary" id="btn-vision" onclick="analisarFoto()" disabled>ANALISAR COM IA</button>
+      </div>
+    </div>
+    <div id="vision-empty" class="empty" style="display:none">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">ENVIE UMA FOTO</div>
+    </div>
+    <div class="vr-wrap" id="vision-result">
+      <div class="vcard">
+        <div class="rl">PRODUTO IDENTIFICADO</div>
+        <div class="vproduct" id="v-produto">—</div>
+        <div class="rl" style="margin-top:12px">NCM SUGERIDO</div>
+        <div class="vncm" id="v-ncm">—</div>
+        <div class="vdesc" id="v-ncm-desc">—</div>
+        <div class="vtags" id="v-tags"></div>
+        <div id="v-alerts"></div>
+        <div class="rl" style="margin-top:12px">RACIOCÍNIO</div>
+        <div class="vreason" id="v-reason">—</div>
+        <button class="btn-primary" style="margin-top:14px" onclick="usarNCMFoto()">✓ Usar este NCM na Calculadora</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMUNICAÇÃO -->
+  <div class="tab-panel" id="tab-comm">
+    <div class="page-title">COMUNICAÇÃO</div>
+    <div class="page-sub">Tradutor · Frases prontas · Cartão de produto</div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">🔄</div><div class="ct">TRADUTOR AO VIVO</div><div class="cbadge b-bl" id="lang-badge">PT → ZH</div></div>
+      <div class="cb">
+        <div class="lang-row">
+          <span class="lang-flag" id="lf-from">🇧🇷</span>
+          <span class="lang-lbl" id="ll-from">Português</span>
+          <button class="swap-btn" onclick="swapLang()">⇄</button>
+          <span class="lang-lbl" id="ll-to" style="text-align:right">Mandarim</span>
+          <span class="lang-flag" id="lf-to">🇨🇳</span>
+        </div>
+        <textarea id="trans-input" placeholder="Digite aqui…" style="min-height:80px"></textarea>
+        <button class="btn-primary" style="margin-top:10px" onclick="traduzir()">TRADUZIR</button>
+        <div id="trans-out-wrap" style="display:none;margin-top:12px">
+          <div class="trans-out" id="trans-out">—</div>
+          <div class="trans-py" id="trans-py"></div>
+          <div class="trans-acts">
+            <button class="tts-btn" id="tts-btn" onclick="speakChinese()">🔊 Ouvir</button>
+            <button class="tts-btn" onclick="showDisp(document.getElementById('trans-out').textContent,document.getElementById('trans-py').textContent,document.getElementById('trans-input').value)">📱 Mostrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">💬</div><div class="ct">FRASES PRONTAS</div><div class="cbadge b-pu">Toque p/ mostrar</div></div>
+      <div class="cb">
+        <div class="pcats" id="pcats"></div>
+        <div class="plist" id="plist"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">🪪</div><div class="ct">CARTÃO DE PRODUTO</div></div>
+      <div class="cb">
+        <div class="r2">
+          <div class="field"><label>Produto</label><input type="text" id="pc-produto" placeholder="Caixinha acrílica"></div>
+          <div class="field"><label>Quantidade</label><input type="text" id="pc-qtd" placeholder="500 un."></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>Material</label><input type="text" id="pc-material" placeholder="Acrílico"></div>
+          <div class="field"><label>Dimensões</label><input type="text" id="pc-dim" placeholder="20x15cm"></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>Cor</label><input type="text" id="pc-cor" placeholder="Transparente"></div>
+          <div class="field"><label>Preço alvo ($)</label><div class="pfx"><span>$</span><input type="number" id="pc-preco" placeholder="2.50" inputmode="decimal"></div></div>
+        </div>
+        <div class="field"><label>Obs</label><textarea id="pc-obs" placeholder="Logo impresso, embalagem individual…" style="min-height:60px"></textarea></div>
+        <button class="btn-primary" onclick="gerarCartao()">GERAR CARTÃO EM CHINÊS</button>
+        <div id="cartao-preview" style="display:none;margin-top:14px">
+          <div class="pc-preview" id="cartao-html"></div>
+          <button class="btn-ghost" style="margin-top:10px" onclick="showCartaoDisp()">📱 Mostrar ao fornecedor</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- YIWU -->
+  <div class="tab-panel" id="tab-yiwu">
+    <div class="page-title">YIWU MART</div>
+    <div class="page-sub">Notas · Distritos · Reversa · Conversor</div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">📝</div><div class="ct">REGISTRAR STAND</div></div>
+      <div class="cb">
+        <div class="r2">
+          <div class="field"><label>Nº do Stand</label><input type="text" id="s-num" placeholder="1A-30025" autocomplete="off"></div>
+          <div class="field"><label>Produto</label><input type="text" id="s-produto" placeholder="Nome" autocomplete="off"></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>Preço (US$)</label><div class="pfx"><span>$</span><input type="number" id="s-preco" placeholder="2.50" inputmode="decimal"></div></div>
+          <div class="field"><label>MOQ</label><input type="text" id="s-moq" placeholder="500 un." autocomplete="off"></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>WeChat</label><input type="text" id="s-wechat" placeholder="ID" autocomplete="off"></div>
+          <div class="field"><label>Interesse</label>
+            <select id="s-interesse">
+              <option value="alto">🟢 Alto</option>
+              <option value="medio">🟡 Médio</option>
+              <option value="baixo">🔴 Baixo</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Observações</label><textarea id="s-obs" placeholder="Qualidade, prazo, aceita TT…" style="min-height:70px"></textarea></div>
+        <button class="btn-primary" onclick="salvarStand()">+ REGISTRAR STAND</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">📋</div><div class="ct">STANDS REGISTRADOS</div><div class="cbadge b-yw" id="stands-count">0</div></div>
+      <div class="cb" style="padding:0">
+        <div id="stands-empty" class="empty" style="padding:24px"><div class="empty-icon" style="font-size:28px">📋</div><div class="empty-sub">Nenhum stand ainda</div></div>
+        <div id="stands-list" style="padding:12px"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">🎯</div><div class="ct">CALCULADORA REVERSA</div></div>
+      <div class="cb">
+        <div style="font-size:13px;color:var(--t3);margin-bottom:12px">FOB máximo que pode pagar dado preço de venda e margem</div>
+        <div class="r2">
+          <div class="field"><label>Preço venda (R$)</label><div class="pfx"><span>R$</span><input type="number" id="rev-venda" placeholder="89.90" inputmode="decimal"></div></div>
+          <div class="field"><label>Margem desejada</label><div class="sfx"><input type="number" id="rev-margem" placeholder="40" inputmode="decimal"><span>%</span></div></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>Câmbio</label><div class="pfx"><span>R$</span><input type="number" id="rev-cambio" value="5.85" inputmode="decimal"></div></div>
+          <div class="field"><label>Carga trib. est.</label><div class="sfx"><input type="number" id="rev-imp" value="80" inputmode="decimal"><span>%</span></div></div>
+        </div>
+        <button class="btn-primary" onclick="calcReversa()">CALCULAR FOB MÁXIMO</button>
+        <div class="rev-res" id="rev-res">
+          <div class="rl">FOB MÁXIMO</div>
+          <div class="rev-val" id="rev-fob-max">—</div>
+          <div style="font-size:12px;color:var(--t2);margin-top:5px" id="rev-sub">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">🗺️</div><div class="ct">DISTRITOS YIWU</div></div>
+      <div class="cb" style="padding:12px"><div id="yiwu-map"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">⚖️</div><div class="ct">CONVERSOR UNIDADES</div></div>
+      <div class="cb">
+        <div class="r2">
+          <div class="field"><label>Valor</label><input type="number" id="conv-val" placeholder="1" inputmode="decimal" oninput="converterUnidades()"></div>
+          <div class="field"><label>Unidade</label>
+            <select id="conv-unit" onchange="converterUnidades()">
+              <option value="jin">斤 Jin (0,5 kg)</option>
+              <option value="liang">两 Liang (50 g)</option>
+              <option value="dan">担 Dan (50 kg)</option>
+              <option value="cun">寸 Cun (3,33 cm)</option>
+              <option value="chi">尺 Chi (33,3 cm)</option>
+              <option value="zhang">丈 Zhang (3,33 m)</option>
+            </select>
+          </div>
+        </div>
+        <div id="conv-results"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div class="tab-panel" id="tab-hist">
+    <div class="page-title">HISTÓRICO</div>
+    <div class="page-sub">Simulações salvas na nuvem</div>
+    <div class="sync-indicator" id="sync-indicator" style="display:none">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-txt">Sincronizado</span>
+    </div>
+    <div id="hist-container">
+      <div class="empty"><div class="empty-icon">📋</div><div class="empty-title">SEM SIMULAÇÕES</div><div class="empty-sub">Calcule e salve na aba Calculadora</div></div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" id="bottom-nav" style="display:none">
+  <button class="bnav-btn active" onclick="switchTab('calc',this)"><span class="bnav-icon">📊</span><span class="bnav-label">Calc</span></button>
+  <button class="bnav-btn" onclick="switchTab('ncm',this)"><span class="bnav-icon">📸</span><span class="bnav-label">NCM</span></button>
+  <button class="bnav-btn" onclick="switchTab('comm',this)"><span class="bnav-icon">🇨🇳</span><span class="bnav-label">Comm</span></button>
+  <button class="bnav-btn" onclick="switchTab('yiwu',this)"><span class="bnav-icon">🏪</span><span class="bnav-label">Yiwu</span></button>
+  <button class="bnav-btn" onclick="switchTab('hist',this)"><span class="bnav-icon">📋</span><span class="bnav-label">Histórico</span></button>
+</nav>
+
+<!-- MODAIS -->
+<div class="overlay" id="save-overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">SALVAR SIMULAÇÃO</div>
+    <div class="modal-sub">Salvo na nuvem — acesse de qualquer device.</div>
+    <div class="field"><label>Nome / Referência</label><input type="text" id="save-nome" placeholder="Ex: Caixa acrílica Fornecedor A"></div>
+    <div class="modal-acts">
+      <button class="btn-cancel" onclick="closeSave()">Cancelar</button>
+      <button class="btn-confirm" onclick="confirmarSave()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="api-overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔑 API KEY ANTHROPIC</div>
+    <div class="modal-sub">Necessária para Tradutor IA, NCM por Foto e Cartão de Produto.</div>
+    <div class="field">
+      <label>Cole sua API Key</label>
+      <div style="position:relative">
+        <input type="password" id="api-key-input" placeholder="sk-ant-api03-…" style="font-size:14px;padding-right:80px">
+        <button onclick="toggleApiVis()" id="api-vis-btn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:4px 8px;min-height:0">mostrar</button>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--t3);padding:10px 12px;background:var(--s2);border-radius:8px;line-height:1.6">
+      📍 <strong style="color:var(--t2)">console.anthropic.com</strong> → API Keys → Create Key
+    </div>
+    <div id="api-test-result" style="display:none;margin-top:10px;padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.6;word-break:break-all"></div>
+    <div class="modal-acts">
+      <button class="btn-cancel" onclick="closeApiCfg()">Cancelar</button>
+      <button class="btn-confirm" onclick="salvarApiKey()">Salvar</button>
+    </div>
+    <button class="btn-ghost" style="margin-top:10px" onclick="testarAPI()">🔍 Testar conexão da API</button>
+  </div>
+</div>
+
+<div class="overlay" id="user-overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">CONTA</div>
+    <div id="user-info" style="font-size:14px;color:var(--t2);margin-bottom:16px"></div>
+    <button class="btn-ghost" onclick="logout()">🚪 Sair da conta</button>
+  </div>
+</div>
+
+<!-- DISPLAY FULLSCREEN -->
+<div class="disp-overlay" id="disp-overlay" onclick="closeDisp()">
+  <div class="disp-zh" id="disp-zh"></div>
+  <div class="disp-py" id="disp-py"></div>
+  <div class="disp-pt" id="disp-pt"></div>
+  <button class="disp-close" onclick="closeDisp()">✕ Fechar</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════
+var SUPA_URL = 'https://todwpfiqmvahyginrkip.supabase.co';
+var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvZHdwZmlxbXZhaHlnaW5ya2lwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MjI4MjQsImV4cCI6MjA5NjE5ODgyNH0.b-5ZhNsl3DAMbT8HAu-BaPTj_2Ubh4w0OExO7Y99grY';
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+var currentUser = null;
+var currentSession = null;
+var modalidade = 'formal';
+var containerTipo = 'lcl';
+var lastResult = null;
+var langDir = 'ptZh';
+var photoBase64 = null;
+var visionNCM = null;
+var visionII = 0;
+var visionIPI = 0;
+var cartaoData = null;
+var curCat = 'Negociação';
+var loginTab = 'login';
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'success');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3200);
+}
+
+// ═══════════════════════════════════════════════════════
+// SUPABASE HELPERS
+// ═══════════════════════════════════════════════════════
+function supaHeaders(token) {
+  var h = {
+    'Content-Type': 'application/json',
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + (token || SUPA_KEY)
+  };
+  return h;
+}
+
+async function supaFetch(path, opts) {
+  var token = currentSession ? currentSession.access_token : null;
+  var res = await fetch(SUPA_URL + path, {
+    method: opts.method || 'GET',
+    headers: Object.assign(supaHeaders(token), opts.headers || {}),
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  var data = null;
+  try { data = await res.json(); } catch(e) {}
+  return { ok: res.ok, status: res.status, data: data };
+}
+
+// ═══════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════
+function setLoginTab(t) {
+  loginTab = t;
+  document.getElementById('ltab-login').classList.toggle('active', t === 'login');
+  document.getElementById('ltab-register').classList.toggle('active', t === 'register');
+  document.getElementById('field-nome').style.display = t === 'register' ? '' : 'none';
+  document.getElementById('btn-login').textContent = t === 'login' ? 'ENTRAR' : 'CRIAR CONTA';
+  document.getElementById('login-err').style.display = 'none';
+}
+
+async function handleAuth() {
+  var email = document.getElementById('inp-email').value.trim();
+  var senha = document.getElementById('inp-senha').value;
+  var nome = document.getElementById('inp-nome').value.trim();
+  var btn = document.getElementById('btn-login');
+  var errEl = document.getElementById('login-err');
+  errEl.style.display = 'none';
+
+  if (!email || !senha) { showLoginErr('Preencha email e senha.'); return; }
+  if (loginTab === 'register' && !nome) { showLoginErr('Informe seu nome.'); return; }
+  if (senha.length < 6) { showLoginErr('Senha deve ter mínimo 6 caracteres.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>';
+
+  try {
+    var endpoint = loginTab === 'login' ? '/auth/v1/token?grant_type=password' : '/auth/v1/signup';
+    var body = { email: email, password: senha };
+    if (loginTab === 'register') body.data = { nome: nome };
+
+    var res = await fetch(SUPA_URL + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+      body: JSON.stringify(body)
+    });
+    var data = await res.json();
+
+    if (!res.ok) {
+      var msg = data.error_description || data.message || data.msg || 'Erro ao autenticar.';
+      if (msg.includes('Invalid login')) msg = 'Email ou senha incorretos.';
+      if (msg.includes('already registered')) msg = 'Email já cadastrado. Faça login.';
+      showLoginErr(msg);
+      btn.disabled = false;
+      btn.textContent = loginTab === 'login' ? 'ENTRAR' : 'CRIAR CONTA';
+      return;
+    }
+
+    if (loginTab === 'register' && data.user && !data.access_token) {
+      showLoginErr('Conta criada! Verifique seu email para confirmar, ou entre diretamente.');
+      btn.disabled = false;
+      btn.textContent = 'CRIAR CONTA';
+      return;
+    }
+
+    currentSession = data;
+    currentUser = data.user;
+    localStorage.setItem('importcalc_session', JSON.stringify(data));
+    showApp();
+  } catch(e) {
+    showLoginErr('Erro de conexão. Verifique sua internet.');
+    btn.disabled = false;
+    btn.textContent = loginTab === 'login' ? 'ENTRAR' : 'CRIAR CONTA';
+  }
+}
+
+function showLoginErr(msg) {
+  var el = document.getElementById('login-err');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function checkSession() {
+  var saved = localStorage.getItem('importcalc_session');
+  if (!saved) { showLogin(); return; }
+  try {
+    var sess = JSON.parse(saved);
+    // Check if token expired
+    var payload = JSON.parse(atob(sess.access_token.split('.')[1]));
+    if (payload.exp * 1000 < Date.now()) {
+      // Try refresh
+      var res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=refresh_token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+        body: JSON.stringify({ refresh_token: sess.refresh_token })
+      });
+      if (res.ok) {
+        var data = await res.json();
+        currentSession = data;
+        currentUser = data.user;
+        localStorage.setItem('importcalc_session', JSON.stringify(data));
+        showApp();
+      } else {
+        localStorage.removeItem('importcalc_session');
+        showLogin();
+      }
+      return;
+    }
+    currentSession = sess;
+    currentUser = sess.user;
+    showApp();
+  } catch(e) {
+    localStorage.removeItem('importcalc_session');
+    showLogin();
+  }
+}
+
+function showLogin() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('main-header').style.display = 'none';
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('bottom-nav').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-header').style.display = 'flex';
+  document.getElementById('main-app').style.display = 'block';
+  document.getElementById('bottom-nav').style.display = 'flex';
+  var nome = currentUser && currentUser.user_metadata && currentUser.user_metadata.nome
+    ? currentUser.user_metadata.nome
+    : (currentUser ? currentUser.email.split('@')[0] : 'Usuário');
+  document.getElementById('user-name-btn').textContent = '👤 ' + nome;
+  document.getElementById('user-info').innerHTML = '<strong>' + nome + '</strong><br>' + (currentUser ? currentUser.email : '');
+  updateApiStatus();
+  renderYiwuMap();
+  initFrases();
+}
+
+function openUserMenu() { document.getElementById('user-overlay').classList.add('open'); }
+
+function logout() {
+  localStorage.removeItem('importcalc_session');
+  currentUser = null;
+  currentSession = null;
+  document.getElementById('user-overlay').classList.remove('open');
+  showLogin();
+}
+
+// ═══════════════════════════════════════════════════════
+// API KEY
+// ═══════════════════════════════════════════════════════
+function getKey() { return localStorage.getItem('anthropic_api_key') || ''; }
+
+function updateApiStatus() {
+  var key = getKey();
+  document.getElementById('api-dot').style.background = key ? 'var(--gn)' : 'var(--rd)';
+  document.getElementById('api-lbl').textContent = key ? 'IA ativa' : 'API';
+}
+
+function openApiCfg() {
+  document.getElementById('api-key-input').value = getKey();
+  document.getElementById('api-overlay').classList.add('open');
+}
+function closeApiCfg() { document.getElementById('api-overlay').classList.remove('open'); }
+
+function salvarApiKey() {
+  var key = document.getElementById('api-key-input').value.trim();
+  if (!key) { toast('Cole a chave primeiro.', 'error'); return; }
+  if (!key.startsWith('sk-ant')) { toast('Chave inválida — deve começar com sk-ant-', 'error'); return; }
+  localStorage.setItem('anthropic_api_key', key);
+  closeApiCfg();
+  updateApiStatus();
+  toast('✓ IA ativada!', 'success');
+}
+
+function toggleApiVis() {
+  var inp = document.getElementById('api-key-input');
+  var btn = document.getElementById('api-vis-btn');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? 'mostrar' : 'ocultar';
+}
+
+async function callClaude(messages, maxTokens) {
+  var key = getKey();
+  if (!key) { openApiCfg(); throw new Error('API key não configurada'); }
+  var res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens || 1500, messages: messages })
+  });
+  var rawText = await res.text();
+  var data;
+  try { data = JSON.parse(rawText); } catch(e) { throw new Error('Resposta inválida da API: ' + rawText.slice(0,120)); }
+  if (!res.ok) {
+    var msg = (data.error && data.error.message) || data.msg || ('HTTP ' + res.status);
+    if (res.status === 401) msg = 'API key inválida. Verifique a chave no botão API.';
+    if (res.status === 429) msg = 'Limite de requisições atingido. Aguarde um momento.';
+    throw new Error(msg);
+  }
+  return data;
+}
+
+// Teste de diagnóstico da API
+async function testarAPI() {
+  var resEl = document.getElementById('api-test-result');
+  resEl.style.display = 'block';
+  resEl.style.background = 'var(--s3)';
+  resEl.style.color = 'var(--t2)';
+  resEl.textContent = '⏳ Testando...';
+  var key = document.getElementById('api-key-input').value.trim() || getKey();
+  if (!key) { resEl.textContent = '❌ Nenhuma chave inserida.'; return; }
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 20,
+        messages: [{ role: 'user', content: 'Say OK' }]
+      })
+    });
+    var raw = await res.text();
+    resEl.textContent = 'HTTP ' + res.status + ' | ' + raw.slice(0, 300);
+    if (res.ok) {
+      resEl.style.background = 'var(--gnd)';
+      resEl.style.color = 'var(--gn)';
+      resEl.textContent = '✅ API funcionando! HTTP ' + res.status;
+    } else {
+      resEl.style.background = 'var(--rdd)';
+      resEl.style.color = 'var(--rd)';
+    }
+  } catch(e) {
+    resEl.style.background = 'var(--rdd)';
+    resEl.style.color = 'var(--rd)';
+    resEl.textContent = '❌ Erro de rede: ' + e.message + ' | Tipo: ' + e.name;
+  }
+}
+
+// Extrai texto da resposta do Claude com segurança
+function claudeText(data) {
+  return ((data.content || []).filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('') || '').trim();
+}
+
+// Parse JSON do Claude — tolera markdown fences
+function claudeJSON(data) {
+  var txt = claudeText(data);
+  // Remove markdown fences
+  txt = txt.replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
+  // Encontra o primeiro { ... } ou [ ... ]
+  var start = txt.indexOf('{');
+  var last = txt.lastIndexOf('}');
+  if (start === -1 || last === -1) throw new Error('Resposta sem JSON: ' + txt.slice(0,100));
+  return JSON.parse(txt.slice(start, last+1));
+}
+
+// ═══════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════
+function switchTab(t, btn) {
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.bnav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('tab-' + t).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (t === 'hist') loadHistory();
+  if (t === 'yiwu') loadStands();
+}
+
+// ═══════════════════════════════════════════════════════
+// OVERLAYS
+// ═══════════════════════════════════════════════════════
+function showDisp(zh, py, pt) {
+  document.getElementById('disp-zh').textContent = zh || '';
+  document.getElementById('disp-py').textContent = py || '';
+  document.getElementById('disp-pt').textContent = pt || '';
+  document.getElementById('disp-overlay').classList.add('open');
+}
+function closeDisp() { document.getElementById('disp-overlay').classList.remove('open'); }
+
+// Close overlays on backdrop click
+['save-overlay','api-overlay','user-overlay'].forEach(function(id){
+  document.getElementById(id).addEventListener('click', function(e){
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// CALCULADORA
+// ═══════════════════════════════════════════════════════
+function setModal(m) {
+  modalidade = m;
+  document.getElementById('opt-formal').classList.toggle('sel', m === 'formal');
+  document.getElementById('opt-simples').classList.toggle('sel', m === 'simples');
+  document.getElementById('modal-info').textContent = m === 'formal'
+    ? 'II por NCM · IPI por NCM · PIS 2,1% · COFINS 9,65% · ICMS por dentro · AFRMM 8%'
+    : 'RTS: II fixo 60% · ICMS por dentro · Até US$ 3.000';
+  document.getElementById('frete-formal').style.display = m === 'formal' ? '' : 'none';
+  document.getElementById('frete-simples').style.display = m === 'simples' ? '' : 'none';
+  document.getElementById('frete-badge').textContent = m === 'formal' ? 'Marítimo' : 'Aéreo';
+  document.getElementById('c-desp').value = m === 'formal' ? '1200' : '0';
+  document.getElementById('c-sis').value = m === 'formal' ? '214.50' : '0';
+}
+
+function setContainer(t) {
+  containerTipo = t;
+  document.getElementById('btn-lcl').classList.toggle('active', t === 'lcl');
+  document.getElementById('btn-fcl').classList.toggle('active', t === 'fcl');
+  document.getElementById('frete-lcl').style.display = t === 'lcl' ? '' : 'none';
+  document.getElementById('frete-fcl').style.display = t === 'fcl' ? '' : 'none';
+}
+
+function setICMS() {
+  var v = document.getElementById('estado-sel').value;
+  if (v) document.getElementById('aliq-icms').value = v;
+}
+
+function gn(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function gi(id) { return parseInt(document.getElementById(id).value) || 0; }
+
+async function buscarNCM() {
+  var raw = document.getElementById('ncm-input').value.trim().replace(/\D/g,'');
+  if (!raw) { toast('Digite o código NCM.','error'); return; }
+  var btn = document.getElementById('btn-ncm');
+  var txt = document.getElementById('ncm-btn-txt');
+  btn.disabled = true; txt.innerHTML = '<span class="loader"></span>';
+  document.getElementById('ncm-res').classList.remove('on');
+  document.getElementById('ncm-err').style.display = 'none';
+  try {
+    var code = (raw + '00000000').slice(0,8);
+    var r = await fetch('https://brasilapi.com.br/api/ncm/v1/' + code);
+    if (!r.ok) throw new Error('not found');
+    var d = await r.json();
+    var ipi = parseFloat(d.aliquotaIpi) || 0;
+    var ii = parseFloat(d.aliquotaIi) || 0;
+    document.getElementById('aliq-ipi').value = ipi;
+    document.getElementById('aliq-ii').value = ii;
+    document.getElementById('ncm-desc').textContent = d.descricao || '—';
+    document.getElementById('ncm-tags').innerHTML =
+      '<span class="ntag ii">II: ' + ii + '%</span>' +
+      '<span class="ntag ipi">IPI: ' + ipi + '%</span>' +
+      '<span class="ntag pis">PIS 2,1% · COFINS 9,65%</span>';
+    document.getElementById('ncm-res').classList.add('on');
+  } catch(e) {
+    document.getElementById('ncm-err').style.display = 'block';
+  }
+  btn.disabled = false; txt.textContent = 'Buscar';
+}
+
+var fmt = function(n) { return 'R$ ' + n.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); };
+var pct = function(n,b) { return b > 0 ? ((n/b)*100).toFixed(1) + '%' : '0%'; };
+
+function calcular() {
+  var cambio = gn('cambio') || 5.85;
+  var qtd = gi('qtd') || 1;
+  var fobUnit = gn('fob-unit');
+  var segPct = gn('seguro-pct') || 0.5;
+  var icms = gn('aliq-icms') || 18;
+  var precoVenda = gn('preco-venda');
+  var pctC = gn('pct-consult');
+
+  if (!fobUnit || !qtd) { toast('Informe FOB e quantidade.','error'); return; }
+
+  var fobBRL = fobUnit * qtd * cambio;
+  var freteUSD = 0, freteInfo = '';
+
+  if (modalidade === 'formal') {
+    if (containerTipo === 'lcl') {
+      var c = gn('lcl-c') || 30, l = gn('lcl-l') || 20, a = gn('lcl-a') || 15;
+      var qcx = gi('lcl-qtd-cx') || 1, rate = gn('lcl-rate') || 80, minCbm = gn('lcl-min') || 1;
+      var cbmCx = (c * l * a) / 1e6;
+      var ncx = Math.ceil(qtd / qcx);
+      var cbm = Math.max(ncx * cbmCx, minCbm);
+      freteUSD = cbm * rate;
+      freteInfo = ncx + ' cx · ' + cbm.toFixed(3) + ' CBM';
+    } else {
+      var fcl = gn('fcl-total'), cap = gn('fcl-tipo') || 28;
+      var fc = gn('fcl-c') || 30, fl = gn('fcl-l') || 20, fa = gn('fcl-a') || 15;
+      var fqcx = gi('fcl-qtd-cx') || 1;
+      var fcbm = Math.ceil(qtd / fqcx) * (fc * fl * fa) / 1e6;
+      freteUSD = fcl * Math.min(fcbm / cap, 1);
+      freteInfo = fcbm.toFixed(2) + ' / ' + cap + ' CBM';
+    }
+  } else {
+    freteUSD = gn('frete-aereo');
+    freteInfo = 'frete aéreo';
+  }
+
+  var freteBRL = freteUSD * cambio;
+  var segBRL = (fobBRL + freteBRL) * (segPct / 100);
+  var cifBRL = fobBRL + freteBRL + segBRL;
+  var aliqII = gn('aliq-ii'), aliqIPI = gn('aliq-ipi');
+  var ii = 0, ipi = 0, pis = 0, cofins = 0, afrmm = 0, icmsV = 0;
+
+  if (modalidade === 'formal') {
+    ii = cifBRL * (aliqII / 100);
+    ipi = (cifBRL + ii) * (aliqIPI / 100);
+    pis = cifBRL * 0.021;
+    cofins = cifBRL * 0.0965;
+    afrmm = freteBRL * 0.08;
+    icmsV = ((cifBRL + ii + ipi + pis + cofins + afrmm) / (1 - icms / 100)) * (icms / 100);
+  } else {
+    ii = cifBRL * 0.60;
+    icmsV = ((cifBRL + ii) / (1 - icms / 100)) * (icms / 100);
+  }
+
+  var totImp = ii + ipi + pis + cofins + icmsV + afrmm;
+  var opCosts = gn('c-desp') + gn('c-sis') + gn('c-arm') + gn('c-fint') + gn('c-outros');
+  var landedBase = cifBRL + totImp + opCosts;
+  var consultV = landedBase * (pctC / 100);
+  var landedTotal = landedBase + consultV;
+  var landedUnit = landedTotal / qtd;
+  var freteUnit = freteBRL / qtd;
+  var markup = 0, margem = 0, lucroUnit = 0;
+  if (precoVenda > 0) {
+    lucroUnit = precoVenda - landedUnit;
+    margem = (lucroUnit / precoVenda) * 100;
+    markup = ((precoVenda - landedUnit) / landedUnit) * 100;
+  }
+
+  lastResult = { fobBRL:fobBRL, freteBRL:freteBRL, segBRL:segBRL, cifBRL:cifBRL,
+    ii:ii, ipi:ipi, pis:pis, cofins:cofins, afrmm:afrmm, icmsV:icmsV,
+    totImp:totImp, opCosts:opCosts, consultV:consultV, landedBase:landedBase,
+    landedTotal:landedTotal, landedUnit:landedUnit, freteUnit:freteUnit,
+    qtd:qtd, modalidade:modalidade, precoVenda:precoVenda,
+    markup:markup, margem:margem, lucroUnit:lucroUnit,
+    freteInfo:freteInfo, cambio:cambio, fobUnit:fobUnit, aliqII:aliqII, aliqIPI:aliqIPI, icms:icms };
+
+  renderResults(lastResult);
+  document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderResults(r) {
+  document.getElementById('results-panel').style.display = 'block';
+  document.getElementById('res-landed').textContent = fmt(r.landedTotal);
+  document.getElementById('res-landed-sub').textContent = fmt(r.landedUnit) + ' por unidade';
+  document.getElementById('res-fob').textContent = fmt(r.fobBRL);
+  document.getElementById('res-imp').textContent = fmt(r.totImp);
+  document.getElementById('res-imp-pct').textContent = pct(r.totImp, r.fobBRL) + ' sobre FOB';
+  document.getElementById('res-unit').textContent = fmt(r.landedBase / r.qtd);
+  document.getElementById('res-fret-unit').textContent = fmt(r.freteUnit);
+  document.getElementById('res-fret-sub').textContent = r.freteInfo;
+
+  var rows = [
+    { n:'Mercadoria FOB', v:r.fobBRL },
+    { n:'Frete Internacional', v:r.freteBRL },
+    { n:'Seguro', v:r.segBRL }
+  ];
+  if (r.ii > 0) rows.push({ n:'II (' + r.aliqII + '%)', v:r.ii });
+  if (r.ipi > 0) rows.push({ n:'IPI (' + r.aliqIPI + '%)', v:r.ipi });
+  if (r.pis > 0) rows.push({ n:'PIS (2,1%)', v:r.pis });
+  if (r.cofins > 0) rows.push({ n:'COFINS (9,65%)', v:r.cofins });
+  if (r.afrmm > 0) rows.push({ n:'AFRMM (8%)', v:r.afrmm });
+  rows.push({ n:'ICMS (' + r.icms + '% por dentro)', v:r.icmsV });
+  if (r.opCosts > 0) rows.push({ n:'Custos Operacionais', v:r.opCosts });
+  if (r.consultV > 0) rows.push({ n:'Consultoria', v:r.consultV });
+  rows.push({ n:'CUSTO LANDED TOTAL', v:r.landedTotal, tot:true });
+
+  document.getElementById('bk-rows').innerHTML = rows.map(function(row){
+    return '<div class="bk-row' + (row.tot?' tot':'') + '">' +
+      '<span class="bk-n' + (row.tot?' t':'') + '">' + row.n + '</span>' +
+      '<span class="bk-p">' + pct(row.v, r.fobBRL) + '</span>' +
+      '<span class="bk-v' + (row.tot?' t':'') + '">' + fmt(row.v) + '</span>' +
+    '</div>';
+  }).join('');
+
+  var vM = document.getElementById('v-metrics');
+  var vNP = document.getElementById('v-no-preco');
+  var vBar = document.getElementById('v-bar');
+  var vMup = document.getElementById('v-markup');
+  var vBdg = document.getElementById('v-badge');
+
+  if (r.precoVenda > 0) {
+    vNP.style.display = 'none'; vM.style.display = '';
+    var w = Math.min(Math.max(r.markup / 150 * 100, 0), 100);
+    var color = r.markup >= 40 ? 'var(--gn)' : r.markup >= 15 ? 'var(--yw)' : 'var(--rd)';
+    vBar.style.width = w + '%'; vBar.style.background = color;
+    vMup.textContent = r.markup.toFixed(1) + '% markup';
+    var bc = r.markup >= 40 ? 'vg' : r.markup >= 15 ? 'vy' : 'vr';
+    var bt = r.markup >= 40 ? '✅ Viável' : r.markup >= 15 ? '⚠️ Margem baixa' : '🚫 Inviável';
+    vBdg.innerHTML = '<span class="vbadge ' + bc + '">' + bt + '</span>';
+    document.getElementById('v-margem').textContent = r.margem.toFixed(1) + '%';
+    document.getElementById('v-margem').style.color = color;
+    document.getElementById('v-lucro').textContent = fmt(r.lucroUnit);
+    document.getElementById('v-lucro').style.color = color;
+    var custo1 = r.landedUnit - r.opCosts / r.qtd;
+    var l1 = r.precoVenda - custo1;
+    var be = l1 > 0 ? Math.ceil(r.opCosts / l1) : '—';
+    document.getElementById('v-be').textContent = (typeof be === 'number' && isFinite(be)) ? be : '—';
+  } else {
+    vNP.style.display = ''; vM.style.display = 'none';
+    vBar.style.width = '0%'; vMup.textContent = '—'; vBdg.innerHTML = '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// SAVE / HISTORY (Supabase)
+// ═══════════════════════════════════════════════════════
+function openSave() {
+  if (!lastResult) { toast('Calcule primeiro.','error'); return; }
+  document.getElementById('save-nome').value = document.getElementById('nome-produto').value;
+  document.getElementById('save-overlay').classList.add('open');
+}
+function closeSave() { document.getElementById('save-overlay').classList.remove('open'); }
+
+async function confirmarSave() {
+  var nome = document.getElementById('save-nome').value.trim() || 'Produto sem nome';
+  var btn = document.querySelector('#save-overlay .btn-confirm');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
+
+  try {
+    var r = await supaFetch('/rest/v1/simulacoes', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: {
+        user_id: currentUser.id,
+        nome: nome,
+        modalidade: lastResult.modalidade,
+        fob_unit: lastResult.fobUnit,
+        qtd: lastResult.qtd,
+        cambio: lastResult.cambio,
+        landed_total: lastResult.landedTotal,
+        landed_unit: lastResult.landedUnit,
+        tot_impostos: lastResult.totImp,
+        margem: lastResult.margem,
+        preco_venda: lastResult.precoVenda,
+        dados_completos: lastResult
+      }
+    });
+    if (!r.ok) throw new Error('Erro ao salvar: ' + JSON.stringify(r.data));
+    closeSave();
+    toast('✓ Simulação salva na nuvem!','success');
+  } catch(e) {
+    toast('Erro ao salvar: ' + e.message, 'error');
+  }
+  btn.disabled = false; btn.textContent = 'Salvar';
+}
+
+async function loadHistory() {
+  var c = document.getElementById('hist-container');
+  var si = document.getElementById('sync-indicator');
+  var sd = document.getElementById('sync-dot');
+  var st = document.getElementById('sync-txt');
+  si.style.display = 'flex'; sd.classList.add('syncing'); st.textContent = 'Carregando…';
+
+  try {
+    var r = await supaFetch('/rest/v1/simulacoes?select=*&order=created_at.desc&limit=50', { method:'GET' });
+    sd.classList.remove('syncing'); st.textContent = 'Sincronizado';
+
+    if (!r.ok) throw new Error('Erro ao carregar histórico');
+    var hist = Array.isArray(r.data) ? r.data : [];
+
+    if (!hist.length) {
+      c.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">SEM SIMULAÇÕES</div><div class="empty-sub">Calcule e salve na aba Calculadora</div></div>';
+      return;
+    }
+
+    c.innerHTML = hist.map(function(e){
+      var modLabel = e.modalidade === 'formal' ? 'Formal Marítima' : 'Simplificada Aérea';
+      var color = e.margem >= 30 ? 'var(--gn)' : e.margem >= 10 ? 'var(--yw)' : 'var(--rd)';
+      var data = new Date(e.created_at).toLocaleDateString('pt-BR');
+      return '<div class="hcard">' +
+        '<div class="hc-top"><div><div class="hc-name">' + e.nome + '</div><div class="hc-date">' + data + ' · ' + modLabel + '</div></div>' +
+        '<button class="hc-del" onclick="delHist(' + e.id + ')">🗑</button></div>' +
+        '<div class="hc-metrics">' +
+          '<div><div class="hm-lbl">Landed Total</div><div class="hm-val" style="color:var(--ac)">' + fmt(e.landed_total) + '</div></div>' +
+          '<div><div class="hm-lbl">Por Unidade</div><div class="hm-val">' + fmt(e.landed_unit) + '</div></div>' +
+          '<div><div class="hm-lbl">FOB Unit</div><div class="hm-val">US$ ' + (e.fob_unit || 0).toFixed(2) + '</div></div>' +
+          '<div><div class="hm-lbl">Qtd</div><div class="hm-val">' + (e.qtd || '—') + '</div></div>' +
+          (e.preco_venda > 0 ? '<div><div class="hm-lbl">Margem</div><div class="hm-val" style="color:' + color + '">' + (e.margem || 0).toFixed(1) + '%</div></div>' : '') +
+        '</div></div>';
+    }).join('');
+  } catch(e) {
+    sd.classList.remove('syncing'); st.textContent = 'Erro ao carregar';
+    toast('Erro ao carregar histórico: ' + e.message, 'error');
+  }
+}
+
+async function delHist(id) {
+  if (!confirm('Excluir esta simulação?')) return;
+  var r = await supaFetch('/rest/v1/simulacoes?id=eq.' + id, { method:'DELETE' });
+  if (r.ok) { toast('Excluído.','success'); loadHistory(); }
+  else toast('Erro ao excluir.','error');
+}
+
+// ═══════════════════════════════════════════════════════
+// NCM POR FOTO
+// ═══════════════════════════════════════════════════════
+function onPhotoSelected(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    // Redimensiona para max 1024px antes de enviar — fotos de iPhone são muito grandes
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var MAX = 1024;
+      var w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
+      else { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      var resized = canvas.toDataURL('image/jpeg', 0.85);
+      photoBase64 = resized.split(',')[1];
+      var prev = document.getElementById('photo-prev');
+      prev.src = resized; prev.style.display = 'block';
+      document.getElementById('btn-vision').disabled = false;
+      document.getElementById('photo-zone').style.border = '2px solid var(--ac)';
+      // Mostra tamanho para debug
+      var kb = Math.round(photoBase64.length * 0.75 / 1024);
+      document.getElementById('photo-zone-sub').textContent = 'Imagem pronta: ' + w + 'x' + h + 'px · ' + kb + 'KB';
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analisarFoto() {
+  if (!photoBase64) return;
+  var btn = document.getElementById('btn-vision');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Analisando…';
+  var desc = document.getElementById('photo-desc').value;
+  var prompt = 'Você é especialista em NCM/SH e importação da China para o Brasil.\nAnalise esta imagem e responda APENAS em JSON válido (sem markdown):\n{"produto":"nome","ncm_formatado":"XXXX.XX.XX","descricao_ncm":"desc","aliq_ii_estimada":0,"aliq_ipi_estimada":0,"alertas":[{"tipo":"yellow|red|green","texto":"texto"}],"restricoes_brasil":"texto","raciocinio":"explicação 2-3 linhas"}\n' + (desc ? 'Info adicional: ' + desc : '');
+  try {
+    var data = await callClaude([{ role:'user', content:[
+      { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:photoBase64 } },
+      { type:'text', text:prompt }
+    ]}]);
+    var j = claudeJSON(data);
+    visionNCM = j.ncm_formatado || '';
+    visionII = j.aliq_ii_estimada || 0;
+    visionIPI = j.aliq_ipi_estimada || 0;
+    document.getElementById('v-produto').textContent = j.produto || '—';
+    document.getElementById('v-ncm').textContent = j.ncm_formatado || '—';
+    document.getElementById('v-ncm-desc').textContent = j.descricao_ncm || '—';
+    document.getElementById('v-tags').innerHTML =
+      '<span class="ntag ii">II: ~' + visionII + '%</span>' +
+      '<span class="ntag ipi">IPI: ~' + visionIPI + '%</span>' +
+      '<span class="ntag pis">PIS 2,1% · COFINS 9,65%</span>';
+    document.getElementById('v-reason').textContent = j.raciocinio || '—';
+    var ah = (j.alertas||[]).map(function(a){ return '<div class="valert a-' + a.tipo + '">⚠️ ' + a.texto + '</div>'; }).join('');
+    if (j.restricoes_brasil) ah += '<div class="valert a-y">🇧🇷 ' + j.restricoes_brasil + '</div>';
+    document.getElementById('v-alerts').innerHTML = ah;
+    document.getElementById('vision-result').classList.add('on');
+  } catch(e) {
+    var msg = e.message || 'Erro desconhecido';
+    toast('Erro: ' + msg, 'error');
+    // Mostra detalhes na tela para debug
+    document.getElementById('vision-empty').style.display = '';
+    document.getElementById('vision-empty').innerHTML = '<div style="padding:16px;background:var(--rdd);border:1px solid var(--rd);border-radius:10px;font-size:12px;color:var(--rd);word-break:break-all;line-height:1.6"><strong>ERRO DETALHADO:</strong><br>' + msg + '</div>';
+  }
+  btn.disabled = false; btn.textContent = 'ANALISAR COM IA';
+}
+
+function usarNCMFoto() {
+  if (!visionNCM) return;
+  document.getElementById('ncm-input').value = visionNCM;
+  document.getElementById('aliq-ii').value = visionII;
+  document.getElementById('aliq-ipi').value = visionIPI;
+  switchTab('calc', document.querySelector('.bnav-btn'));
+  toast('NCM aplicado ✓','success');
+}
+
+// ═══════════════════════════════════════════════════════
+// TRADUTOR
+// ═══════════════════════════════════════════════════════
+function swapLang() {
+  langDir = langDir === 'ptZh' ? 'zhPt' : 'ptZh';
+  var isPt = langDir === 'ptZh';
+  document.getElementById('lf-from').textContent = isPt ? '🇧🇷' : '🇨🇳';
+  document.getElementById('ll-from').textContent = isPt ? 'Português' : 'Mandarim';
+  document.getElementById('lf-to').textContent = isPt ? '🇨🇳' : '🇧🇷';
+  document.getElementById('ll-to').textContent = isPt ? 'Mandarim' : 'Português';
+  document.getElementById('lang-badge').textContent = isPt ? 'PT → ZH' : 'ZH → PT';
+  document.getElementById('trans-input').placeholder = isPt ? 'Digite aqui…' : 'Digite em chinês…';
+  document.getElementById('trans-out-wrap').style.display = 'none';
+}
+
+async function traduzir() {
+  var input = document.getElementById('trans-input').value.trim();
+  if (!input) return;
+  var isPtZh = langDir === 'ptZh';
+  var outWrap = document.getElementById('trans-out-wrap');
+  var outEl = document.getElementById('trans-out');
+  var pyEl = document.getElementById('trans-py');
+  outEl.textContent = '…'; pyEl.textContent = ''; outWrap.style.display = 'block';
+  var prompt = isPtZh
+    ? 'Traduza para Mandarim. JSON APENAS: {"zh":"texto","pinyin":"pinyin","pt":"confirmação"}'
+    : 'Traduza para Português Brasileiro. JSON APENAS: {"pt":"tradução","zh":"original","pinyin":"pinyin"}';
+  try {
+    var data = await callClaude([{ role:'user', content: prompt + '\nTexto: "' + input + '"' }]);
+    var j = claudeJSON(data);
+    outEl.textContent = isPtZh ? (j.zh||'—') : (j.pt||'—');
+    pyEl.textContent = j.pinyin || '';
+  } catch(e) { outEl.textContent = 'Erro. Verifique a API key.'; }
+}
+
+function speakChinese() {
+  var txt = document.getElementById('trans-out').textContent;
+  if (!txt || txt === '—' || txt === '…') return;
+  var utt = new SpeechSynthesisUtterance(txt);
+  utt.lang = 'zh-CN';
+  var voices = window.speechSynthesis.getVoices();
+  var zh = voices.find(function(v){ return v.lang.startsWith('zh'); });
+  if (zh) utt.voice = zh;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+  var btn = document.getElementById('tts-btn');
+  btn.classList.add('playing');
+  utt.onend = function(){ btn.classList.remove('playing'); };
+}
+
+// ═══════════════════════════════════════════════════════
+// FRASES PRONTAS
+// ═══════════════════════════════════════════════════════
+var FRASES = {
+  'Negociação': [
+    { pt:'Qual o preço para 100 unidades?', zh:'100件的价格是多少？', py:'Yìbǎi jiàn de jiàgé shì duōshao?' },
+    { pt:'Qual o preço para 500 unidades?', zh:'500件的价格是多少？', py:'Wǔbǎi jiàn de jiàgé shì duōshao?' },
+    { pt:'Qual o preço para 1000 unidades?', zh:'1000件的价格是多少？', py:'Yīqiān jiàn de jiàgé shì duōshao?' },
+    { pt:'Pode fazer um desconto?', zh:'可以给我优惠吗？', py:'Kěyǐ gěi wǒ yōuhuì ma?' },
+    { pt:'Esse é o seu melhor preço?', zh:'这是您最低的价格吗？', py:'Zhè shì nín zuìdī de jiàgé shì duōshao?' },
+    { pt:'Se eu comprar mais, o preço cai?', zh:'如果我买更多，价格会便宜吗？', py:'Rúguǒ wǒ mǎi gèng duō, jiàgé huì piányí ma?' },
+    { pt:'Qual o MOQ mínimo?', zh:'最小起订量是多少？', py:'Zuìxiǎo qǐdìng liàng shì duōshao?' },
+    { pt:'Posso começar com menos unidades?', zh:'我可以从更小的数量开始吗？', py:'Wǒ kěyǐ cóng gèng xiǎo de shùliàng kāishǐ ma?' },
+    { pt:'Qual o preço para pedido de teste?', zh:'试订单的价格是多少？', py:'Shì dìngdān de jiàgé shì duōshao?' },
+    { pt:'Muito caro! Pode baixar mais?', zh:'太贵了！可以再便宜一点吗？', py:'Tài guì le! Kěyǐ zài piányí yīdiǎn ma?' },
+    { pt:'Meu concorrente vende mais barato.', zh:'我的竞争对手卖得更便宜。', py:'Wǒ de jìngzhēng duìshǒu mài de gèng piányí.' },
+    { pt:'Se eu fechar hoje, tem desconto especial?', zh:'如果我今天下单，有特别优惠吗？', py:'Rúguǒ wǒ jīntiān xià dān, yǒu tèbié yōuhuì ma?' },
+    { pt:'Qual o desconto para pagamento à vista?', zh:'现金付款有折扣吗？', py:'Xiànjīn fùkuǎn yǒu zhékòu ma?' },
+    { pt:'Tenho interesse, vamos fechar.', zh:'我感兴趣，我们成交吧。', py:'Wǒ gǎn xìngqù, wǒmen chéngjiāo ba.' },
+    { pt:'Vou pensar e volto amanhã.', zh:'我考虑一下，明天再来。', py:'Wǒ kǎolǜ yīxià, míngtiān zài lái.' },
+    { pt:'Pode me dar uma proposta por escrito?', zh:'可以给我一个书面报价吗？', py:'Kěyǐ gěi wǒ yīgè shūmiàn bàojià ma?' },
+    { pt:'Quanto tempo esta oferta é válida?', zh:'这个报价有效期多久？', py:'Zhège bàojià yǒuxiào qī duō jiǔ?' },
+    { pt:'Pode me dar seu catálogo?', zh:'可以给我您的产品目录吗？', py:'Kěyǐ gěi wǒ nín de chǎnpǐn mùlù ma?' },
+    { pt:'Esse preço inclui embalagem?', zh:'这个价格包括包装吗？', py:'Zhège jiàgé bāokuò bāozhuāng ma?' },
+    { pt:'Qual o prazo para me dar uma cotação?', zh:'您什么时候能给我报价？', py:'Nín shénme shíhòu néng gěi wǒ bàojià?' }
+  ],
+  'Produto': [
+    { pt:'Qual o material?', zh:'这个材料是什么？', py:'Zhège cáiliào shì shénme?' },
+    { pt:'Qual a espessura?', zh:'厚度是多少？', py:'Hòudù shì duōshao?' },
+    { pt:'Qual o peso por unidade?', zh:'每件重量是多少？', py:'Měi jiàn zhòngliàng shì duōshao?' },
+    { pt:'Quais cores estão disponíveis?', zh:'有哪些颜色？', py:'Yǒu nǎxiē yánsè?' },
+    { pt:'Tem amostra?', zh:'有样品吗？', py:'Yǒu yàngpǐn ma?' },
+    { pt:'Quanto custa a amostra?', zh:'样品多少钱？', py:'Yàngpǐn duōshao qián?' },
+    { pt:'Pode enviar a amostra para o hotel?', zh:'可以把样品送到我的酒店吗？', py:'Kěyǐ bǎ yàngpǐn sòng dào wǒ de jiǔdiàn ma?' },
+    { pt:'Qual a certificação do produto?', zh:'产品有什么认证？', py:'Chǎnpǐn yǒu shénme rènzhèng?' },
+    { pt:'Tem certificado CE ou RoHS?', zh:'有CE或RoHS认证吗？', py:'Yǒu CE huò RoHS rènzhèng ma?' },
+    { pt:'Pode personalizar com minha logo?', zh:'可以定制我的logo吗？', py:'Kěyǐ dìngzhì wǒ de logo ma?' },
+    { pt:'Pode mudar a cor do produto?', zh:'可以改变产品颜色吗？', py:'Kěyǐ gǎibiàn chǎnpǐn yánsè ma?' },
+    { pt:'Qual o prazo de produção?', zh:'生产周期多久？', py:'Shēngchǎn zhōuqī duō jiǔ?' },
+    { pt:'Quantas unidades por caixa?', zh:'每箱有多少件？', py:'Měi xiāng yǒu duōshao jiàn?' },
+    { pt:'Quais são as dimensões da caixa?', zh:'纸箱尺寸是多少？', py:'Zhǐxiāng chǐcùn shì duōshao?' },
+    { pt:'Este produto é resistente?', zh:'这个产品耐用吗？', py:'Zhège chǎnpǐn nàiyòng ma?' },
+    { pt:'Qual a garantia do produto?', zh:'产品保修期多久？', py:'Chǎnpǐn bǎoxiū qī duō jiǔ?' },
+    { pt:'Tem foto de alta qualidade?', zh:'有高清产品照片吗？', py:'Yǒu gāoqīng chǎnpǐn zhàopiàn ma?' }
+  ],
+  'Pagamento': [
+    { pt:'Aceita TT (transferência bancária)?', zh:'接受电汇付款吗？', py:'Jiēshòu diànhuì fùkuǎn ma?' },
+    { pt:'Aceita Alibaba Trade Assurance?', zh:'接受阿里巴巴贸易保障吗？', py:'Jiēshòu Ālǐbābā màoyì bǎozhàng ma?' },
+    { pt:'Qual a porcentagem de entrada?', zh:'定金比例是多少？', py:'Dìngjīn bǐlì shì duōshao?' },
+    { pt:'30% entrada, 70% antes do envio?', zh:'30%定金，70%发货前付清可以吗？', py:'Bǎifēnzhī sānshí dìngjīn, bǎifēnzhī qīshí fāhuò qián fùqīng kěyǐ ma?' },
+    { pt:'Pode emitir invoice para pagamento?', zh:'可以开发票吗？', py:'Kěyǐ kāi fāpiào ma?' },
+    { pt:'Qual o prazo após o pagamento?', zh:'付款后多久发货？', py:'Fùkuǎn hòu duō jiǔ fāhuò?' },
+    { pt:'Tem conta no PayPal?', zh:'您有PayPal账户吗？', py:'Nín yǒu PayPal zhànghù ma?' },
+    { pt:'Pode parcelar o pagamento?', zh:'可以分期付款吗？', py:'Kěyǐ fēnqī fùkuǎn ma?' }
+  ],
+  'Logística': [
+    { pt:'Qual o prazo de entrega?', zh:'交货期是多久？', py:'Jiāohuò qī shì duō jiǔ?' },
+    { pt:'Faz embalagem para exportação?', zh:'可以做出口包装吗？', py:'Kěyǐ zuò chūkǒu bāozhuāng ma?' },
+    { pt:'Qual o peso total do pedido?', zh:'订单总重量是多少？', py:'Dìngdān zǒng zhòngliàng shì duōshao?' },
+    { pt:'Qual o volume em CBM?', zh:'体积是多少立方米？', py:'Tǐjī shì duōshao lìfāng mǐ?' },
+    { pt:'Trabalha com agente de frete?', zh:'您有合作的货运代理吗？', py:'Nín yǒu hézuò de huòyùn dàilǐ ma?' },
+    { pt:'Faz entrega no armazém de Yiwu?', zh:'可以送到义乌仓库吗？', py:'Kěyǐ sòng dào Yìwū cāngkù ma?' },
+    { pt:'Qual o endereço do armazém?', zh:'仓库地址是什么？', py:'Cāngkù dìzhǐ shì shénme?' },
+    { pt:'Faz despacho aduaneiro?', zh:'你们做报关吗？', py:'Nǐmen zuò bàoguān ma?' }
+  ],
+  'Geral': [
+    { pt:'Bom dia!', zh:'早上好！', py:'Zǎoshang hǎo!' },
+    { pt:'Boa tarde!', zh:'下午好！', py:'Xiàwǔ hǎo!' },
+    { pt:'Obrigada!', zh:'谢谢！', py:'Xièxiè!' },
+    { pt:'Quanto custa?', zh:'多少钱？', py:'Duōshao qián?' },
+    { pt:'Muito caro! Pode baixar?', zh:'太贵了！可以便宜一点吗？', py:'Tài guì le! Kěyǐ piányí yīdiǎn ma?' },
+    { pt:'Pode repetir mais devagar?', zh:'可以说慢一点吗？', py:'Kěyǐ shuō màn yīdiǎn ma?' },
+    { pt:'Não entendi, pode escrever?', zh:'我没听懂，可以写下来吗？', py:'Wǒ méi tīng dǒng, kěyǐ xiě xià lái ma?' },
+    { pt:'Fala inglês?', zh:'你会说英语吗？', py:'Nǐ huì shuō yīngyǔ ma?' },
+    { pt:'Seu WeChat é qual?', zh:'你的微信号是什么？', py:'Nǐ de Wēixìn hào shì shénme?' },
+    { pt:'Me adiciona no WeChat?', zh:'可以加我的微信吗？', py:'Kěyǐ jiā wǒ de Wēixìn ma?' },
+    { pt:'Tem cartão de visitas?', zh:'有名片吗？', py:'Yǒu míngpiàn ma?' },
+    { pt:'Posso tirar uma foto do produto?', zh:'我可以拍产品的照片吗？', py:'Wǒ kěyǐ pāi chǎnpǐn de zhàopiàn ma?' },
+    { pt:'Vou voltar depois.', zh:'我待会儿再来。', py:'Wǒ dāihuìr zài lái.' },
+    { pt:'Pode anotar o preço aqui?', zh:'可以把价格写在这里吗？', py:'Kěyǐ bǎ jiàgé xiě zài zhèlǐ ma?' },
+    { pt:'Qual é o número deste stand?', zh:'这个摊位号码是多少？', py:'Zhège tānwèi hàomǎ shì duōshao?' },
+    { pt:'Onde fica o banheiro?', zh:'洗手间在哪里？', py:'Xǐshǒujiān zài nǎlǐ?' },
+    { pt:'Onde fico o restaurante?', zh:'餐厅在哪里？', py:'Cāntīng zài nǎlǐ?' },
+    { pt:'Até que horas vocês ficam abertos?', zh:'你们几点关门？', py:'Nǐmen jǐ diǎn guānmén?' }
+  ]
+};
+
+function initFrases() {
+  var cats = Object.keys(FRASES);
+  document.getElementById('pcats').innerHTML = cats.map(function(c){
+    return '<button class="pcat' + (c === curCat ? ' active' : '') + '" onclick="setCat(\'' + c + '\')">' + c + '</button>';
+  }).join('');
+  renderFrases();
+}
+
+function setCat(c) {
+  curCat = c;
+  document.querySelectorAll('.pcat').forEach(function(b){ b.classList.toggle('active', b.textContent === c); });
+  renderFrases();
+}
+
+function renderFrases() {
+  var list = FRASES[curCat] || [];
+  document.getElementById('plist').innerHTML = list.map(function(f){
+    var zh = f.zh.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var py = f.py.replace(/'/g,"\\'");
+    var pt = f.pt.replace(/'/g,"\\'");
+    return '<div class="pitem" onclick="showDisp(\'' + zh + '\',\'' + py + '\',\'' + pt + '\')">' +
+      '<div class="pitem-pt">' + f.pt + '</div>' +
+      '<div class="pitem-zh">' + f.zh + '</div>' +
+      '<div class="pitem-py">' + f.py + '</div></div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// CARTÃO DE PRODUTO
+// ═══════════════════════════════════════════════════════
+async function gerarCartao() {
+  var prod = document.getElementById('pc-produto').value.trim();
+  if (!prod) { toast('Informe o nome do produto.','error'); return; }
+  var qtd = document.getElementById('pc-qtd').value;
+  var mat = document.getElementById('pc-material').value;
+  var dim = document.getElementById('pc-dim').value;
+  var cor = document.getElementById('pc-cor').value;
+  var preco = document.getElementById('pc-preco').value;
+  var obs = document.getElementById('pc-obs').value;
+  var btn = document.querySelector('[onclick="gerarCartao()"]');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Gerando…';
+  var prompt = 'Traduza para Mandarim simplificado. JSON APENAS:\n{"produto_zh":"","quantidade_zh":"","material_zh":"","dimensoes_zh":"","cor_zh":"","preco_zh":"","obs_zh":"","saudacao":"请给我看这个产品 (em chinês)"}\nDados: Produto:' + prod + '|Qtd:' + (qtd||'—') + '|Material:' + (mat||'—') + '|Dim:' + (dim||'—') + '|Cor:' + (cor||'—') + '|Preço:' + (preco?'US$'+preco:'—') + '|Obs:' + (obs||'—');
+  try {
+    var data = await callClaude([{ role:'user', content:prompt }]);
+    var j = claudeJSON(data);
+    cartaoData = { prod:prod, qtd:qtd, preco:preco, zh:j };
+    var html = '<div class="pc-hdr">🇧🇷 Efeito Vendas — 报价请求</div>' +
+      '<div class="pc-title">' + (j.produto_zh||prod) + '</div>' +
+      (qtd ? '<div class="pc-row"><div class="pc-lbl">数量</div><div class="pc-zh">' + (j.quantidade_zh||qtd) + '</div></div>' : '') +
+      (mat ? '<div class="pc-row"><div class="pc-lbl">材料</div><div class="pc-zh">' + (j.material_zh||mat) + '</div></div>' : '') +
+      (dim ? '<div class="pc-row"><div class="pc-lbl">尺寸</div><div class="pc-zh">' + (j.dimensoes_zh||dim) + '</div></div>' : '') +
+      (cor ? '<div class="pc-row"><div class="pc-lbl">颜色</div><div class="pc-zh">' + (j.cor_zh||cor) + '</div></div>' : '') +
+      (preco ? '<div class="pc-row"><div class="pc-lbl">目标价</div><div class="pc-zh">' + (j.preco_zh||'US$'+preco) + '</div></div>' : '') +
+      (obs ? '<div class="pc-row"><div class="pc-lbl">备注</div><div class="pc-zh">' + (j.obs_zh||obs) + '</div></div>' : '') +
+      '<div class="pc-note">📱 ' + (j.saudacao||'请给我看这个产品') + '</div>';
+    document.getElementById('cartao-html').innerHTML = html;
+    document.getElementById('cartao-preview').style.display = 'block';
+  } catch(e) { toast('Erro: ' + e.message,'error'); }
+  btn.disabled = false; btn.textContent = 'GERAR CARTÃO EM CHINÊS';
+}
+
+function showCartaoDisp() {
+  if (!cartaoData || !cartaoData.zh) return;
+  var j = cartaoData.zh;
+  var linhas = [
+    j.quantidade_zh ? '数量: ' + j.quantidade_zh : '',
+    j.material_zh ? '材料: ' + j.material_zh : '',
+    j.dimensoes_zh ? '尺寸: ' + j.dimensoes_zh : '',
+    cartaoData.preco ? '目标价: US$ ' + cartaoData.preco : ''
+  ].filter(Boolean).join('\n');
+  document.getElementById('disp-zh').innerHTML =
+    '<div style="font-size:32px;font-weight:700;margin-bottom:10px">' + (j.produto_zh||cartaoData.prod) + '</div>' +
+    '<div style="font-size:16px;line-height:2;white-space:pre-line">' + linhas + '</div>';
+  document.getElementById('disp-py').textContent = '';
+  document.getElementById('disp-pt').textContent = j.saudacao || '请给我看这个产品';
+  document.getElementById('disp-overlay').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// YIWU — STANDS (Supabase)
+// ═══════════════════════════════════════════════════════
+async function salvarStand() {
+  var num = document.getElementById('s-num').value.trim();
+  var prod = document.getElementById('s-produto').value.trim();
+  if (!num || !prod) { toast('Informe nº do stand e produto.','error'); return; }
+  var btn = document.querySelector('[onclick="salvarStand()"]');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
+  try {
+    var r = await supaFetch('/rest/v1/stands', {
+      method: 'POST',
+      headers: { 'Prefer':'return=minimal' },
+      body: {
+        user_id: currentUser.id,
+        num: num,
+        produto: prod,
+        preco: gn('s-preco') || null,
+        moq: document.getElementById('s-moq').value,
+        wechat: document.getElementById('s-wechat').value,
+        interesse: document.getElementById('s-interesse').value,
+        obs: document.getElementById('s-obs').value
+      }
+    });
+    if (!r.ok) throw new Error(JSON.stringify(r.data));
+    ['s-num','s-produto','s-preco','s-moq','s-wechat','s-obs'].forEach(function(id){ document.getElementById(id).value = ''; });
+    document.getElementById('s-interesse').value = 'alto';
+    toast('Stand registrado ✓','success');
+    loadStands();
+  } catch(e) { toast('Erro ao salvar: ' + e.message,'error'); }
+  btn.disabled = false; btn.textContent = '+ REGISTRAR STAND';
+}
+
+async function loadStands() {
+  var listEl = document.getElementById('stands-list');
+  var emptyEl = document.getElementById('stands-empty');
+  var countEl = document.getElementById('stands-count');
+  try {
+    var r = await supaFetch('/rest/v1/stands?select=*&order=created_at.desc', { method:'GET' });
+    if (!r.ok) throw new Error('Erro ao carregar');
+    var stands = Array.isArray(r.data) ? r.data : [];
+    if (countEl) countEl.textContent = stands.length;
+    if (!stands.length) {
+      emptyEl.style.display = ''; listEl.innerHTML = ''; return;
+    }
+    emptyEl.style.display = 'none';
+    var intColor = { alto:'var(--gn)', medio:'var(--yw)', baixo:'var(--rd)' };
+    var intLabel = { alto:'Alto interesse', medio:'Médio interesse', baixo:'Baixo interesse' };
+    listEl.innerHTML = stands.map(function(s){
+      var color = intColor[s.interesse] || 'var(--t3)';
+      var label = intLabel[s.interesse] || s.interesse;
+      var data = new Date(s.created_at).toLocaleDateString('pt-BR');
+      return '<div class="sc">' +
+        '<div class="sc-top">' +
+          '<div><div class="sc-stand">' + s.num + '</div>' +
+          '<div class="sc-produto">' + s.produto + '</div>' +
+          '<div class="sc-meta">' + data + (s.wechat ? ' · WeChat: ' + s.wechat : '') + '</div></div>' +
+          '<button class="sc-del" onclick="delStand(' + s.id + ')">🗑</button>' +
+        '</div>' +
+        '<div class="sc-badges">' +
+          (s.preco ? '<span class="sc-badge" style="background:var(--bld);color:var(--bl)">US$ ' + parseFloat(s.preco).toFixed(2) + '</span>' : '') +
+          (s.moq ? '<span class="sc-badge" style="background:var(--s3);color:var(--t2)">MOQ: ' + s.moq + '</span>' : '') +
+          '<span class="sc-badge" style="background:' + color + '22;color:' + color + '">● ' + label + '</span>' +
+        '</div>' +
+        (s.obs ? '<div class="sc-obs">' + s.obs + '</div>' : '') +
+      '</div>';
+    }).join('');
+  } catch(e) { toast('Erro ao carregar stands: ' + e.message,'error'); }
+}
+
+async function delStand(id) {
+  if (!confirm('Excluir este stand?')) return;
+  var r = await supaFetch('/rest/v1/stands?id=eq.' + id, { method:'DELETE' });
+  if (r.ok) { toast('Excluído.','success'); loadStands(); }
+  else toast('Erro ao excluir.','error');
+}
+
+// ═══════════════════════════════════════════════════════
+// CALCULADORA REVERSA
+// ═══════════════════════════════════════════════════════
+function calcReversa() {
+  var venda = gn('rev-venda'), margem = gn('rev-margem') || 40;
+  var cambio = gn('rev-cambio') || 5.85, carga = gn('rev-imp') || 80;
+  if (!venda) { toast('Informe o preço de venda.','error'); return; }
+  var custoMax = venda * (1 - margem / 100);
+  var fobMaxBRL = custoMax / (1 + carga / 100);
+  var fobMaxUSD = fobMaxBRL / cambio;
+  document.getElementById('rev-fob-max').textContent = 'US$ ' + fobMaxUSD.toFixed(2);
+  document.getElementById('rev-sub').textContent = 'R$ ' + fobMaxBRL.toFixed(2) + ' · Venda R$ ' + venda.toFixed(2) + ' com ' + margem + '% margem';
+  document.getElementById('rev-res').classList.add('on');
+}
+
+// ═══════════════════════════════════════════════════════
+// YIWU MAP
+// ═══════════════════════════════════════════════════════
+var DISTRITOS = [
+  { num:1, name:'Distrito 1', sub:'Natal, Joias, Flores, Brinquedos', cats:['Artigos de Natal','Joias de fantasia','Flores artificiais','Bolsas','Brinquedos'], tip:'O mais movimentado. Chegue cedo — corredores lotam até o meio-dia.' },
+  { num:2, name:'Distrito 2', sub:'Papelaria, Plásticos, Relógios, Óculos', cats:['Papelaria','Artigos plásticos','Relógios','Óculos de sol','Malas e mochilas'], tip:'Ótimo para escritório e escolar. Fornecedores com catálogo digital.' },
+  { num:3, name:'Distrito 3', sub:'Eletrônicos, Cosméticos, Brinquedos elétricos', cats:['Eletrônicos','Acessórios celular','Cosméticos','Brinquedos eletrônicos'], tip:'Eletrônicos: atenção à cert. ANATEL/INMETRO. Peça especificação técnica.' },
+  { num:4, name:'Distrito 4', sub:'Roupas, Calçados, Moda', cats:['Roupas femininas','Calçados','Acessórios moda','Roupas infantis'], tip:'Têxteis: laudo de composição obrigatório para importação formal.' },
+  { num:5, name:'Distrito 5', sub:'Construção, Elétricos, Móveis, LED', cats:['Materiais de construção','Elétricos','Ferragens','Iluminação LED'], tip:'Mais novo. Produtos em volume, ideal para LCL. Menos turismo.' }
+];
+
+function renderYiwuMap() {
+  document.getElementById('yiwu-map').innerHTML = DISTRITOS.map(function(d){
+    return '<div class="dc" id="dist-' + d.num + '" onclick="toggleDist(' + d.num + ')">' +
+      '<div class="dc-hdr"><div class="dc-num">' + d.num + '</div>' +
+      '<div><div class="dc-name">' + d.name + '</div><div class="dc-sub">' + d.sub + '</div></div></div>' +
+      '<div class="dc-body">' + d.cats.map(function(c){ return '<span class="cat-tag">' + c + '</span>'; }).join('') +
+      '<div class="dc-tip">💡 ' + d.tip + '</div></div></div>';
+  }).join('');
+}
+function toggleDist(n) { document.getElementById('dist-' + n).classList.toggle('open'); }
+
+// ═══════════════════════════════════════════════════════
+// CONVERSOR
+// ═══════════════════════════════════════════════════════
+var CONV = { jin:{kg:.5}, liang:{kg:.05}, dan:{kg:50}, cun:{cm:3.3333}, chi:{cm:33.333}, zhang:{m:3.3333} };
+var CLBLS = { kg:'kg', cm:'cm', m:'metros' };
+function converterUnidades() {
+  var v = gn('conv-val') || 1;
+  var u = document.getElementById('conv-unit').value;
+  var c = CONV[u];
+  var res = document.getElementById('conv-results');
+  if (!c) { res.innerHTML = ''; return; }
+  res.innerHTML = Object.keys(c).map(function(unit){
+    var val = (v * c[unit]).toFixed(4).replace(/\.?0+$/, '');
+    return '<div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:baseline;gap:8px">' +
+      '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--ac)">' + val + '</span>' +
+      '<span style="color:var(--t2);font-size:14px">' + (CLBLS[unit]||unit) + '</span></div>';
+  }).join('');
+}
+
+
+// ═══════════════════════════════════════════════════════
+// INIT — MODO TESTE (login desativado temporariamente)
+// ═══════════════════════════════════════════════════════
+currentUser = { id: "00000000-0000-0000-0000-000000000001", email: "karina@efeitovendas.com.br", user_metadata: { nome: "Karina" } };
+currentSession = { access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvZHdwZmlxbXZhaHlnaW5ya2lwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MjI4MjQsImV4cCI6MjA5NjE5ODgyNH0.b-5ZhNsl3DAMbT8HAu-BaPTj_2Ubh4w0OExO7Y99grY" };
+showApp();
+
+
+
+
+</script>
+</body>
+</html>
