@@ -8,17 +8,18 @@
 <meta name="theme-color" content="#07080a">
 <title>ImportCalc — Efeito Vendas</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
 :root{
-  --bg:#07080a;--s1:#0f1014;--s2:#16181e;--s3:#1e2028;
-  --b1:#2a2d38;--b2:#363a48;
-  --ac:#ff4d1c;--ac2:#ff6b3d;--acd:rgba(255,77,28,0.12);--acg:rgba(255,77,28,0.25);
-  --gn:#22c55e;--gnd:rgba(34,197,94,0.12);
-  --yw:#eab308;--ywd:rgba(234,179,8,0.12);
-  --rd:#ef4444;--rdd:rgba(239,68,68,0.12);
-  --bl:#3b82f6;--bld:rgba(59,130,246,0.12);
-  --pu:#a855f7;--pud:rgba(168,85,247,0.12);
-  --t1:#f0f2f8;--t2:#9aa0b8;--t3:#5a6080;
+  --bg:#f4f6fa;--s1:#ffffff;--s2:#f0f2f8;--s3:#e8ebf4;
+  --b1:#dde1ee;--b2:#c8cede;
+  --ac:#ff4d1c;--ac2:#ff6b3d;--acd:rgba(255,77,28,0.10);--acg:rgba(255,77,28,0.20);
+  --gn:#16a34a;--gnd:rgba(22,163,74,0.10);
+  --yw:#b45309;--ywd:rgba(180,83,9,0.10);
+  --rd:#dc2626;--rdd:rgba(220,38,38,0.10);
+  --bl:#2563eb;--bld:rgba(37,99,235,0.10);
+  --pu:#7c3aed;--pud:rgba(124,58,237,0.10);
+  --t1:#1a1f36;--t2:#4a5380;--t3:#8892b0;
   --r:14px;--rs:10px;
   --tap:48px;
 }
@@ -27,13 +28,13 @@ html{font-size:16px;} /* prevent iOS zoom */
 body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
 
 /* ── TELA DE LOGIN ───────────────────────────────── */
-#login-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#fff5f2 0%,#f4f6fa 50%,#f0f4ff 100%);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
 .login-box{width:100%;max-width:400px;}
 .login-logo{text-align:center;margin-bottom:32px;}
 .login-logo-icon{width:56px;height:56px;background:var(--ac);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;margin:0 auto 12px;}
 .login-logo-text{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;}
 .login-logo-sub{font-size:13px;color:var(--t3);}
-.login-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:24px;}
+.login-card{background:#fff;border:1px solid var(--b1);border-radius:var(--r);padding:24px;box-shadow:0 4px 24px rgba(0,0,0,.08);}
 .login-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:4px;}
 .login-sub{font-size:13px;color:var(--t3);margin-bottom:20px;}
 .login-tabs{display:flex;gap:6px;margin-bottom:20px;}
@@ -42,7 +43,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 .login-err{font-size:13px;color:var(--rd);padding:10px 12px;background:var(--rdd);border:1px solid rgba(239,68,68,.3);border-radius:var(--rs);margin-bottom:14px;display:none;}
 
 /* ── HEADER ─────────────────────────────────────── */
-header{position:sticky;top:0;z-index:100;background:rgba(7,8,10,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--b1);padding:0 16px;height:56px;display:flex;align-items:center;gap:12px;}
+header{position:sticky;top:0;z-index:100;background:rgba(244,246,250,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--b1);padding:0 16px;height:56px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 8px rgba(0,0,0,.06);}
 .logo{display:flex;align-items:center;gap:8px;}
 .logo-icon{width:28px;height:28px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#fff;flex-shrink:0;}
 .logo-text{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;}
@@ -52,7 +53,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,8,10,.97);backdrop-fi
 .api-dot{width:7px;height:7px;border-radius:50%;background:var(--rd);flex-shrink:0;}
 
 /* ── BOTTOM NAV ─────────────────────────────────── */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(7,8,10,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--b1);display:flex;padding-bottom:env(safe-area-inset-bottom);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(244,246,250,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--b1);display:flex;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -1px 8px rgba(0,0,0,.06);}
 .bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;border:none;background:transparent;color:var(--t3);font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;cursor:pointer;min-height:56px;gap:4px;transition:color .2s;}
 .bnav-btn.active{color:var(--ac);}
 .bnav-icon{font-size:20px;line-height:1;}
@@ -65,7 +66,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,8,10,.97);backdrop-fi
 .page-sub{font-size:13px;color:var(--t3);margin-bottom:18px;}
 
 /* ── CARDS ───────────────────────────────────────── */
-.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;margin-bottom:14px;}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
 .ch{padding:14px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;}
 .ci{width:26px;height:26px;border-radius:6px;background:var(--acd);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
 .ct{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;}
@@ -97,6 +98,16 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .sfx input{padding-right:36px;}
 .divider{height:1px;background:var(--b1);margin:14px 0;}
 
+/* ── TOOLTIPS DE SIGLAS ──────────────────── */
+.sigla{display:inline-flex;align-items:center;gap:3px;cursor:help;position:relative;}
+.sigla-badge{font-size:10px;font-weight:700;background:var(--acd);color:var(--ac);border:1px solid rgba(255,77,28,.3);border-radius:4px;padding:1px 5px;vertical-align:middle;}
+.sigla-popup{display:none;position:fixed;z-index:500;background:#fff;border:1px solid var(--b1);border-radius:10px;padding:12px 14px;max-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.15);font-size:13px;line-height:1.5;color:var(--t1);}
+.sigla-popup.show{display:block;}
+.sigla-popup strong{color:var(--ac);display:block;margin-bottom:4px;font-size:14px;}
+.sigla-popup .example{font-size:11px;color:var(--t3);margin-top:4px;font-style:italic;}
+#sigla-overlay{position:fixed;inset:0;z-index:499;display:none;}
+#sigla-overlay.show{display:block;}
+
 /* ── BUTTONS ─────────────────────────────────────── */
 .btn-primary{width:100%;min-height:var(--tap);padding:14px;background:var(--ac);border:none;border-radius:var(--rs);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
 .btn-primary:active{background:var(--ac2);transform:scale(.98);}
@@ -121,7 +132,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 
 /* ── RESULTS ─────────────────────────────────────── */
 .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-.rc{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;}
+.rc{background:#fff;border:1px solid var(--b1);border-radius:var(--rs);padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .rc.accent{border-color:var(--ac);background:var(--acd);}
 .rc.full{grid-column:1/-1;}
 .rl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:5px;}
@@ -130,8 +141,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .rsub{font-size:11px;color:var(--t3);margin-top:3px;}
 
 /* ── BREAKDOWN ───────────────────────────────────── */
-.bk{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);overflow:hidden;margin-bottom:14px;}
-.bk-head{padding:10px 14px;background:var(--s3);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);display:grid;grid-template-columns:1fr auto auto;gap:10px;}
+.bk{background:#fff;border:1px solid var(--b1);border-radius:var(--rs);overflow:hidden;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.bk-head{padding:10px 14px;background:#f4f6fa;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);display:grid;grid-template-columns:1fr auto auto;gap:10px;}
 .bk-row{padding:10px 14px;display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border-bottom:1px solid var(--b1);}
 .bk-row:last-child{border-bottom:none;}
 .bk-row.tot{background:var(--s3);border-top:1px solid var(--ac);}
@@ -144,7 +155,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 /* ── NCM ─────────────────────────────────────────── */
 .ncm-row{display:flex;gap:8px;}
 .ncm-row input{flex:1;}
-.ncm-res{margin-top:8px;padding:12px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:13px;display:none;}
+.ncm-res{margin-top:8px;padding:12px;background:#f8f9ff;border:1px solid var(--b1);border-radius:var(--rs);font-size:13px;display:none;}
 .ncm-res.on{display:block;}
 .ncm-desc{color:var(--t2);margin-bottom:8px;line-height:1.4;}
 .ncm-tags{display:flex;gap:6px;flex-wrap:wrap;}
@@ -154,9 +165,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .ntag.pis{background:var(--acd);color:var(--ac);}
 
 /* ── VIABILIDADE ─────────────────────────────────── */
-.vbar{margin-bottom:14px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;}
+.vbar{margin-bottom:14px;background:#fff;border:1px solid var(--b1);border-radius:var(--rs);padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .vbar-lbl{display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;color:var(--t2);}
-.bar-track{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;}
+.bar-track{height:8px;background:#e8ebf4;border-radius:4px;overflow:hidden;}
 .bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1);}
 .vbadge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;margin-top:10px;}
 .vg{background:var(--gnd);color:var(--gn);border:1px solid rgba(34,197,94,.3);}
@@ -168,7 +179,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .lang-flag{font-size:22px;}
 .lang-lbl{font-size:13px;font-weight:700;color:var(--t2);flex:1;}
 .swap-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.trans-out{background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;min-height:90px;font-size:18px;line-height:1.6;color:var(--t1);}
+.trans-out{background:#f8f9ff;border:1px solid var(--b1);border-radius:var(--rs);padding:14px;min-height:90px;font-size:18px;line-height:1.6;color:var(--t1);box-shadow:inset 0 1px 3px rgba(0,0,0,.04);}
 .trans-py{font-size:12px;color:var(--t3);margin-top:6px;font-style:italic;}
 .trans-acts{display:flex;gap:8px;margin-top:10px;}
 .tts-btn{flex:1;min-height:var(--tap);padding:10px;border-radius:var(--rs);border:1px solid var(--b2);background:var(--s2);color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
@@ -178,7 +189,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .pcat{min-height:var(--tap);padding:10px 16px;border-radius:20px;border:1px solid var(--b2);background:transparent;color:var(--t2);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;}
 .pcat.active{background:var(--ac);border-color:var(--ac);color:#fff;}
 .plist{display:flex;flex-direction:column;gap:8px;}
-.pitem{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;cursor:pointer;transition:all .2s;min-height:var(--tap);}
+.pitem{background:#fff;border:1px solid var(--b1);border-radius:var(--rs);padding:14px;cursor:pointer;transition:all .2s;min-height:var(--tap);box-shadow:0 1px 3px rgba(0,0,0,.04);}
 .pitem:active{border-color:var(--ac);background:var(--acd);}
 .pitem-pt{font-size:12px;color:var(--t2);margin-bottom:4px;}
 .pitem-zh{font-size:16px;color:var(--t1);}
@@ -194,7 +205,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .pc-note{font-size:11px;color:#aaa;margin-top:10px;padding-top:9px;border-top:1px solid #eee;}
 
 /* ── YIWU / STANDS ───────────────────────────────── */
-.sc{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;margin-bottom:10px;position:relative;}
+.sc{background:#fff;border:1px solid var(--b1);border-radius:var(--rs);padding:14px;margin-bottom:10px;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .sc-top{display:flex;justify-content:space-between;align-items:flex-start;}
 .sc-stand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--ac);}
 .sc-produto{font-size:14px;font-weight:700;color:var(--t1);margin-top:2px;}
@@ -206,7 +217,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .sc-del:active{background:var(--rdd);border-color:var(--rd);color:var(--rd);}
 
 /* ── DISTRITOS YIWU ──────────────────────────────── */
-.dc{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
+.dc{background:#fff;border:1px solid var(--b1);border-radius:var(--rs);padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .dc.open{border-color:var(--ac);}
 .dc-hdr{display:flex;align-items:center;gap:10px;}
 .dc-num{width:30px;height:30px;border-radius:7px;background:var(--ac);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -218,12 +229,12 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .dc-tip{font-size:12px;color:var(--t3);margin-top:10px;line-height:1.5;font-style:italic;}
 
 /* ── CALCULADORA REVERSA ─────────────────────────── */
-.rev-res{background:var(--acd);border:1px solid var(--ac);border-radius:var(--rs);padding:14px;margin-top:12px;display:none;}
+.rev-res{background:#fff5f2;border:1px solid var(--ac);border-radius:var(--rs);padding:14px;margin-top:12px;display:none;}
 .rev-res.on{display:block;}
 .rev-val{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--ac);}
 
 /* ── HISTÓRICO ───────────────────────────────────── */
-.hcard{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:12px;position:relative;}
+.hcard{background:#fff;border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:12px;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.06);}
 .hc-top{display:flex;justify-content:space-between;align-items:flex-start;}
 .hc-name{font-weight:700;font-size:15px;color:var(--t1);}
 .hc-date{font-size:11px;color:var(--t3);margin-top:2px;}
@@ -234,7 +245,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .hm-val{font-size:16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
 
 /* ── FOTO NCM ────────────────────────────────────── */
-.photo-zone{border:2px dashed var(--b2);border-radius:var(--r);padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;}
+.photo-zone{border:2px dashed var(--b2);border-radius:var(--r);padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#fafbff;}
 .photo-zone.drag{border-color:var(--ac);background:var(--acd);}
 .photo-zone input[type=file]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;}
 .photo-zone-icon{font-size:36px;opacity:.4;}
@@ -243,7 +254,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .photo-prev{width:100%;max-height:260px;object-fit:contain;border-radius:var(--rs);border:1px solid var(--b2);margin-top:12px;display:none;}
 .vr-wrap{margin-top:14px;display:none;}
 .vr-wrap.on{display:block;}
-.vcard{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:14px;margin-bottom:10px;}
+.vcard{background:#fff;border:1px solid var(--b1);border-radius:var(--rs);padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .vproduct{font-size:16px;font-weight:700;margin-bottom:8px;}
 .vncm{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--ac);}
 .vdesc{font-size:13px;color:var(--t2);margin-bottom:10px;}
@@ -255,9 +266,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .vreason{font-size:12px;color:var(--t3);font-style:italic;line-height:1.5;}
 
 /* ── OVERLAYS ────────────────────────────────────── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.overlay{position:fixed;inset:0;background:rgba(26,31,54,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;display:none;align-items:flex-end;justify-content:center;}
 .overlay.open{display:flex;}
-.modal{background:var(--s1);border:1px solid var(--b2);border-radius:var(--r) var(--r) 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:600px;animation:slideUp .25s ease;}
+.modal{background:#fff;border:1px solid var(--b1);border-top:none;border-radius:var(--r) var(--r) 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:600px;animation:slideUp .25s ease;box-shadow:0 -4px 32px rgba(0,0,0,.12);}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .modal-handle{width:40px;height:4px;background:var(--b2);border-radius:2px;margin:0 auto 16px;}
 .modal-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:4px;}
@@ -280,8 +291,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-80px);border-radius:var(--rs);padding:12px 18px;font-size:14px;font-weight:600;z-index:400;transition:transform .3s;white-space:nowrap;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.6);}
 .toast.show{transform:translateX(-50%) translateY(0);}
-.toast.success{background:#166534;border:1px solid var(--gn);color:#fff;}
-.toast.error{background:#7f1d1d;border:1px solid var(--rd);color:#fff;}
+.toast.success{background:#15803d;border:1px solid #16a34a;color:#fff;}
+.toast.error{background:#b91c1c;border:1px solid #dc2626;color:#fff;}
 .empty{text-align:center;padding:40px 20px;color:var(--t3);}
 .empty-icon{font-size:40px;margin-bottom:10px;opacity:.3;}
 .empty-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:4px;}
@@ -395,9 +406,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
         </div>
         <div class="slabel">Alíquotas</div>
         <div class="r3">
-          <div class="field"><label>II %</label><div class="sfx"><input type="number" id="aliq-ii" placeholder="0" inputmode="decimal"><span>%</span></div></div>
-          <div class="field"><label>IPI %</label><div class="sfx"><input type="number" id="aliq-ipi" placeholder="0" inputmode="decimal"><span>%</span></div></div>
-          <div class="field"><label>ICMS %</label><div class="sfx"><input type="number" id="aliq-icms" value="18" inputmode="decimal"><span>%</span></div></div>
+          <div class="field"><label><span class="sigla" onclick="showSigla('II',event)"><span class="sigla-badge">? II</span></span> %</label><div class="sfx"><input type="number" id="aliq-ii" placeholder="0" inputmode="decimal"><span>%</span></div></div>
+          <div class="field"><label><span class="sigla" onclick="showSigla('IPI',event)"><span class="sigla-badge">? IPI</span></span> %</label><div class="sfx"><input type="number" id="aliq-ipi" placeholder="0" inputmode="decimal"><span>%</span></div></div>
+          <div class="field"><label><span class="sigla" onclick="showSigla('ICMS',event)"><span class="sigla-badge">? ICMS</span></span> %</label><div class="sfx"><input type="number" id="aliq-icms" value="18" inputmode="decimal"><span>%</span></div></div>
         </div>
         <div class="field">
           <label>Estado de destino</label>
@@ -420,12 +431,12 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
       <div class="ch"><div class="ci">💰</div><div class="ct">VALORES & CÂMBIO</div></div>
       <div class="cb">
         <div class="r2">
-          <div class="field"><label>FOB unitário (US$)</label><div class="pfx"><span>$</span><input type="number" id="fob-unit" placeholder="0.00" inputmode="decimal"></div></div>
+          <div class="field"><label>Preço <span class="sigla" onclick="showSigla('FOB',event)"><span class="sigla-badge">? FOB</span></span> unitário (US$)</label><div class="pfx"><span>$</span><input type="number" id="fob-unit" placeholder="0.00" inputmode="decimal"></div></div>
           <div class="field"><label>Quantidade</label><input type="number" id="qtd" placeholder="0" inputmode="numeric"></div>
         </div>
         <div class="r2">
           <div class="field"><label>Câmbio USD/BRL</label><div class="pfx"><span>R$</span><input type="number" id="cambio" value="5.85" inputmode="decimal"></div></div>
-          <div class="field"><label>Seguro s/ CIF</label><div class="sfx"><input type="number" id="seguro-pct" value="0.5" inputmode="decimal"><span>%</span></div></div>
+          <div class="field"><label>Seguro s/ <span class="sigla" onclick="showSigla('CIF',event)"><span class="sigla-badge">? CIF</span></span></label><div class="sfx"><input type="number" id="seguro-pct" value="0.5" inputmode="decimal"><span>%</span></div></div>
         </div>
       </div>
     </div>
@@ -441,7 +452,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
           </div>
           <div id="frete-lcl">
             <div class="r2">
-              <div class="field"><label>Custo/CBM (US$)</label><div class="pfx"><span>$</span><input type="number" id="lcl-rate" placeholder="80" inputmode="decimal"></div></div>
+              <div class="field"><label>Custo/<span class="sigla" onclick="showSigla('CBM',event)"><span class="sigla-badge">? CBM</span></span> (US$)</label><div class="pfx"><span>$</span><input type="number" id="lcl-rate" placeholder="80" inputmode="decimal"></div></div>
               <div class="field"><label>Mínimo (CBM)</label><input type="number" id="lcl-min" value="1" inputmode="decimal"></div>
             </div>
             <div class="slabel">Dimensões da Caixa</div>
@@ -478,8 +489,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
       <div class="ch"><div class="ci">🔧</div><div class="ct">CUSTOS OPERACIONAIS</div></div>
       <div class="cb">
         <div class="r2">
-          <div class="field"><label>Despachante (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-desp" value="1200" inputmode="decimal"></div></div>
-          <div class="field"><label>Taxa Siscomex (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-sis" value="214.50" inputmode="decimal"></div></div>
+          <div class="field"><label>Despachante Aduaneiro (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-desp" value="1200" inputmode="decimal"></div></div>
+          <div class="field"><label>Taxa Siscomex (R$) <span style="font-size:10px;color:var(--t3)">— R$214,50 fixo</span></label><div class="pfx"><span>R$</span><input type="number" id="c-sis" value="214.50" inputmode="decimal"></div></div>
         </div>
         <div class="r2">
           <div class="field"><label>Armazém (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-arm" placeholder="400" inputmode="decimal"></div></div>
@@ -487,7 +498,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
         </div>
         <div class="field"><label>Outros (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-outros" placeholder="0" inputmode="decimal"></div></div>
         <div class="divider"></div>
-        <div class="field"><label>Consultoria (% sobre landed)</label><div class="sfx"><input type="number" id="pct-consult" value="0" inputmode="decimal"><span>%</span></div></div>
+        <div class="field"><label>Consultoria (% sobre custo total)</label><div class="sfx"><input type="number" id="pct-consult" value="0" inputmode="decimal"><span>%</span></div></div>
         <div class="divider"></div>
         <div class="field"><label>Preço de venda Shopee (R$)</label><div class="pfx"><span>R$</span><input type="number" id="preco-venda" placeholder="0.00" inputmode="decimal"></div></div>
       </div>
@@ -595,10 +606,12 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
         <div id="trans-out-wrap" style="display:none;margin-top:12px">
           <div class="trans-out" id="trans-out">—</div>
           <div class="trans-py" id="trans-py"></div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:6px">Verifique a tradução e então reproduza o áudio</div>
           <div class="trans-acts">
-            <button class="tts-btn" id="tts-btn" onclick="speakChinese()">🔊 Ouvir</button>
-            <button class="tts-btn" onclick="showDisp(document.getElementById('trans-out').textContent,document.getElementById('trans-py').textContent,document.getElementById('trans-input').value)">📱 Mostrar</button>
+            <button class="tts-btn" id="tts-btn" onclick="speakChinese()">🔊 Reproduzir áudio</button>
+            <button class="tts-btn" onclick="showDisp(document.getElementById('trans-out').textContent,document.getElementById('trans-py').textContent,document.getElementById('trans-input').value)">📱 Tela cheia</button>
           </div>
+          <div style="font-size:11px;color:var(--t3);margin-top:6px">💡 No iPhone: ative a voz chinesa em Ajustes → Acessibilidade → Fala → Vozes</div>
         </div>
       </div>
     </div>
@@ -649,11 +662,21 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
           <div class="field"><label>Produto</label><input type="text" id="s-produto" placeholder="Nome" autocomplete="off"></div>
         </div>
         <div class="r2">
-          <div class="field"><label>Preço (US$)</label><div class="pfx"><span>$</span><input type="number" id="s-preco" placeholder="2.50" inputmode="decimal"></div></div>
-          <div class="field"><label>MOQ</label><input type="text" id="s-moq" placeholder="500 un." autocomplete="off"></div>
+          <div class="field"><label>Preço unitário (US$)</label><div class="pfx"><span>$</span><input type="number" id="s-preco" placeholder="2.50" inputmode="decimal"></div></div>
+          <div class="field"><label><span class="sigla" onclick="showSigla('MOQ',event)"><span class="sigla-badge">? MOQ</span></span></label><input type="text" id="s-moq" placeholder="Ex: 500 unidades" autocomplete="off"></div>
         </div>
         <div class="r2">
-          <div class="field"><label>WeChat</label><input type="text" id="s-wechat" placeholder="ID" autocomplete="off"></div>
+          <div class="field"><label>Frete estimado (US$/CBM)</label><div class="pfx"><span>$</span><input type="number" id="s-frete" placeholder="80" inputmode="decimal"></div></div>
+          <div class="field"><label>Prazo de produção</label><input type="text" id="s-prazo" placeholder="Ex: 15 dias" autocomplete="off"></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>WeChat / Contato</label>
+<div style="display:flex;gap:8px">
+  <input type="text" id="s-wechat" placeholder="ID do WeChat ou telefone" autocomplete="off" style="flex:1">
+  <button onclick="scanWeChat()" style="min-height:var(--tap);padding:0 14px;background:var(--acd);border:1px solid var(--ac);border-radius:var(--rs);color:var(--ac);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">📷 QR</button>
+</div>
+<div style="font-size:11px;color:var(--t3);margin-top:4px">💡 O fornecedor mostra o QR Code do WeChat → toque em 📷 QR para escanear</div>
+</div>
           <div class="field"><label>Interesse</label>
             <select id="s-interesse">
               <option value="alto">🟢 Alto</option>
@@ -672,6 +695,22 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
       <div class="cb" style="padding:0">
         <div id="stands-empty" class="empty" style="padding:24px"><div class="empty-icon" style="font-size:28px">📋</div><div class="empty-sub">Nenhum stand ainda</div></div>
         <div id="stands-list" style="padding:12px"></div>
+      </div>
+    </div>
+
+    <div class="card" style="background:#fff8f0;border-color:#fed7aa">
+      <div class="ch" style="border-color:#fed7aa"><div class="ci" style="background:#fff3e0">💡</div><div class="ct" style="color:var(--yw)">COMO FUNCIONA O FRETE EM YIWU</div></div>
+      <div class="cb" style="font-size:13px;color:var(--t2);line-height:1.7">
+        <p>Em Yiwu, os fornecedores geralmente <strong style="color:var(--t1)">passam uma estimativa do frete</strong> quando você fecha o pedido.</p>
+        <br>
+        <p>O processo funciona assim:</p>
+        <div style="margin:8px 0;padding:10px;background:#fff;border-radius:8px;font-size:12px">
+          <div style="margin-bottom:6px">1️⃣ <strong>Você fecha o pedido</strong> no stand</div>
+          <div style="margin-bottom:6px">2️⃣ <strong>Eles medem e pesam</strong> as caixas depois de produzir</div>
+          <div style="margin-bottom:6px">3️⃣ <strong>Você contrata um freight forwarder</strong> (agente de frete) em Yiwu — eles passam o preço por CBM</div>
+          <div>4️⃣ <strong>O frete sai do armazém do fornecedor</strong> para o armazém do agente, que consolida com outras cargas</div>
+        </div>
+        <p style="font-size:12px;color:var(--t3)">💡 Peça ao fornecedor o endereço do armazém e a quantidade de caixas/CBM estimado. Use isso na calculadora ao lado.</p>
       </div>
     </div>
 
@@ -802,6 +841,14 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- SIGLA POPUP -->
+<div id="sigla-overlay" onclick="closeSigla()"></div>
+<div class="sigla-popup" id="sigla-popup">
+  <strong id="sigla-nome"></strong>
+  <span id="sigla-desc"></span>
+  <div class="example" id="sigla-ex"></div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════
@@ -1762,7 +1809,9 @@ async function salvarStand() {
         moq: document.getElementById('s-moq').value,
         wechat: document.getElementById('s-wechat').value,
         interesse: document.getElementById('s-interesse').value,
-        obs: document.getElementById('s-obs').value
+        obs: (document.getElementById('s-obs').value || '') +
+          (document.getElementById('s-frete').value ? ' | Frete: US$' + document.getElementById('s-frete').value + '/CBM' : '') +
+          (document.getElementById('s-prazo').value ? ' | Prazo: ' + document.getElementById('s-prazo').value : '')
       }
     });
     if (!r.ok) throw new Error(JSON.stringify(r.data));
@@ -1837,11 +1886,46 @@ function calcReversa() {
 // YIWU MAP
 // ═══════════════════════════════════════════════════════
 var DISTRITOS = [
-  { num:1, name:'Distrito 1', sub:'Natal, Joias, Flores, Brinquedos', cats:['Artigos de Natal','Joias de fantasia','Flores artificiais','Bolsas','Brinquedos'], tip:'O mais movimentado. Chegue cedo — corredores lotam até o meio-dia.' },
-  { num:2, name:'Distrito 2', sub:'Papelaria, Plásticos, Relógios, Óculos', cats:['Papelaria','Artigos plásticos','Relógios','Óculos de sol','Malas e mochilas'], tip:'Ótimo para escritório e escolar. Fornecedores com catálogo digital.' },
-  { num:3, name:'Distrito 3', sub:'Eletrônicos, Cosméticos, Brinquedos elétricos', cats:['Eletrônicos','Acessórios celular','Cosméticos','Brinquedos eletrônicos'], tip:'Eletrônicos: atenção à cert. ANATEL/INMETRO. Peça especificação técnica.' },
-  { num:4, name:'Distrito 4', sub:'Roupas, Calçados, Moda', cats:['Roupas femininas','Calçados','Acessórios moda','Roupas infantis'], tip:'Têxteis: laudo de composição obrigatório para importação formal.' },
-  { num:5, name:'Distrito 5', sub:'Construção, Elétricos, Móveis, LED', cats:['Materiais de construção','Elétricos','Ferragens','Iluminação LED'], tip:'Mais novo. Produtos em volume, ideal para LCL. Menos turismo.' }
+  {
+    num:1, name:'Distrito 1 — O Coração de Yiwu',
+    sub:'Natal · Joias · Flores · Bijuterias · Brinquedos',
+    cats:['Artigos de Natal','Joias de fantasia','Flores e plantas artificiais','Bolsas e carteiras','Meias, lingerie e roupas íntimas','Brinquedos pequenos','Bijuterias e acessórios','Artigos religiosos'],
+    tip:'O mais antigo e movimentado dos 5 distritos. Chegue antes das 9h — depois das 11h os corredores ficam lotados. Aqui estão os maiores fornecedores de itens de Natal do mundo. As joias de fantasia ficam no setor 1A e 1B. Negocie no mínimo 3 stands antes de fechar.',
+    frete:'Produtos leves e pequenos — frete por peso pode ser mais barato que por CBM.',
+    alerta:'⚠️ Bijuterias com níquel: Verifique certificação RoHS para exportar legalmente ao Brasil.'
+  },
+  {
+    num:2, name:'Distrito 2 — Utilidades e Escritório',
+    sub:'Papelaria · Plásticos · Relógios · Óculos · Malas',
+    cats:['Papelaria e material escolar','Artigos plásticos domésticos','Relógios e acessórios','Óculos de sol e de grau','Malas, mochilas e bolsas de viagem','Artigos de escritório','Cosméticos e cuidados pessoais','Embalagens e caixas'],
+    tip:'Fornecedores aqui geralmente têm catálogo digital e aceitam pedidos via Alibaba. Boa opção para quem quer continuar comprando após a viagem. Malas e mochilas ficam no setor 2C — boa concentração de fornecedores com MOQ baixo (100-300 unidades).',
+    frete:'Malas e mochilas: atenção ao volume cubado — são leves mas volumosas, o CBM é o que manda.',
+    alerta:'⚠️ Óculos de grau: exigem registro na ANVISA para venda no Brasil.'
+  },
+  {
+    num:3, name:'Distrito 3 — Eletrônicos e Tecnologia',
+    sub:'Eletrônicos · Celular · Cosméticos · Esportes',
+    cats:['Eletrônicos e gadgets','Acessórios de celular e carregadores','Cosméticos e perfumaria','Brinquedos eletrônicos e drones','Utensílios domésticos elétricos','Artigos esportivos','Ferramentas e equipamentos','Iluminação e lanternas'],
+    tip:'O distrito que exige mais atenção. Eletrônicos de má qualidade abundam. Sempre peça a especificação técnica por escrito e solicite amostra antes de fechar. Acessórios de celular têm MOQ baixo (50-200 unidades) e boa margem. Cosméticos ficam no setor 3D.',
+    frete:'Eletrônicos: verifique se o produto tem bateria de lítio — frete aéreo proibido para baterias. Use marítimo.',
+    alerta:'⚠️ Eletrônicos: precisam de certificação ANATEL no Brasil. Sem isso, a importação pode ser retida na alfândega.'
+  },
+  {
+    num:4, name:'Distrito 4 — Moda e Vestuário',
+    sub:'Roupas · Calçados · Moda feminina · Infantil',
+    cats:['Roupas femininas','Roupas masculinas','Roupas infantis e bebê','Calçados adulto e infantil','Acessórios de moda (cintos, chapéus, lenços)','Roupas esportivas e de academia','Underwear e pijamas','Tecidos e aviamentos'],
+    tip:'O maior polo de moda popular da China. Roupas femininas são o forte — setor 4A e 4B. Calçados ficam no 4C. Muitos fornecedores trabalham com coleção sazonal. Para roupas infantis, sempre peça certificado de composição (algodão, poliéster %). MOQ costuma ser por cor/tamanho.',
+    frete:'Roupas: comprimir bem na embalagem reduz CBM. Peça ao fornecedor embalar a vácuo.',
+    alerta:'⚠️ Têxteis: lei brasileira exige etiqueta em português com composição, país de origem e instruções de lavagem.'
+  },
+  {
+    num:5, name:'Distrito 5 — Construção e Indústria',
+    sub:'Construção · Elétricos · Móveis · LED · Jardim',
+    cats:['Materiais de construção','Produtos elétricos e fios','Ferragens e parafusos','Móveis e acessórios de decoração','Artigos de jardim e área externa','Iluminação LED e lustres','Plásticos industriais','Ferramentas manuais e elétricas'],
+    tip:'O distrito mais novo e menos turístico. Fornecedores aqui são mais técnicos e menos habituados a turistas. Leve um tradutor ou use o app. Iluminação LED tem ótima margem no Brasil. Móveis em MDF têm CBM alto — calcule bem o frete antes de negociar.',
+    frete:'Produtos pesados e volumosos — quase sempre compensa FCL se o volume for grande o suficiente.',
+    alerta:'⚠️ Elétricos: produtos precisam certificação INMETRO no Brasil. LEDs sem certificação podem ser retidos.'
+  }
 ];
 
 function renderYiwuMap() {
@@ -1849,8 +1933,12 @@ function renderYiwuMap() {
     return '<div class="dc" id="dist-' + d.num + '" onclick="toggleDist(' + d.num + ')">' +
       '<div class="dc-hdr"><div class="dc-num">' + d.num + '</div>' +
       '<div><div class="dc-name">' + d.name + '</div><div class="dc-sub">' + d.sub + '</div></div></div>' +
-      '<div class="dc-body">' + d.cats.map(function(c){ return '<span class="cat-tag">' + c + '</span>'; }).join('') +
-      '<div class="dc-tip">💡 ' + d.tip + '</div></div></div>';
+      '<div class="dc-body">' +
+        '<div style="margin-bottom:10px">' + d.cats.map(function(c2){ return '<span class="cat-tag">' + c2 + '</span>'; }).join('') + '</div>' +
+        '<div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:8px">' + d.tip + '</div>' +
+        '<div style="padding:8px 10px;background:var(--bld);border-radius:6px;font-size:12px;color:var(--bl);margin-bottom:6px">🚢 ' + d.frete + '</div>' +
+        '<div style="padding:8px 10px;background:var(--ywd);border-radius:6px;font-size:12px;color:var(--yw)">' + d.alerta + '</div>' +
+      '</div></div>';
   }).join('');
 }
 function toggleDist(n) { document.getElementById('dist-' + n).classList.toggle('open'); }
@@ -1872,6 +1960,337 @@ function converterUnidades() {
       '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--ac)">' + val + '</span>' +
       '<span style="color:var(--t2);font-size:14px">' + (CLBLS[unit]||unit) + '</span></div>';
   }).join('');
+}
+
+
+// ═══════════════════════════════════════════════════════
+// SIGLAS — Dicionário em linguagem simples
+// ═══════════════════════════════════════════════════════
+var SIGLAS = {
+  'FOB': { nome:'FOB — Free On Board', desc:'Preço do produto saindo da fábrica na China, sem incluir frete internacional nem seguro. É o preço que o fornecedor te cobra.', ex:'Ex: FOB US$ 5,00 = você paga US$ 5 por peça na fábrica.' },
+  'CIF': { nome:'CIF — Cost, Insurance & Freight', desc:'Custo total até chegar no Brasil: FOB + Frete + Seguro. É a base de cálculo para os impostos.', ex:'Ex: CIF = FOB + frete marítimo + seguro da carga.' },
+  'NCM': { nome:'NCM — Nomenclatura Comum do Mercosul', desc:'Código de 8 números que classifica o produto. Define quais impostos você vai pagar. É como uma "identidade" do produto para a Receita Federal.', ex:'Ex: NCM 6403.51.00 = calçados de couro.' },
+  'II': { nome:'II — Imposto de Importação', desc:'Imposto cobrado pelo governo federal na entrada do produto no Brasil. Varia de 0% a 35% dependendo do tipo de produto.', ex:'Ex: II 20% sobre CIF R$10.000 = R$2.000 de imposto.' },
+  'IPI': { nome:'IPI — Imposto sobre Produtos Industrializados', desc:'Imposto federal sobre produtos industrializados. Muitos produtos têm IPI de 0%. É calculado sobre CIF + II.', ex:'Ex: Eletrônicos costumam ter IPI mais alto.' },
+  'PIS': { nome:'PIS — Programa de Integração Social', desc:'Contribuição federal fixa de 2,1% calculada sobre o valor CIF. Todo produto importado paga.', ex:'Ex: CIF R$10.000 → PIS = R$210.' },
+  'COFINS': { nome:'COFINS — Contribuição para Financiamento da Seguridade Social', desc:'Contribuição federal fixa de 9,65% sobre o valor CIF. Todo produto importado paga.', ex:'Ex: CIF R$10.000 → COFINS = R$965.' },
+  'ICMS': { nome:'ICMS — Imposto sobre Circulação de Mercadorias', desc:'Imposto estadual que varia por estado (12% a 20%). É calculado "por dentro" — isso significa que a base de cálculo inclui o próprio ICMS, tornando-o mais caro do que parece.', ex:'Ex: SP tem ICMS de 18%, PR tem 12%.' },
+  'AFRMM': { nome:'AFRMM — Adicional de Frete para Renovação da Marinha Mercante', desc:'Taxa de 8% cobrada sobre o frete marítimo internacional. Só se aplica quando o transporte é por navio.', ex:'Frete US$1.000 → AFRMM = US$80 a mais.' },
+  'CBM': { nome:'CBM — Cubic Meter (Metro Cúbico)', desc:'Unidade de volume usada no frete marítimo. No LCL (container compartilhado) você paga por CBM ocupado. 1 CBM = 1m × 1m × 1m.', ex:'Caixa 50x40x30cm = 0,06 CBM.' },
+  'LCL': { nome:'LCL — Less than Container Load', desc:'Container compartilhado: você divide o espaço (e o custo) com outras empresas. Ideal para volumes menores.', ex:'Você ocupa 2 CBM num container de 28 CBM.' },
+  'FCL': { nome:'FCL — Full Container Load', desc:'Container exclusivo: você aluga o container inteiro. Mais barato por unidade quando o volume é grande.', ex:'Container 20 pés = 28 CBM, 40 pés = 58 CBM.' },
+  'MOQ': { nome:'MOQ — Minimum Order Quantity', desc:'Quantidade mínima de pedido exigida pelo fornecedor. Abaixo disso, ele não vende.', ex:'MOQ 500 unidades = você precisa comprar ao menos 500 peças.' },
+  'TT': { nome:'TT — Telegraphic Transfer', desc:'Transferência bancária internacional. O jeito mais comum de pagar fornecedores chineses. Normalmente 30% de entrada + 70% antes do envio.', ex:'Pedido US$5.000 → paga US$1.500 agora, US$3.500 quando ficar pronto.' },
+  'RTS': { nome:'RTS — Regime de Tributação Simplificada', desc:'Sistema simplificado para importações de até US$3.000. Só paga II fixo de 60% + ICMS. Mais simples, mas pode sair mais caro que a importação formal.', ex:'Produto US$100 → imposto = US$60 + ICMS.' },
+};
+
+function showSigla(sigla, event) {
+  event.stopPropagation();
+  var d = SIGLAS[sigla]; if (!d) return;
+  var pop = document.getElementById('sigla-popup');
+  var ov = document.getElementById('sigla-overlay');
+  document.getElementById('sigla-nome').textContent = d.nome;
+  document.getElementById('sigla-desc').textContent = d.desc;
+  document.getElementById('sigla-ex').textContent = d.ex || '';
+  var rect = event.target.getBoundingClientRect();
+  var top = rect.bottom + 8;
+  var left = Math.min(rect.left, window.innerWidth - 275);
+  if (top + 150 > window.innerHeight) top = rect.top - 160;
+  pop.style.top = top + 'px';
+  pop.style.left = Math.max(8, left) + 'px';
+  pop.classList.add('show');
+  ov.classList.add('show');
+}
+function closeSigla() {
+  document.getElementById('sigla-popup').classList.remove('show');
+  document.getElementById('sigla-overlay').classList.remove('show');
+}
+
+// Helper: wrap sigla in clickable badge
+function S(sigla) {
+  return '<span class="sigla" onclick="showSigla(\'' + sigla + '\',event)"><span class="sigla-badge">?' + sigla + '</span></span>';
+}
+
+// ═══════════════════════════════════════════════════════
+// TRADUÇÃO COM ÁUDIO DO SISTEMA
+// ═══════════════════════════════════════════════════════
+var lastTranslation = { zh: '', py: '', pt: '' };
+
+// Override traduzir to store result for audio
+var _traduzirOrig = traduzir;
+async function traduzir() {
+  var input = document.getElementById('trans-input').value.trim();
+  if (!input) return;
+  var isPtZh = langDir === 'ptZh';
+  var outWrap = document.getElementById('trans-out-wrap');
+  var outEl = document.getElementById('trans-out');
+  var pyEl = document.getElementById('trans-py');
+  outEl.textContent = '…'; pyEl.textContent = ''; outWrap.style.display = 'block';
+  var prompt = isPtZh
+    ? 'Traduza para Mandarim. JSON APENAS: {"zh":"texto","pinyin":"pinyin","pt":"confirmação"}'
+    : 'Traduza para Português Brasileiro. JSON APENAS: {"pt":"tradução","zh":"original","pinyin":"pinyin"}';
+  try {
+    var data = await callClaude([{ role:'user', content: prompt + '\nTexto: "' + input + '"' }]);
+    var j = claudeJSON(data);
+    lastTranslation = { zh: j.zh || '', py: j.pinyin || '', pt: j.pt || input };
+    outEl.textContent = isPtZh ? (j.zh || '—') : (j.pt || '—');
+    pyEl.textContent = j.pinyin || '';
+    // Show audio button
+    var audioBtn = document.getElementById('audio-confirm-btn');
+    if (audioBtn) audioBtn.style.display = 'flex';
+  } catch(e) { outEl.textContent = 'Erro. Verifique a API key.'; }
+}
+
+function speakLastTranslation() {
+  var txt = lastTranslation.zh || document.getElementById('trans-out').textContent;
+  if (!txt || txt === '—') { toast('Nenhuma tradução para reproduzir.', 'error'); return; }
+  var lang = langDir === 'ptZh' ? 'zh-CN' : 'pt-BR';
+  if (langDir !== 'ptZh') txt = lastTranslation.pt || txt;
+  var utt = new SpeechSynthesisUtterance(txt);
+  utt.lang = lang;
+  utt.rate = 0.85;
+  var voices = window.speechSynthesis.getVoices();
+  var voice = voices.find(function(v){ return v.lang.startsWith(lang.split('-')[0]); });
+  if (voice) utt.voice = voice;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+  var btn = document.getElementById('tts-btn');
+  if (btn) { btn.classList.add('playing'); utt.onend = function(){ btn.classList.remove('playing'); }; }
+}
+
+// ═══════════════════════════════════════════════════════
+// ADMIN VIEW — ver todos os dados
+// ═══════════════════════════════════════════════════════
+var ADMIN_EMAIL = 'kleite1103@gmail.com';
+function isAdmin() { return currentUser && currentUser.email === ADMIN_EMAIL; }
+
+async function loadHistory() {
+  var c = document.getElementById('hist-container');
+  var si = document.getElementById('sync-indicator');
+  var sd = document.getElementById('sync-dot');
+  var st = document.getElementById('sync-txt');
+  si.style.display = 'flex'; sd.classList.add('syncing'); st.textContent = 'Carregando…';
+  try {
+    // Admin vê todos; user vê só os próprios (RLS já filtra)
+    var url = '/rest/v1/simulacoes?select=*&order=created_at.desc&limit=100';
+    var r = await supaFetch(url, { method:'GET' });
+    sd.classList.remove('syncing'); st.textContent = 'Sincronizado';
+    if (!r.ok) throw new Error('Erro ao carregar histórico');
+    var hist = Array.isArray(r.data) ? r.data : [];
+    if (!hist.length) {
+      c.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">SEM SIMULAÇÕES</div><div class="empty-sub">Calcule e salve na aba Calculadora</div></div>';
+      return;
+    }
+    c.innerHTML = (isAdmin() ? '<div style="padding:8px 12px;background:#fff5f2;border:1px solid var(--ac);border-radius:8px;font-size:12px;color:var(--ac);margin-bottom:12px;font-weight:600">👑 Visão Admin — mostrando todos os usuários</div>' : '') +
+      hist.map(function(e){
+        var modLabel = e.modalidade === 'formal' ? 'Formal Marítima' : 'Simplificada Aérea';
+        var color = e.margem >= 30 ? 'var(--gn)' : e.margem >= 10 ? 'var(--yw)' : 'var(--rd)';
+        var data = new Date(e.created_at).toLocaleDateString('pt-BR');
+        return '<div class="hcard">' +
+          '<div class="hc-top"><div><div class="hc-name">' + e.nome + '</div>' +
+          '<div class="hc-date">' + data + ' · ' + modLabel + '</div></div>' +
+          '<button class="hc-del" onclick="delHist(' + e.id + ')">🗑</button></div>' +
+          '<div class="hc-metrics">' +
+            '<div><div class="hm-lbl">Landed Total</div><div class="hm-val" style="color:var(--ac)">' + fmt(e.landed_total) + '</div></div>' +
+            '<div><div class="hm-lbl">Por Unidade</div><div class="hm-val">' + fmt(e.landed_unit) + '</div></div>' +
+            '<div><div class="hm-lbl">FOB Unit</div><div class="hm-val">US$ ' + (e.fob_unit||0).toFixed(2) + '</div></div>' +
+            '<div><div class="hm-lbl">Qtd</div><div class="hm-val">' + (e.qtd||'—') + '</div></div>' +
+            (e.preco_venda > 0 ? '<div><div class="hm-lbl">Margem</div><div class="hm-val" style="color:' + color + '">' + (e.margem||0).toFixed(1) + '%</div></div>' : '') +
+          '</div></div>';
+      }).join('');
+  } catch(e) {
+    sd.classList.remove('syncing'); st.textContent = 'Erro';
+    toast('Erro ao carregar: ' + e.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// QR CODE SCANNER PARA WECHAT
+// ═══════════════════════════════════════════════════════
+function scanWeChat() {
+  // No iPhone, abre a câmera para o usuário escanear o QR
+  // Usamos a câmera nativa + jsQR para decodificar
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.capture = 'environment';
+  inp.onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        canvas.width = img.width; canvas.height = img.height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        // Try to decode QR with jsQR
+        if (typeof jsQR !== 'undefined') {
+          var code = jsQR(imageData.data, imageData.width, imageData.height);
+          if (code) {
+            var wechat = code.data;
+            // Extract WeChat ID from QR URL if it's a WeChat URL
+            var match = wechat.match(/weixin:\/\/dl\/chat\?([^&]+)/) || wechat.match(/\/([^\/\?]+)\??$/);
+            if (match) wechat = match[1];
+            document.getElementById('s-wechat').value = wechat;
+            toast('✓ WeChat escaneado: ' + wechat, 'success');
+          } else {
+            toast('QR não reconhecido. Digite manualmente.', 'error');
+          }
+        } else {
+          toast('QR scanner não disponível. Digite o ID manualmente.', 'error');
+        }
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// SIGLAS — Dicionário em linguagem simples
+// ═══════════════════════════════════════════════════════
+var SIGLAS = {
+  'FOB':   { nome:'FOB — Free On Board', desc:'Preço do produto na saída da fábrica na China, sem frete e seguro. É o que o fornecedor te cobra.', ex:'Ex: FOB US$ 5,00 = você paga US$5 por peça na fábrica.' },
+  'CIF':   { nome:'CIF — Cost, Insurance & Freight', desc:'FOB + Frete Internacional + Seguro. Base de cálculo para impostos no Brasil.', ex:'Ex: CIF = FOB + frete marítimo + seguro da carga.' },
+  'NCM':   { nome:'NCM — Nomenclatura Comum do Mercosul', desc:'Código de 8 números que classifica o produto. Define quais impostos você paga.', ex:'Ex: 6403.51.00 = calçados de couro.' },
+  'II':    { nome:'II — Imposto de Importação', desc:'Imposto federal na entrada do produto no Brasil. Varia de 0% a 35% pelo tipo de produto.', ex:'Ex: II 20% sobre CIF R$10.000 = R$2.000.' },
+  'IPI':   { nome:'IPI — Imposto sobre Produtos Industrializados', desc:'Imposto federal. Muitos produtos têm 0%. Calculado sobre CIF + II.', ex:'Eletrônicos costumam ter IPI mais alto.' },
+  'PIS':   { nome:'PIS — Programa de Integração Social', desc:'Contribuição federal fixa de 2,1% sobre o CIF. Todo produto importado paga.', ex:'CIF R$10.000 → PIS = R$210.' },
+  'COFINS':{ nome:'COFINS — Contrib. p/ Financiamento da Seguridade Social', desc:'Contribuição federal fixa de 9,65% sobre o CIF.', ex:'CIF R$10.000 → COFINS = R$965.' },
+  'ICMS':  { nome:'ICMS — Imposto sobre Circulação de Mercadorias', desc:'Imposto estadual de 12% a 20%. Calculado "por dentro" — a base inclui o próprio ICMS, tornando-o mais pesado.', ex:'SP = 18%, PR = 12%.' },
+  'AFRMM': { nome:'AFRMM — Adicional de Frete p/ Renovação da Marinha Mercante', desc:'Taxa de 8% sobre o frete marítimo. Só paga quando transporta por navio.', ex:'Frete US$1.000 → AFRMM = US$80.' },
+  'CBM':   { nome:'CBM — Metro Cúbico', desc:'Unidade de volume do frete marítimo. No LCL você paga por CBM ocupado.', ex:'Caixa 50x40x30cm = 0,06 CBM.' },
+  'LCL':   { nome:'LCL — Container Compartilhado', desc:'Você divide o container com outras empresas e paga só pelo espaço usado. Ideal para volumes menores.', ex:'Você usa 2 CBM de um container de 28 CBM.' },
+  'FCL':   { nome:'FCL — Container Exclusivo', desc:'Você aluga o container inteiro. Mais barato por unidade em grandes volumes.', ex:'20 pés = 28 CBM, 40 pés = 58 CBM.' },
+  'MOQ':   { nome:'MOQ — Quantidade Mínima de Pedido', desc:'Mínimo que o fornecedor aceita vender. Abaixo disso, ele não fecha.', ex:'MOQ 500 unidades = compra mínima de 500 peças.' },
+  'TT':    { nome:'TT — Transferência Bancária Internacional', desc:'Forma mais comum de pagar fornecedor chinês. Normalmente 30% de entrada + 70% antes do envio.', ex:'Pedido US$5.000 → paga US$1.500 agora + US$3.500 quando ficar pronto.' },
+  'RTS':   { nome:'RTS — Regime de Tributação Simplificada', desc:'Importações até US$3.000 com imposto fixo de 60% + ICMS. Mais simples, às vezes mais caro.', ex:'Produto US$100 → imposto = US$60.' },
+};
+
+function showSigla(sigla, event) {
+  event.stopPropagation();
+  var d = SIGLAS[sigla]; if (!d) return;
+  var pop = document.getElementById('sigla-popup');
+  var ov = document.getElementById('sigla-overlay');
+  document.getElementById('sigla-nome').textContent = d.nome;
+  document.getElementById('sigla-desc').textContent = d.desc;
+  document.getElementById('sigla-ex').textContent = d.ex || '';
+  var rect = event.target.getBoundingClientRect();
+  var top = rect.bottom + 8;
+  var left = Math.min(rect.left, window.innerWidth - 275);
+  if (top + 180 > window.innerHeight) top = Math.max(8, rect.top - 180);
+  pop.style.top = top + 'px';
+  pop.style.left = Math.max(8, left) + 'px';
+  pop.classList.add('show');
+  ov.classList.add('show');
+}
+function closeSigla() {
+  document.getElementById('sigla-popup').classList.remove('show');
+  document.getElementById('sigla-overlay').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════
+// ADMIN VIEW
+// ═══════════════════════════════════════════════════════
+var ADMIN_EMAIL = 'kleite1103@gmail.com';
+function isAdmin() { return currentUser && currentUser.email === ADMIN_EMAIL; }
+
+// Override loadHistory to support admin
+var _loadHistory = loadHistory;
+async function loadHistory() {
+  var c = document.getElementById('hist-container');
+  var si = document.getElementById('sync-indicator');
+  var sd = document.getElementById('sync-dot');
+  var st = document.getElementById('sync-txt');
+  si.style.display = 'flex'; sd.classList.add('syncing'); st.textContent = 'Carregando...';
+  try {
+    var r = await supaFetch('/rest/v1/simulacoes?select=*&order=created_at.desc&limit=100', { method:'GET' });
+    sd.classList.remove('syncing'); st.textContent = 'Sincronizado';
+    if (!r.ok) throw new Error('Erro ao carregar historico');
+    var hist = Array.isArray(r.data) ? r.data : [];
+    if (!hist.length) {
+      c.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">SEM SIMULAÇÕES</div><div class="empty-sub">Calcule e salve na aba Calculadora</div></div>';
+      return;
+    }
+    var adminBanner = isAdmin() ? '<div style="padding:8px 12px;background:#fff5f2;border:1px solid var(--ac);border-radius:8px;font-size:12px;color:var(--ac);margin-bottom:12px;font-weight:700">👑 Visão Admin — todos os usuários</div>' : '';
+    c.innerHTML = adminBanner + hist.map(function(e){
+      var modLabel = e.modalidade === 'formal' ? 'Formal Marítima' : 'Simplificada Aérea';
+      var color = e.margem >= 30 ? 'var(--gn)' : e.margem >= 10 ? 'var(--yw)' : 'var(--rd)';
+      var data = new Date(e.created_at).toLocaleDateString('pt-BR');
+      return '<div class="hcard"><div class="hc-top"><div><div class="hc-name">' + e.nome + '</div><div class="hc-date">' + data + ' · ' + modLabel + '</div></div><button class="hc-del" onclick="delHist(' + e.id + ')">🗑</button></div><div class="hc-metrics"><div><div class="hm-lbl">Landed Total</div><div class="hm-val" style="color:var(--ac)">' + fmt(e.landed_total) + '</div></div><div><div class="hm-lbl">Por Unidade</div><div class="hm-val">' + fmt(e.landed_unit) + '</div></div><div><div class="hm-lbl">FOB Unit</div><div class="hm-val">US$ ' + (e.fob_unit||0).toFixed(2) + '</div></div><div><div class="hm-lbl">Qtd</div><div class="hm-val">' + (e.qtd||'-') + '</div></div>' + (e.preco_venda > 0 ? '<div><div class="hm-lbl">Margem</div><div class="hm-val" style="color:' + color + '">' + (e.margem||0).toFixed(1) + '%</div></div>' : '') + '</div></div>';
+    }).join('');
+  } catch(e) {
+    sd.classList.remove('syncing'); st.textContent = 'Erro';
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ÁUDIO DA TRADUÇÃO (voz do sistema)
+// ═══════════════════════════════════════════════════════
+function speakChinese() {
+  var txt = document.getElementById('trans-out').textContent;
+  if (!txt || txt === '—' || txt === '…') { toast('Nada para reproduzir.', 'error'); return; }
+  var isPtZh = langDir === 'ptZh';
+  var lang = isPtZh ? 'zh-CN' : 'pt-BR';
+  var utt = new SpeechSynthesisUtterance(txt);
+  utt.lang = lang;
+  utt.rate = 0.85;
+  // Load voices — on iOS they load async
+  var trySpeak = function() {
+    var voices = window.speechSynthesis.getVoices();
+    var voice = voices.find(function(v){ return v.lang.startsWith(isPtZh ? 'zh' : 'pt'); });
+    if (voice) utt.voice = voice;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utt);
+    var btn = document.getElementById('tts-btn');
+    if (btn) { btn.classList.add('playing'); utt.onend = function(){ btn.classList.remove('playing'); }; }
+    if (!voice && isPtZh) toast('Dica: ative a voz chinesa em Ajustes > Acessibilidade > Fala', 'error');
+  };
+  if (window.speechSynthesis.getVoices().length === 0) {
+    window.speechSynthesis.onvoiceschanged = trySpeak;
+    window.speechSynthesis.getVoices();
+  } else {
+    trySpeak();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// QR CODE — WeChat scanner
+// ═══════════════════════════════════════════════════════
+function scanWeChat() {
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*'; inp.capture = 'environment';
+  inp.onchange = function(e) {
+    var file = e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        canvas.width = img.width; canvas.height = img.height;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        var imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+        if (typeof jsQR !== 'undefined') {
+          var code = jsQR(imageData.data, imageData.width, imageData.height);
+          if (code) {
+            var wid = code.data;
+            var m = wid.match(/weixin:\/\/dl\/chat\?([^&]+)/) || wid.match(/\/([^\/\?]+)\??$/);
+            if (m) wid = m[1];
+            document.getElementById('s-wechat').value = wid;
+            toast('WeChat: ' + wid, 'success');
+          } else { toast('QR não reconhecido. Digite o ID manualmente.', 'error'); }
+        } else { toast('Scanner não disponível. Digite o ID manualmente.', 'error'); }
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
 }
 
 
