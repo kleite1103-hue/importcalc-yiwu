@@ -369,142 +369,137 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
   <!-- CALCULADORA -->
   <div class="tab-panel active" id="tab-calc">
     <div class="page-title">CALCULADORA</div>
-    <div class="page-sub">Custo landed completo China → Brasil</div>
+    <div class="page-sub">Análise rápida de viabilidade — use no stand em Yiwu</div>
 
-    <div class="card">
-      <div class="ch"><div class="ci">🚢</div><div class="ct">MODALIDADE</div></div>
-      <div class="cb">
-        <div class="mtoggle">
-          <div class="mopt sel" id="opt-formal" onclick="setModal('formal')">
-            <div class="mopt-t">Formal Marítima</div><div class="mopt-s">CNPJ + Siscomex</div>
-          </div>
-          <div class="mopt" id="opt-simples" onclick="setModal('simples')">
-            <div class="mopt-t">Simplificada Aérea</div><div class="mopt-s">Até US$ 3.000</div>
-          </div>
-        </div>
-        <div id="modal-info" style="font-size:12px;color:var(--t3);padding:10px 12px;background:var(--s2);border-radius:8px;line-height:1.5">
-          II por NCM · IPI por NCM · PIS 2,1% · COFINS 9,65% · ICMS por dentro · AFRMM 8%
-        </div>
-      </div>
+    <!-- DICA -->
+    <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:var(--r);padding:14px 16px;margin-bottom:14px;font-size:13px;color:#1e40af;line-height:1.6">
+      <strong>💡 Como usar:</strong> Fotografe o produto na aba <strong>NCM</strong> — o Claude preenche os impostos automaticamente. Depois volte aqui, informe o preço e quantidade, e veja se vale a pena comprar.
     </div>
 
+    <!-- PRODUTO -->
     <div class="card">
-      <div class="ch"><div class="ci">📦</div><div class="ct">PRODUTO & NCM</div></div>
+      <div class="ch"><div class="ci">📦</div><div class="ct">PRODUTO</div></div>
       <div class="cb">
-        <div class="field"><label>Nome do Produto</label><input type="text" id="nome-produto" placeholder="Ex: Caixinha acrílica 20cm…" autocomplete="off"></div>
+        <div class="field"><label>Nome do Produto</label><input type="text" id="nome-produto" placeholder="Ex: Bolsa de couro sintético preta" autocomplete="off"></div>
         <div class="field">
-          <label>Código NCM</label>
+          <label>Código NCM <span style="font-size:11px;color:var(--t3)">— preenchido automaticamente pela foto</span></label>
           <div class="ncm-row">
-            <input type="text" id="ncm-input" placeholder="Ex: 94036000" inputmode="numeric" maxlength="10">
+            <input type="text" id="ncm-input" placeholder="Cole ou busque o código NCM" inputmode="numeric" maxlength="10">
             <button class="btn-sm" id="btn-ncm" onclick="buscarNCM()"><span id="ncm-btn-txt">Buscar</span></button>
           </div>
           <div class="ncm-res" id="ncm-res">
             <div class="ncm-desc" id="ncm-desc">—</div>
             <div class="ncm-tags" id="ncm-tags"></div>
           </div>
-          <div id="ncm-err" style="font-size:13px;color:var(--rd);margin-top:6px;display:none">NCM não encontrado. Preencha as alíquotas manualmente.</div>
+          <div id="ncm-err" style="font-size:13px;color:var(--rd);margin-top:6px;display:none">NCM não encontrado. Preencha as alíquotas abaixo manualmente.</div>
         </div>
-        <div class="slabel">Alíquotas</div>
-        <div class="r3">
-          <div class="field"><label><span class="sigla" onclick="showSigla('II',event)"><span class="sigla-badge">? II</span></span> %</label><div class="sfx"><input type="number" id="aliq-ii" placeholder="0" inputmode="decimal"><span>%</span></div></div>
-          <div class="field"><label><span class="sigla" onclick="showSigla('IPI',event)"><span class="sigla-badge">? IPI</span></span> %</label><div class="sfx"><input type="number" id="aliq-ipi" placeholder="0" inputmode="decimal"><span>%</span></div></div>
-          <div class="field"><label><span class="sigla" onclick="showSigla('ICMS',event)"><span class="sigla-badge">? ICMS</span></span> %</label><div class="sfx"><input type="number" id="aliq-icms" value="18" inputmode="decimal"><span>%</span></div></div>
+
+        <!-- IMPOSTOS — colapsável -->
+        <div onclick="toggleImpostos()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 0;border-top:1px solid var(--b1);margin-top:4px">
+          <span style="font-size:13px;font-weight:600;color:var(--t2)">⚙️ Alíquotas de impostos</span>
+          <span id="imp-toggle-icon" style="font-size:12px;color:var(--t3)">▼ ver detalhes</span>
+        </div>
+        <div id="imp-detail" style="display:none">
+          <div style="background:#f8f9ff;border-radius:8px;padding:12px;margin-bottom:8px;font-size:12px;color:var(--t3);line-height:1.6">
+            Preenchidos automaticamente quando você usa a aba NCM por Foto. Você pode editar se necessário.
+          </div>
+          <div class="r3">
+            <div class="field"><label><span class="sigla" onclick="showSigla('II',event)"><span class="sigla-badge">? II</span></span></label><div class="sfx"><input type="number" id="aliq-ii" placeholder="0" inputmode="decimal"><span>%</span></div></div>
+            <div class="field"><label><span class="sigla" onclick="showSigla('IPI',event)"><span class="sigla-badge">? IPI</span></span></label><div class="sfx"><input type="number" id="aliq-ipi" placeholder="0" inputmode="decimal"><span>%</span></div></div>
+            <div class="field"><label><span class="sigla" onclick="showSigla('ICMS',event)"><span class="sigla-badge">? ICMS</span></span></label><div class="sfx"><input type="number" id="aliq-icms" value="18" inputmode="decimal"><span>%</span></div></div>
+          </div>
+          <div class="field">
+            <label>Seu estado (define o ICMS)</label>
+            <select id="estado-sel" onchange="setICMS()">
+              <option value="">— Selecione —</option>
+              <option value="20">AM (20%)</option><option value="19">BA (19%)</option>
+              <option value="20">CE (20%)</option><option value="18">DF (18%)</option>
+              <option value="17">ES (17%)</option><option value="17">GO (17%)</option>
+              <option value="17">MT (17%)</option><option value="17">MS (17%)</option>
+              <option value="18">MG (18%)</option><option value="19">PA (19%)</option>
+              <option value="20">PE (20%)</option><option value="12">PR (12%)</option>
+              <option value="20">RJ (20%)</option><option value="18">RS (18%)</option>
+              <option value="17">SC (17%)</option><option value="18">SP (18%)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREÇO & QUANTIDADE -->
+    <div class="card">
+      <div class="ch"><div class="ci">💰</div><div class="ct">PREÇO & QUANTIDADE</div></div>
+      <div class="cb">
+        <div class="r2">
+          <div class="field">
+            <label>Preço unitário na China <span class="sigla" onclick="showSigla('FOB',event)"><span class="sigla-badge">? FOB</span></span></label>
+            <div class="pfx"><span>US$</span><input type="number" id="fob-unit" placeholder="0.00" inputmode="decimal"></div>
+          </div>
+          <div class="field">
+            <label>Quantidade</label>
+            <input type="number" id="qtd" placeholder="0" inputmode="numeric">
+          </div>
         </div>
         <div class="field">
-          <label>Estado de destino</label>
-          <select id="estado-sel" onchange="setICMS()">
-            <option value="">— Selecione —</option>
-            <option value="20">AM (20%)</option><option value="19">BA (19%)</option>
-            <option value="20">CE (20%)</option><option value="18">DF (18%)</option>
-            <option value="17">ES (17%)</option><option value="17">GO (17%)</option>
-            <option value="17">MT (17%)</option><option value="17">MS (17%)</option>
-            <option value="18">MG (18%)</option><option value="19">PA (19%)</option>
-            <option value="20">PE (20%)</option><option value="12">PR (12%)</option>
-            <option value="20">RJ (20%)</option><option value="18">RS (18%)</option>
-            <option value="17">SC (17%)</option><option value="18">SP (18%)</option>
-          </select>
+          <label>Câmbio do dia (US$ → R$)</label>
+          <div class="pfx"><span>R$</span><input type="number" id="cambio" value="5.85" inputmode="decimal"></div>
+          <div style="font-size:11px;color:var(--t3);margin-top:4px">💡 Verifique o câmbio atual no Google antes de usar</div>
         </div>
       </div>
     </div>
 
+    <!-- FRETE & CHENG -->
     <div class="card">
-      <div class="ch"><div class="ci">💰</div><div class="ct">VALORES & CÂMBIO</div></div>
+      <div class="ch"><div class="ci">🚢</div><div class="ct">FRETE & ASSESSORIA</div></div>
       <div class="cb">
-        <div class="r2">
-          <div class="field"><label>Preço <span class="sigla" onclick="showSigla('FOB',event)"><span class="sigla-badge">? FOB</span></span> unitário (US$)</label><div class="pfx"><span>$</span><input type="number" id="fob-unit" placeholder="0.00" inputmode="decimal"></div></div>
-          <div class="field"><label>Quantidade</label><input type="number" id="qtd" placeholder="0" inputmode="numeric"></div>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:14px;font-size:12px;color:#166534;line-height:1.6">
+          ✅ Você vai com a <strong>Cheng Importa</strong> — eles cuidam do frete e desembaraço. Informe apenas a estimativa de custo de frete que eles te passarem.
         </div>
         <div class="r2">
-          <div class="field"><label>Câmbio USD/BRL</label><div class="pfx"><span>R$</span><input type="number" id="cambio" value="5.85" inputmode="decimal"></div></div>
-          <div class="field"><label>Seguro s/ <span class="sigla" onclick="showSigla('CIF',event)"><span class="sigla-badge">? CIF</span></span></label><div class="sfx"><input type="number" id="seguro-pct" value="0.5" inputmode="decimal"><span>%</span></div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="ch"><div class="ci">🚢</div><div class="ct">FRETE</div><div class="cbadge b-bl" id="frete-badge">Marítimo</div></div>
-      <div class="cb">
-        <div id="frete-formal">
-          <div class="slabel">Tipo de Contratação</div>
-          <div class="ftoggle">
-            <button class="fsb active" id="btn-lcl" onclick="setContainer('lcl')">LCL Compartilhado</button>
-            <button class="fsb" id="btn-fcl" onclick="setContainer('fcl')">FCL Exclusivo</button>
+          <div class="field">
+            <label>Frete estimado total (US$)</label>
+            <div class="pfx"><span>$</span><input type="number" id="lcl-rate" placeholder="100" inputmode="decimal"></div>
+            <div style="font-size:11px;color:var(--t3);margin-top:4px">Referência: US$80–130 por <span class="sigla" onclick="showSigla('CBM',event)"><span class="sigla-badge">? CBM</span></span></div>
           </div>
-          <div id="frete-lcl">
-            <div class="r2">
-              <div class="field"><label>Custo/<span class="sigla" onclick="showSigla('CBM',event)"><span class="sigla-badge">? CBM</span></span> (US$)</label><div class="pfx"><span>$</span><input type="number" id="lcl-rate" placeholder="80" inputmode="decimal"></div></div>
-              <div class="field"><label>Mínimo (CBM)</label><input type="number" id="lcl-min" value="1" inputmode="decimal"></div>
-            </div>
-            <div class="slabel">Dimensões da Caixa</div>
-            <div class="r3">
-              <div class="field"><label>C (cm)</label><input type="number" id="lcl-c" placeholder="30" inputmode="decimal"></div>
-              <div class="field"><label>L (cm)</label><input type="number" id="lcl-l" placeholder="20" inputmode="decimal"></div>
-              <div class="field"><label>A (cm)</label><input type="number" id="lcl-a" placeholder="15" inputmode="decimal"></div>
-            </div>
-            <div class="r2">
-              <div class="field"><label>Unid/caixa</label><input type="number" id="lcl-qtd-cx" value="1" inputmode="numeric"></div>
-              <div class="field"><label>Peso cx (kg)</label><input type="number" id="lcl-peso" placeholder="5" inputmode="decimal"></div>
-            </div>
-          </div>
-          <div id="frete-fcl" style="display:none">
-            <div class="r2">
-              <div class="field"><label>Custo container (US$)</label><div class="pfx"><span>$</span><input type="number" id="fcl-total" placeholder="2500" inputmode="decimal"></div></div>
-              <div class="field"><label>Tipo</label><select id="fcl-tipo"><option value="28">20' (28 CBM)</option><option value="58">40' (58 CBM)</option><option value="60">40'HC (60 CBM)</option></select></div>
-            </div>
-            <div class="r3">
-              <div class="field"><label>C (cm)</label><input type="number" id="fcl-c" placeholder="30" inputmode="decimal"></div>
-              <div class="field"><label>L (cm)</label><input type="number" id="fcl-l" placeholder="20" inputmode="decimal"></div>
-              <div class="field"><label>A (cm)</label><input type="number" id="fcl-a" placeholder="15" inputmode="decimal"></div>
-            </div>
-            <div class="field"><label>Unid/caixa</label><input type="number" id="fcl-qtd-cx" value="1" inputmode="numeric"></div>
+          <div class="field">
+            <label>Volume estimado (<span class="sigla" onclick="showSigla('CBM',event)"><span class="sigla-badge">? CBM</span></span>)</label>
+            <input type="number" id="lcl-cbm-direto" placeholder="1" value="1" inputmode="decimal">
+            <div style="font-size:11px;color:var(--t3);margin-top:4px">Peça ao fornecedor</div>
           </div>
         </div>
-        <div id="frete-simples" style="display:none">
-          <div class="field"><label>Frete aéreo total (US$)</label><div class="pfx"><span>$</span><input type="number" id="frete-aereo" placeholder="350" inputmode="decimal"></div></div>
+        <div class="field">
+          <label>Comissão Cheng Importa (% sobre custo total)</label>
+          <div class="sfx"><input type="number" id="pct-consult" value="15" inputmode="decimal"><span>%</span></div>
         </div>
       </div>
     </div>
 
+    <!-- PREÇO DE VENDA -->
     <div class="card">
-      <div class="ch"><div class="ci">🔧</div><div class="ct">CUSTOS OPERACIONAIS</div></div>
+      <div class="ch"><div class="ci">🏪</div><div class="ct">PREÇO DE VENDA</div></div>
       <div class="cb">
-        <div class="r2">
-          <div class="field"><label>Despachante Aduaneiro (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-desp" value="1200" inputmode="decimal"></div></div>
-          <div class="field"><label>Taxa Siscomex (R$) <span style="font-size:10px;color:var(--t3)">— R$214,50 fixo</span></label><div class="pfx"><span>R$</span><input type="number" id="c-sis" value="214.50" inputmode="decimal"></div></div>
+        <div class="field">
+          <label>Quanto você quer vender na Shopee? (R$)</label>
+          <div class="pfx"><span>R$</span><input type="number" id="preco-venda" placeholder="0.00" inputmode="decimal"></div>
         </div>
-        <div class="r2">
-          <div class="field"><label>Armazém (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-arm" placeholder="400" inputmode="decimal"></div></div>
-          <div class="field"><label>Frete interno (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-fint" placeholder="800" inputmode="decimal"></div></div>
-        </div>
-        <div class="field"><label>Outros (R$)</label><div class="pfx"><span>R$</span><input type="number" id="c-outros" placeholder="0" inputmode="decimal"></div></div>
-        <div class="divider"></div>
-        <div class="field"><label>Consultoria (% sobre custo total)</label><div class="sfx"><input type="number" id="pct-consult" value="0" inputmode="decimal"><span>%</span></div></div>
-        <div class="divider"></div>
-        <div class="field"><label>Preço de venda Shopee (R$)</label><div class="pfx"><span>R$</span><input type="number" id="preco-venda" placeholder="0.00" inputmode="decimal"></div></div>
+        <!-- hidden fields for calc compat -->
+        <input type="hidden" id="seguro-pct" value="0.5">
+        <input type="hidden" id="c-desp" value="1200">
+        <input type="hidden" id="c-sis" value="214.50">
+        <input type="hidden" id="c-arm" value="400">
+        <input type="hidden" id="c-fint" value="800">
+        <input type="hidden" id="c-outros" value="0">
+        <input type="hidden" id="lcl-min" value="1">
+        <input type="hidden" id="lcl-c" value="30">
+        <input type="hidden" id="lcl-l" value="20">
+        <input type="hidden" id="lcl-a" value="15">
+        <input type="hidden" id="lcl-qtd-cx" value="1">
+        <input type="hidden" id="lcl-peso" value="5">
+        <input type="hidden" id="frete-badge" value="">
       </div>
     </div>
 
-    <button class="btn-primary" onclick="calcular()">CALCULAR VIABILIDADE</button>
+    <button class="btn-primary" onclick="calcular()">✓ ANALISAR VIABILIDADE</button>
 
     <div id="results-empty" style="display:none"></div>
     <div id="results-panel" style="display:none;margin-top:16px">
@@ -1201,25 +1196,10 @@ function closeDisp() { document.getElementById('disp-overlay').classList.remove(
 // ═══════════════════════════════════════════════════════
 function setModal(m) {
   modalidade = m;
-  document.getElementById('opt-formal').classList.toggle('sel', m === 'formal');
-  document.getElementById('opt-simples').classList.toggle('sel', m === 'simples');
-  document.getElementById('modal-info').textContent = m === 'formal'
-    ? 'II por NCM · IPI por NCM · PIS 2,1% · COFINS 9,65% · ICMS por dentro · AFRMM 8%'
-    : 'RTS: II fixo 60% · ICMS por dentro · Até US$ 3.000';
-  document.getElementById('frete-formal').style.display = m === 'formal' ? '' : 'none';
-  document.getElementById('frete-simples').style.display = m === 'simples' ? '' : 'none';
-  document.getElementById('frete-badge').textContent = m === 'formal' ? 'Marítimo' : 'Aéreo';
-  document.getElementById('c-desp').value = m === 'formal' ? '1200' : '0';
-  document.getElementById('c-sis').value = m === 'formal' ? '214.50' : '0';
+  // Simplified mode — always formal maritima
 }
 
-function setContainer(t) {
-  containerTipo = t;
-  document.getElementById('btn-lcl').classList.toggle('active', t === 'lcl');
-  document.getElementById('btn-fcl').classList.toggle('active', t === 'fcl');
-  document.getElementById('frete-lcl').style.display = t === 'lcl' ? '' : 'none';
-  document.getElementById('frete-fcl').style.display = t === 'fcl' ? '' : 'none';
-}
+function setContainer(t) { containerTipo = t; }
 
 function setICMS() {
   var v = document.getElementById('estado-sel').value;
@@ -1275,27 +1255,12 @@ function calcular() {
   var fobBRL = fobUnit * qtd * cambio;
   var freteUSD = 0, freteInfo = '';
 
-  if (modalidade === 'formal') {
-    if (containerTipo === 'lcl') {
-      var c = gn('lcl-c') || 30, l = gn('lcl-l') || 20, a = gn('lcl-a') || 15;
-      var qcx = gi('lcl-qtd-cx') || 1, rate = gn('lcl-rate') || 80, minCbm = gn('lcl-min') || 1;
-      var cbmCx = (c * l * a) / 1e6;
-      var ncx = Math.ceil(qtd / qcx);
-      var cbm = Math.max(ncx * cbmCx, minCbm);
-      freteUSD = cbm * rate;
-      freteInfo = ncx + ' cx · ' + cbm.toFixed(3) + ' CBM';
-    } else {
-      var fcl = gn('fcl-total'), cap = gn('fcl-tipo') || 28;
-      var fc = gn('fcl-c') || 30, fl = gn('fcl-l') || 20, fa = gn('fcl-a') || 15;
-      var fqcx = gi('fcl-qtd-cx') || 1;
-      var fcbm = Math.ceil(qtd / fqcx) * (fc * fl * fa) / 1e6;
-      freteUSD = fcl * Math.min(fcbm / cap, 1);
-      freteInfo = fcbm.toFixed(2) + ' / ' + cap + ' CBM';
-    }
-  } else {
-    freteUSD = gn('frete-aereo');
-    freteInfo = 'frete aéreo';
-  }
+  // Simplified: frete = taxa/CBM × volume estimado
+  var cbmDireto = gn('lcl-cbm-direto') || 1;
+  var rateDireto = gn('lcl-rate') || 100;
+  freteUSD = rateDireto * cbmDireto;
+  freteInfo = cbmDireto.toFixed(1) + ' CBM · US$' + rateDireto + '/CBM (Cheng Importa)';
+  modalidade = 'formal'; // sempre formal marítima
 
   var freteBRL = freteUSD * cambio;
   var segBRL = (fobBRL + freteBRL) * (segPct / 100);
@@ -1984,6 +1949,18 @@ var SIGLAS = {
   'RTS': { nome:'RTS — Regime de Tributação Simplificada', desc:'Sistema simplificado para importações de até US$3.000. Só paga II fixo de 60% + ICMS. Mais simples, mas pode sair mais caro que a importação formal.', ex:'Produto US$100 → imposto = US$60 + ICMS.' },
 };
 
+function toggleImpostos() {
+  var d = document.getElementById('imp-detail');
+  var icon = document.getElementById('imp-toggle-icon');
+  if (d.style.display === 'none') {
+    d.style.display = 'block';
+    icon.textContent = '▲ ocultar';
+  } else {
+    d.style.display = 'none';
+    icon.textContent = '▼ ver detalhes';
+  }
+}
+
 function showSigla(sigla, event) {
   event.stopPropagation();
   var d = SIGLAS[sigla]; if (!d) return;
@@ -2170,6 +2147,18 @@ var SIGLAS = {
   'TT':    { nome:'TT — Transferência Bancária Internacional', desc:'Forma mais comum de pagar fornecedor chinês. Normalmente 30% de entrada + 70% antes do envio.', ex:'Pedido US$5.000 → paga US$1.500 agora + US$3.500 quando ficar pronto.' },
   'RTS':   { nome:'RTS — Regime de Tributação Simplificada', desc:'Importações até US$3.000 com imposto fixo de 60% + ICMS. Mais simples, às vezes mais caro.', ex:'Produto US$100 → imposto = US$60.' },
 };
+
+function toggleImpostos() {
+  var d = document.getElementById('imp-detail');
+  var icon = document.getElementById('imp-toggle-icon');
+  if (d.style.display === 'none') {
+    d.style.display = 'block';
+    icon.textContent = '▲ ocultar';
+  } else {
+    d.style.display = 'none';
+    icon.textContent = '▼ ver detalhes';
+  }
+}
 
 function showSigla(sigla, event) {
   event.stopPropagation();
