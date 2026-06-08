@@ -306,7 +306,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 <body>
 
 <!-- ══════════════════════════════════════
-     TELA DE LOGIN
+<!-- ══════════════════════════════════════
+     TELA DE IDENTIFICAÇÃO
 ══════════════════════════════════════ -->
 <div id="login-screen" style="display:none">
   <div class="login-box">
@@ -316,31 +317,26 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
       <div class="login-logo-sub">Efeito Vendas · Yiwu 2025</div>
     </div>
     <div class="login-card">
-      <div class="login-title">ACESSO</div>
-      <div class="login-sub">Entre com seu email e senha para acessar</div>
-      <div class="login-tabs">
-        <button class="ltab active" id="ltab-login" onclick="setLoginTab('login')">Entrar</button>
-        <button class="ltab" id="ltab-register" onclick="setLoginTab('register')">Criar conta</button>
-      </div>
+      <div class="login-title">QUEM É VOCÊ?</div>
+      <div class="login-sub">Informe seu nome e um código para identificar suas simulações e anotações.</div>
       <div class="login-err" id="login-err"></div>
-      <div id="login-form">
-        <div class="field" id="field-nome" style="display:none">
-          <label>Seu nome</label>
-          <input type="text" id="inp-nome" placeholder="Ex: Karina" autocomplete="name">
-        </div>
-        <div class="field">
-          <label>Email</label>
-          <input type="email" id="inp-email" placeholder="seu@email.com" autocomplete="email">
-        </div>
-        <div class="field">
-          <label>Senha</label>
-          <input type="password" id="inp-senha" placeholder="Mínimo 6 caracteres" autocomplete="current-password">
-        </div>
-        <button class="btn-primary" id="btn-login" onclick="handleAuth()">ENTRAR</button>
+      <div class="field">
+        <label>Seu nome</label>
+        <input type="text" id="inp-nome" placeholder="Ex: Karina" autocomplete="off">
       </div>
+      <div class="field">
+        <label>Código pessoal</label>
+        <input type="text" id="inp-codigo" placeholder="Ex: EV01" autocomplete="off" maxlength="8" style="text-transform:uppercase;letter-spacing:2px">
+        <div style="font-size:11px;color:var(--t3);margin-top:4px">Crie um código curto e memorize — ele identifica seus dados.</div>
+      </div>
+      <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;font-size:12px;color:#1e40af;margin-bottom:16px;line-height:1.5">
+        💡 Sem senha necessária. Na próxima vez use o mesmo nome + código para acessar seus dados.
+      </div>
+      <button class="btn-primary" id="btn-login" onclick="handleAuth()">ENTRAR NO SISTEMA</button>
     </div>
   </div>
 </div>
+
 
 <!-- ══════════════════════════════════════
      HEADER
@@ -821,9 +817,10 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 <div class="overlay" id="user-overlay">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">CONTA</div>
-    <div id="user-info" style="font-size:14px;color:var(--t2);margin-bottom:16px"></div>
-    <button class="btn-ghost" onclick="logout()">🚪 Sair da conta</button>
+    <div class="modal-title">MEU PERFIL</div>
+    <div id="user-info" style="font-size:14px;color:var(--t2);margin-bottom:16px;line-height:1.8"></div>
+    <button class="btn-ghost" style="margin-bottom:10px" onclick="trocarUsuario()">🔄 Trocar de usuário</button>
+    <button class="btn-ghost" onclick="logout()">🚪 Sair</button>
   </div>
 </div>
 
@@ -883,20 +880,18 @@ function toast(msg, type) {
 // ═══════════════════════════════════════════════════════
 // SUPABASE HELPERS
 // ═══════════════════════════════════════════════════════
-function supaHeaders(token) {
-  var h = {
+function supaHeaders() {
+  return {
     'Content-Type': 'application/json',
     'apikey': SUPA_KEY,
-    'Authorization': 'Bearer ' + (token || SUPA_KEY)
+    'Authorization': 'Bearer ' + SUPA_KEY
   };
-  return h;
 }
 
 async function supaFetch(path, opts) {
-  var token = currentSession ? currentSession.access_token : null;
   var res = await fetch(SUPA_URL + path, {
     method: opts.method || 'GET',
-    headers: Object.assign(supaHeaders(token), opts.headers || {}),
+    headers: Object.assign(supaHeaders(), opts.headers || {}),
     body: opts.body ? JSON.stringify(opts.body) : undefined
   });
   var data = null;
@@ -905,70 +900,29 @@ async function supaFetch(path, opts) {
 }
 
 // ═══════════════════════════════════════════════════════
-// AUTH
+// AUTH — Nome + Código (sem senha)
 // ═══════════════════════════════════════════════════════
-function setLoginTab(t) {
-  loginTab = t;
-  document.getElementById('ltab-login').classList.toggle('active', t === 'login');
-  document.getElementById('ltab-register').classList.toggle('active', t === 'register');
-  document.getElementById('field-nome').style.display = t === 'register' ? '' : 'none';
-  document.getElementById('btn-login').textContent = t === 'login' ? 'ENTRAR' : 'CRIAR CONTA';
-  document.getElementById('login-err').style.display = 'none';
-}
-
-async function handleAuth() {
-  var email = document.getElementById('inp-email').value.trim();
-  var senha = document.getElementById('inp-senha').value;
+function handleAuth() {
   var nome = document.getElementById('inp-nome').value.trim();
-  var btn = document.getElementById('btn-login');
+  var codigo = document.getElementById('inp-codigo').value.trim().toUpperCase();
   var errEl = document.getElementById('login-err');
   errEl.style.display = 'none';
 
-  if (!email || !senha) { showLoginErr('Preencha email e senha.'); return; }
-  if (loginTab === 'register' && !nome) { showLoginErr('Informe seu nome.'); return; }
-  if (senha.length < 6) { showLoginErr('Senha deve ter mínimo 6 caracteres.'); return; }
+  if (!nome) { showLoginErr('Informe seu nome.'); return; }
+  if (!codigo || codigo.length < 2) { showLoginErr('Informe um código com pelo menos 2 caracteres.'); return; }
 
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loader"></span>';
+  var userId = 'user_' + codigo + '_' + nome.toLowerCase().replace(/\s+/g,'');
+  var userObj = {
+    id: userId,
+    nome: nome,
+    codigo: codigo,
+    email: nome.toLowerCase().replace(/\s+/g,'') + '_' + codigo + '@importcalc.local'
+  };
 
-  try {
-    var endpoint = loginTab === 'login' ? '/auth/v1/token?grant_type=password' : '/auth/v1/signup';
-    var body = { email: email, password: senha };
-    if (loginTab === 'register') body.data = { nome: nome };
-
-    var res = await fetch(SUPA_URL + endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
-      body: JSON.stringify(body)
-    });
-    var data = await res.json();
-
-    if (!res.ok) {
-      var msg = data.error_description || data.message || data.msg || 'Erro ao autenticar.';
-      if (msg.includes('Invalid login')) msg = 'Email ou senha incorretos.';
-      if (msg.includes('already registered')) msg = 'Email já cadastrado. Faça login.';
-      showLoginErr(msg);
-      btn.disabled = false;
-      btn.textContent = loginTab === 'login' ? 'ENTRAR' : 'CRIAR CONTA';
-      return;
-    }
-
-    if (loginTab === 'register' && data.user && !data.access_token) {
-      showLoginErr('Conta criada! Verifique seu email para confirmar, ou entre diretamente.');
-      btn.disabled = false;
-      btn.textContent = 'CRIAR CONTA';
-      return;
-    }
-
-    currentSession = data;
-    currentUser = data.user;
-    localStorage.setItem('importcalc_session', JSON.stringify(data));
-    showApp();
-  } catch(e) {
-    showLoginErr('Erro de conexão. Verifique sua internet.');
-    btn.disabled = false;
-    btn.textContent = loginTab === 'login' ? 'ENTRAR' : 'CRIAR CONTA';
-  }
+  currentUser = { id: userId, email: userObj.email, user_metadata: { nome: nome, codigo: codigo } };
+  currentSession = { access_token: SUPA_KEY };
+  localStorage.setItem('importcalc_user', JSON.stringify(userObj));
+  showApp();
 }
 
 function showLoginErr(msg) {
@@ -977,37 +931,16 @@ function showLoginErr(msg) {
   el.style.display = 'block';
 }
 
-async function checkSession() {
-  var saved = localStorage.getItem('importcalc_session');
+function checkSession() {
+  var saved = localStorage.getItem('importcalc_user');
   if (!saved) { showLogin(); return; }
   try {
-    var sess = JSON.parse(saved);
-    // Check if token expired
-    var payload = JSON.parse(atob(sess.access_token.split('.')[1]));
-    if (payload.exp * 1000 < Date.now()) {
-      // Try refresh
-      var res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=refresh_token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
-        body: JSON.stringify({ refresh_token: sess.refresh_token })
-      });
-      if (res.ok) {
-        var data = await res.json();
-        currentSession = data;
-        currentUser = data.user;
-        localStorage.setItem('importcalc_session', JSON.stringify(data));
-        showApp();
-      } else {
-        localStorage.removeItem('importcalc_session');
-        showLogin();
-      }
-      return;
-    }
-    currentSession = sess;
-    currentUser = sess.user;
+    var u = JSON.parse(saved);
+    currentUser = { id: u.id, email: u.email, user_metadata: { nome: u.nome, codigo: u.codigo } };
+    currentSession = { access_token: SUPA_KEY };
     showApp();
   } catch(e) {
-    localStorage.removeItem('importcalc_session');
+    localStorage.removeItem('importcalc_user');
     showLogin();
   }
 }
@@ -1024,24 +957,57 @@ function showApp() {
   document.getElementById('main-header').style.display = 'flex';
   document.getElementById('main-app').style.display = 'block';
   document.getElementById('bottom-nav').style.display = 'flex';
-  var nome = currentUser && currentUser.user_metadata && currentUser.user_metadata.nome
-    ? currentUser.user_metadata.nome
-    : (currentUser ? currentUser.email.split('@')[0] : 'Usuário');
+  var nome = currentUser && currentUser.user_metadata ? currentUser.user_metadata.nome : 'Usuário';
+  var codigo = currentUser && currentUser.user_metadata ? currentUser.user_metadata.codigo : '';
   document.getElementById('user-name-btn').textContent = '👤 ' + nome;
-  document.getElementById('user-info').innerHTML = '<strong>' + nome + '</strong><br>' + (currentUser ? currentUser.email : '');
+  document.getElementById('user-info').innerHTML =
+    '<strong style="font-size:18px">' + nome + '</strong><br>' +
+    '<span style="font-size:13px;color:var(--t3)">Código: <strong>' + codigo + '</strong></span><br>' +
+    '<span style="font-size:11px;color:var(--t3)">ID: ' + (currentUser ? currentUser.id : '') + '</span>';
   updateApiStatus();
   renderYiwuMap();
   initFrases();
+  fetchCambio();
 }
 
 function openUserMenu() { document.getElementById('user-overlay').classList.add('open'); }
 
+function trocarUsuario() {
+  document.getElementById('user-overlay').classList.remove('open');
+  showLogin();
+}
+
 function logout() {
-  localStorage.removeItem('importcalc_session');
+  localStorage.removeItem('importcalc_user');
   currentUser = null;
   currentSession = null;
   document.getElementById('user-overlay').classList.remove('open');
   showLogin();
+}
+
+// ═══════════════════════════════════════════════════════
+// CÂMBIO AUTOMÁTICO — funciona na China
+// ═══════════════════════════════════════════════════════
+async function fetchCambio() {
+  try {
+    // Uses CDN that works in China
+    var res = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json');
+    if (!res.ok) throw new Error('fail');
+    var data = await res.json();
+    var brl = data.usd && data.usd.brl;
+    if (brl) {
+      var cambioEl = document.getElementById('cambio');
+      if (cambioEl) {
+        cambioEl.value = brl.toFixed(2);
+        cambioEl.style.borderColor = 'var(--gn)';
+        setTimeout(function(){ cambioEl.style.borderColor = ''; }, 2000);
+        toast('Câmbio atualizado: R$ ' + brl.toFixed(2), 'success');
+      }
+    }
+  } catch(e) {
+    // Silently fail — user can update manually
+    console.log('Câmbio não disponível offline');
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1385,6 +1351,8 @@ async function confirmarSave() {
   btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
 
   try {
+    var userNome = currentUser && currentUser.user_metadata ? currentUser.user_metadata.nome : 'Anon';
+    var userCod = currentUser && currentUser.user_metadata ? currentUser.user_metadata.codigo : '??';
     var r = await supaFetch('/rest/v1/simulacoes', {
       method: 'POST',
       headers: { 'Prefer': 'return=minimal' },
@@ -2284,11 +2252,9 @@ function scanWeChat() {
 
 
 // ═══════════════════════════════════════════════════════
-// INIT — MODO TESTE (login desativado temporariamente)
+// INIT
 // ═══════════════════════════════════════════════════════
-currentUser = { id: "00000000-0000-0000-0000-000000000001", email: "karina@efeitovendas.com.br", user_metadata: { nome: "Karina" } };
-currentSession = { access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvZHdwZmlxbXZhaHlnaW5ya2lwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MjI4MjQsImV4cCI6MjA5NjE5ODgyNH0.b-5ZhNsl3DAMbT8HAu-BaPTj_2Ubh4w0OExO7Y99grY" };
-showApp();
+checkSession();
 
 
 
