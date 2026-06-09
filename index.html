@@ -2329,9 +2329,11 @@ function scanWeChat() {
 
 
 // ═══════════════════════════════════════════════════════
-// INIT
+// INIT — sem login
 // ═══════════════════════════════════════════════════════
-checkSession();
+currentUser = { id: 'guest', email: 'guest@importcalc.local', user_metadata: { nome: 'Visitante' } };
+currentSession = { access_token: SUPA_KEY };
+showApp();
 
 
 
