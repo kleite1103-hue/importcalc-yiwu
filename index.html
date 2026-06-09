@@ -307,7 +307,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 
 <!-- ══════════════════════════════════════
 <!-- ══════════════════════════════════════
-     TELA DE IDENTIFICAÇÃO
+     TELA DE LOGIN
 ══════════════════════════════════════ -->
 <div id="login-screen" style="display:none">
   <div class="login-box">
@@ -316,24 +316,35 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
       <div class="login-logo-text">ImportCalc</div>
       <div class="login-logo-sub">Efeito Vendas · Yiwu 2025</div>
     </div>
-    <div class="login-card">
-      <div class="login-title">QUEM É VOCÊ?</div>
-      <div class="login-sub">Informe seu nome e um código para identificar suas simulações e anotações.</div>
+
+    <!-- ESTADO 1: pedir email -->
+    <div class="login-card" id="login-step-email">
+      <div class="login-title">BEM-VINDA 👋</div>
+      <div class="login-sub">Digite seu email para entrar. Vamos enviar um link de acesso.</div>
       <div class="login-err" id="login-err"></div>
       <div class="field">
-        <label>Seu nome</label>
-        <input type="text" id="inp-nome" placeholder="Ex: Karina" autocomplete="off">
+        <label>Seu email</label>
+        <input type="email" id="inp-email" placeholder="seu@email.com" autocomplete="email" inputmode="email">
       </div>
-      <div class="field">
-        <label>Código pessoal</label>
-        <input type="text" id="inp-codigo" placeholder="Ex: EV01" autocomplete="off" maxlength="8" style="text-transform:uppercase;letter-spacing:2px">
-        <div style="font-size:11px;color:var(--t3);margin-top:4px">Crie um código curto e memorize — ele identifica seus dados.</div>
+      <button class="btn-primary" id="btn-login" onclick="handleAuth()">ENVIAR LINK DE ACESSO</button>
+      <div style="font-size:12px;color:var(--t3);text-align:center;margin-top:14px;line-height:1.6">
+        Sem senha. Você receberá um link no email — clique para entrar.
       </div>
-      <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;font-size:12px;color:#1e40af;margin-bottom:16px;line-height:1.5">
-        💡 Sem senha necessária. Na próxima vez use o mesmo nome + código para acessar seus dados.
-      </div>
-      <button class="btn-primary" id="btn-login" onclick="handleAuth()">ENTRAR NO SISTEMA</button>
     </div>
+
+    <!-- ESTADO 2: aguardando clique no email -->
+    <div class="login-card" id="login-step-sent" style="display:none">
+      <div style="text-align:center;padding:10px 0 20px">
+        <div style="font-size:48px;margin-bottom:12px">📬</div>
+        <div class="login-title">VERIFIQUE SEU EMAIL</div>
+        <div class="login-sub" style="margin-bottom:0">Enviamos um link para<br><strong id="sent-email" style="color:var(--t1)"></strong></div>
+      </div>
+      <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;font-size:13px;color:#1e40af;line-height:1.6;margin-bottom:16px">
+        Abra o email e clique no link. Esta aba ficará ativa.
+      </div>
+      <button class="btn-ghost" onclick="voltarEmail()">← Usar outro email</button>
+    </div>
+
   </div>
 </div>
 
@@ -881,10 +892,11 @@ function toast(msg, type) {
 // SUPABASE HELPERS
 // ═══════════════════════════════════════════════════════
 function supaHeaders() {
+  var token = (currentSession && currentSession.access_token) ? currentSession.access_token : SUPA_KEY;
   return {
     'Content-Type': 'application/json',
     'apikey': SUPA_KEY,
-    'Authorization': 'Bearer ' + SUPA_KEY
+    'Authorization': 'Bearer ' + token
   };
 }
 
@@ -900,29 +912,85 @@ async function supaFetch(path, opts) {
 }
 
 // ═══════════════════════════════════════════════════════
-// AUTH — Nome + Código (sem senha)
+// AUTH — Magic Link (email sem senha)
 // ═══════════════════════════════════════════════════════
-function handleAuth() {
-  var nome = document.getElementById('inp-nome').value.trim();
-  var codigo = document.getElementById('inp-codigo').value.trim().toUpperCase();
+async function handleAuth() {
+  var email = document.getElementById('inp-email').value.trim().toLowerCase();
   var errEl = document.getElementById('login-err');
   errEl.style.display = 'none';
+  if (!email || !email.includes('@')) { showLoginErr('Digite um email válido.'); return; }
 
-  if (!nome) { showLoginErr('Informe seu nome.'); return; }
-  if (!codigo || codigo.length < 2) { showLoginErr('Informe um código com pelo menos 2 caracteres.'); return; }
+  var btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span> Enviando...';
 
-  var userId = 'user_' + codigo + '_' + nome.toLowerCase().replace(/\s+/g,'');
-  var userObj = {
-    id: userId,
-    nome: nome,
-    codigo: codigo,
-    email: nome.toLowerCase().replace(/\s+/g,'') + '_' + codigo + '@importcalc.local'
-  };
+  try {
+    var redirectUrl = window.location.origin + window.location.pathname;
+    var res = await fetch(SUPA_URL + '/auth/v1/magiclink', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+      body: JSON.stringify({ email: email, options: { emailRedirectTo: redirectUrl } })
+    });
+    if (!res.ok) {
+      var d = await res.json();
+      throw new Error(d.msg || d.message || 'Erro ao enviar');
+    }
+    // Show sent state
+    document.getElementById('login-step-email').style.display = 'none';
+    document.getElementById('login-step-sent').style.display = 'block';
+    document.getElementById('sent-email').textContent = email;
+    // Start polling for session
+    pollSession();
+  } catch(e) {
+    showLoginErr('Erro: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = 'ENVIAR LINK DE ACESSO';
+  }
+}
 
-  currentUser = { id: userId, email: userObj.email, user_metadata: { nome: nome, codigo: codigo } };
-  currentSession = { access_token: SUPA_KEY };
-  localStorage.setItem('importcalc_user', JSON.stringify(userObj));
-  showApp();
+var pollTimer = null;
+function pollSession() {
+  // Poll every 2s to detect when user clicked the magic link
+  pollTimer = setInterval(async function() {
+    var hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+      clearInterval(pollTimer);
+      handleMagicLinkCallback();
+    }
+  }, 1000);
+}
+
+async function handleMagicLinkCallback() {
+  try {
+    var hash = window.location.hash.substring(1);
+    var params = {};
+    hash.split('&').forEach(function(p) {
+      var kv = p.split('=');
+      params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
+    });
+    if (!params.access_token) return;
+    // Get user from token
+    var res = await fetch(SUPA_URL + '/auth/v1/user', {
+      headers: { 'Authorization': 'Bearer ' + params.access_token, 'apikey': SUPA_KEY }
+    });
+    var user = await res.json();
+    currentSession = { access_token: params.access_token, refresh_token: params.refresh_token };
+    currentUser = user;
+    localStorage.setItem('importcalc_session', JSON.stringify({ session: currentSession, user: currentUser }));
+    // Clean URL
+    history.replaceState(null, '', window.location.pathname);
+    showApp();
+  } catch(e) {
+    console.error('Magic link error:', e);
+  }
+}
+
+function voltarEmail() {
+  document.getElementById('login-step-sent').style.display = 'none';
+  document.getElementById('login-step-email').style.display = 'block';
+  document.getElementById('btn-login').disabled = false;
+  document.getElementById('btn-login').innerHTML = 'ENVIAR LINK DE ACESSO';
+  if (pollTimer) clearInterval(pollTimer);
 }
 
 function showLoginErr(msg) {
@@ -932,15 +1000,22 @@ function showLoginErr(msg) {
 }
 
 function checkSession() {
-  var saved = localStorage.getItem('importcalc_user');
+  // Check URL hash first (magic link callback)
+  if (window.location.hash && window.location.hash.includes('access_token')) {
+    showLogin();
+    handleMagicLinkCallback();
+    return;
+  }
+  // Check saved session
+  var saved = localStorage.getItem('importcalc_session');
   if (!saved) { showLogin(); return; }
   try {
-    var u = JSON.parse(saved);
-    currentUser = { id: u.id, email: u.email, user_metadata: { nome: u.nome, codigo: u.codigo } };
-    currentSession = { access_token: SUPA_KEY };
+    var s = JSON.parse(saved);
+    currentSession = s.session;
+    currentUser = s.user;
     showApp();
   } catch(e) {
-    localStorage.removeItem('importcalc_user');
+    localStorage.removeItem('importcalc_session');
     showLogin();
   }
 }
@@ -957,13 +1032,14 @@ function showApp() {
   document.getElementById('main-header').style.display = 'flex';
   document.getElementById('main-app').style.display = 'block';
   document.getElementById('bottom-nav').style.display = 'flex';
-  var nome = currentUser && currentUser.user_metadata ? currentUser.user_metadata.nome : 'Usuário';
-  var codigo = currentUser && currentUser.user_metadata ? currentUser.user_metadata.codigo : '';
+  var email = currentUser ? (currentUser.email || '') : '';
+  var nome = (currentUser && currentUser.user_metadata && currentUser.user_metadata.full_name)
+    ? currentUser.user_metadata.full_name
+    : email.split('@')[0];
   document.getElementById('user-name-btn').textContent = '👤 ' + nome;
   document.getElementById('user-info').innerHTML =
-    '<strong style="font-size:18px">' + nome + '</strong><br>' +
-    '<span style="font-size:13px;color:var(--t3)">Código: <strong>' + codigo + '</strong></span><br>' +
-    '<span style="font-size:11px;color:var(--t3)">ID: ' + (currentUser ? currentUser.id : '') + '</span>';
+    '<strong style="font-size:16px">' + nome + '</strong><br>' +
+    '<span style="font-size:13px;color:var(--t3)">' + email + '</span>';
   updateApiStatus();
   renderYiwuMap();
   initFrases();
@@ -973,14 +1049,15 @@ function showApp() {
 function openUserMenu() { document.getElementById('user-overlay').classList.add('open'); }
 
 function trocarUsuario() {
+  localStorage.removeItem('importcalc_session');
+  currentUser = null; currentSession = null;
   document.getElementById('user-overlay').classList.remove('open');
   showLogin();
 }
 
 function logout() {
-  localStorage.removeItem('importcalc_user');
-  currentUser = null;
-  currentSession = null;
+  localStorage.removeItem('importcalc_session');
+  currentUser = null; currentSession = null;
   document.getElementById('user-overlay').classList.remove('open');
   showLogin();
 }
