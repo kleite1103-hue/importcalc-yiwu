@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ff4d1c">
+<title>Pedidos Yiwu — Efeito Vendas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6fa;--s1:#fff;--b1:#dde1ee;--b2:#c8cede;--ac:#ff4d1c;--ac2:#ff6b3d;--acd:rgba(255,77,28,.10);--gn:#16a34a;--gnd:rgba(22,163,74,.10);--rd:#dc2626;--rdd:rgba(220,38,38,.10);--bl:#2563eb;--bld:rgba(37,99,235,.10);--t1:#1a1f36;--t2:#4a5380;--t3:#8892b0;--r:14px;--rs:10px;--tap:48px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{font-size:16px;}
+body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+header{background:#fff;border-bottom:1px solid var(--b1);padding:0 16px;height:56px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 8px rgba(0,0,0,.06);position:sticky;top:0;z-index:100;}
+.logo-icon{width:28px;height:28px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#fff;flex-shrink:0;}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;}
+.logo-sub{font-size:10px;color:var(--t3);}
+.mode-toggle{margin-left:auto;display:flex;gap:4px;}
+.mbtn{padding:6px 12px;border-radius:8px;border:1px solid var(--b2);background:transparent;color:var(--t2);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;min-height:36px;transition:all .2s;}
+.mbtn.active{background:var(--ac);border-color:var(--ac);color:#fff;}
+.app{max-width:600px;margin:0 auto;padding:16px 16px 40px;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:2px;}
+.page-sub{font-size:13px;color:var(--t3);margin-bottom:18px;}
+.card{background:#fff;border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.ch{padding:13px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;}
+.ci{width:26px;height:26px;border-radius:6px;background:var(--acd);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ct{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;}
+.cb{padding:16px;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--t2);margin-bottom:6px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+input,select,textarea{width:100%;background:#fff;border:1px solid var(--b2);border-radius:var(--rs);padding:13px 12px;color:var(--t1);font-family:'Outfit',sans-serif;font-size:16px;transition:border-color .2s;outline:none;-webkit-appearance:none;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acd);}
+input::placeholder,textarea::placeholder{color:var(--t3);}
+textarea{resize:vertical;min-height:70px;line-height:1.5;}
+.pfx{position:relative;display:flex;align-items:center;}
+.pfx span{position:absolute;left:12px;font-size:14px;color:var(--t3);pointer-events:none;}
+.pfx input{padding-left:28px;}
+.btn-primary{width:100%;min-height:var(--tap);padding:14px;background:var(--ac);border:none;border-radius:var(--rs);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-primary:disabled{opacity:.5;pointer-events:none;}
+.btn-ghost{width:100%;min-height:var(--tap);padding:12px;background:transparent;border:1px solid var(--b2);border-radius:var(--rs);color:var(--t2);font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn-sm{padding:8px 14px;min-height:var(--tap);background:var(--acd);border:1px solid var(--ac);border-radius:var(--rs);color:var(--ac);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.foto-zone{border:2px dashed var(--b2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#fafbff;position:relative;min-height:80px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.foto-zone.has{border-color:var(--gn);border-style:solid;}
+.foto-zone input[type=file]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;}
+.foto-prev{width:100%;max-height:220px;object-fit:contain;border-radius:8px;margin-top:10px;display:none;border:1px solid var(--b1);}
+.filtros{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;-webkit-overflow-scrolling:touch;}
+.filtros::-webkit-scrollbar{display:none;}
+.ftag{padding:8px 14px;border-radius:20px;border:1px solid var(--b2);background:#fff;color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;min-height:36px;transition:all .2s;}
+.ftag.active{background:var(--ac);border-color:var(--ac);color:#fff;}
+.pcard{background:#fff;border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.pc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.pc-nome{font-size:16px;font-weight:700;}
+.pc-meta{font-size:12px;color:var(--t3);margin-top:2px;}
+.pc-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;margin-left:8px;flex-shrink:0;}
+.st-p{background:var(--bld);color:var(--bl);border:1px solid var(--bl);}
+.st-e{background:var(--gnd);color:var(--gn);border:1px solid var(--gn);}
+.st-n{background:var(--rdd);color:var(--rd);border:1px solid var(--rd);}
+.pc-fotos{display:flex;gap:8px;margin-bottom:10px;}
+.pc-fwrap{flex:1;}
+.pc-flabel{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:3px;letter-spacing:.5px;}
+.pc-fimg{width:100%;height:110px;object-fit:cover;border-radius:8px;border:1px solid var(--b1);}
+.pc-fimg.ok{border:2px solid var(--gn);}
+.pc-info{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;margin-bottom:10px;}
+.pc-info-t{font-size:10px;font-weight:700;color:var(--gn);margin-bottom:6px;letter-spacing:1px;}
+.pc-info-r{font-size:12px;color:var(--t2);margin-bottom:3px;}
+.pc-obs{background:#f0f2f8;border-radius:6px;padding:8px 10px;font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.5;}
+.pc-acts{display:flex;gap:8px;}
+.btn-col{flex:1;min-height:40px;padding:10px;background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-del{min-height:40px;padding:10px 14px;background:transparent;border:1px solid var(--b2);border-radius:8px;color:var(--t3);font-size:13px;cursor:pointer;}
+.overlay{position:fixed;inset:0;background:rgba(26,31,54,.6);backdrop-filter:blur(6px);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:#fff;border-radius:var(--r) var(--r) 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:600px;animation:sup .25s ease;max-height:90vh;overflow-y:auto;}
+@keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhandle{width:40px;height:4px;background:var(--b2);border-radius:2px;margin:0 auto 16px;}
+.mtitle{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:4px;}
+.msub{font-size:12px;color:var(--t3);margin-bottom:16px;}
+.macts{display:flex;gap:10px;margin-top:16px;}
+.btn-cancel{flex:1;min-height:var(--tap);padding:12px;background:transparent;border:1px solid var(--b2);border-radius:var(--rs);color:var(--t2);font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;}
+.btn-confirm{flex:1;min-height:var(--tap);padding:12px;background:var(--ac);border:none;border-radius:var(--rs);color:#fff;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-80px);border-radius:var(--rs);padding:12px 18px;font-size:14px;font-weight:600;z-index:400;transition:transform .3s;white-space:nowrap;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.2);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{background:#15803d;color:#fff;}
+.toast.error{background:#b91c1c;color:#fff;}
+.empty{text-align:center;padding:48px 20px;color:var(--t3);}
+.empty-icon{font-size:40px;margin-bottom:10px;opacity:.3;}
+.empty-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:4px;}
+.panel{display:none;}.panel.active{display:block;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-icon">EV</div>
+  <div><div class="logo-text">PEDIDOS YIWU</div><div class="logo-sub">Efeito Vendas · Missão China 2025</div></div>
+  <div class="mode-toggle">
+    <button class="mbtn active" id="btn-time" onclick="setModo('time')">📋 Pedir</button>
+    <button class="mbtn" id="btn-yiwu" onclick="setModo('yiwu')">🏪 Coletar</button>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- PANEL TIME -->
+  <div class="panel active" id="panel-time">
+    <div class="page-title">ENVIAR PEDIDO</div>
+    <div class="page-sub">Informe o produto que quer que a Karina busque em Yiwu</div>
+    <div class="card">
+      <div class="ch"><div class="ci">📦</div><div class="ct">NOVO PEDIDO</div></div>
+      <div class="cb">
+        <div class="field"><label>Produto que você quer</label><input type="text" id="p-produto" placeholder="Ex: Bolsa de couro sintético preta, alça dourada" autocomplete="off"></div>
+        <div class="r2">
+          <div class="field"><label>Seu nome / Loja</label><input type="text" id="p-cliente" placeholder="Ex: Loja da Maria" autocomplete="off"></div>
+          <div class="field"><label>Quantidade desejada</label><input type="text" id="p-qtd" placeholder="Ex: 50 unidades" autocomplete="off"></div>
+        </div>
+        <div class="field"><label>Detalhes importantes</label><textarea id="p-obs" placeholder="Cor, tamanho, material, orçamento máximo por unidade..."></textarea></div>
+        <div class="field">
+          <label>Foto de referência</label>
+          <div class="foto-zone" id="p-zona">
+            <input type="file" id="p-foto-input" accept="image/*" onchange="onFotoTime(event)">
+            <span id="p-foto-txt" style="font-size:13px;color:var(--t3)">📷 Adicionar foto do produto</span>
+          </div>
+          <img id="p-foto-prev" class="foto-prev" alt="ref">
+        </div>
+        <div class="field"><label>Quem está pedindo</label><input type="text" id="p-quem" placeholder="Seu nome" autocomplete="off"></div>
+      </div>
+    </div>
+    <button class="btn-primary" id="btn-enviar" onclick="enviarPedido()">📦 ENVIAR PEDIDO</button>
+    <div style="margin-top:18px;padding:14px;background:#f0f7ff;border:1px solid #bfdbfe;border-radius:var(--r);font-size:13px;color:#1e40af;line-height:1.7">
+      <strong>Como funciona:</strong><br>
+      1. Você envia o pedido aqui<br>
+      2. A Karina busca em Yiwu<br>
+      3. Quando encontrado, aparece o preço e foto real
+    </div>
+  </div>
+
+  <!-- PANEL YIWU -->
+  <div class="panel" id="panel-yiwu">
+    <div class="page-title">LISTA DE PEDIDOS</div>
+    <div class="page-sub">Toque para registrar o que encontrou</div>
+    <div class="filtros">
+      <button class="ftag active" id="ft-todos" onclick="filtrar('todos',this)">Todos</button>
+      <button class="ftag" id="ft-proc" onclick="filtrar('procurando',this)">🔍 Procurando</button>
+      <button class="ftag" id="ft-enc" onclick="filtrar('encontrado',this)">✅ Encontrado</button>
+      <button class="ftag" id="ft-nao" onclick="filtrar('nao_encontrado',this)">❌ Não encontrado</button>
+    </div>
+    <div id="pedidos-empty" class="empty"><div class="empty-icon">📦</div><div class="empty-title">SEM PEDIDOS</div><div class="empty-sub">Nenhum pedido ainda.</div></div>
+    <div id="pedidos-list"></div>
+  </div>
+
+</div>
+
+<!-- MODAL COLETAR -->
+<div class="overlay" id="modal-col">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle" id="col-title">COLETAR</div>
+    <div class="msub" id="col-sub"></div>
+    <input type="hidden" id="col-id">
+    <div class="field"><label>Fornecedor / Nº do Stand</label><input type="text" id="col-forn" placeholder="Ex: Stand 3A-20015 · Li Wei"></div>
+    <div class="r2">
+      <div class="field"><label>Preço unitário (US$)</label><div class="pfx"><span>$</span><input type="number" id="col-preco" placeholder="0.00" inputmode="decimal"></div></div>
+      <div class="field"><label>MOQ mínimo</label><input type="text" id="col-moq" placeholder="Ex: 100 unid."></div>
+    </div>
+    <div class="field">
+      <label>WeChat do vendedor</label>
+      <div style="display:flex;gap:8px"><input type="text" id="col-wechat" placeholder="ID do WeChat" style="flex:1"><button class="btn-sm" onclick="scanQR()">📷 QR</button></div>
+    </div>
+    <div class="field"><label>Observações</label><textarea id="col-obs" placeholder="Cores disponíveis, qualidade, prazo..."></textarea></div>
+    <div class="field">
+      <label>Foto do produto real</label>
+      <div class="foto-zone" id="col-zona">
+        <input type="file" id="col-foto-input" accept="image/*" capture="environment" onchange="onFotoYiwu(event)">
+        <span id="col-foto-txt" style="font-size:13px;color:var(--t3)">📷 Fotografar produto</span>
+      </div>
+      <img id="col-foto-prev" class="foto-prev" alt="foto real">
+    </div>
+    <div class="field"><label>Status</label>
+      <select id="col-status">
+        <option value="encontrado">✅ Encontrado</option>
+        <option value="procurando">🔍 Ainda procurando</option>
+        <option value="nao_encontrado">❌ Não encontrado aqui</option>
+      </select>
+    </div>
+    <div class="macts">
+      <button class="btn-cancel" onclick="fecharCol()">Cancelar</button>
+      <button class="btn-confirm" id="btn-salvar" onclick="salvarColeta()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script>
+var SURL='https://todwpfiqmvahyginrkip.supabase.co';
+var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvZHdwZmlxbXZhaHlnaW5ya2lwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MjI4MjQsImV4cCI6MjA5NjE5ODgyNH0.b-5ZhNsl3DAMbT8HAu-BaPTj_2Ubh4w0OExO7Y99grY';
+var modo='time',filtro='todos',todos=[],fotoTime=null,fotoYiwu=null;
+
+function showToast(msg,t){var el=document.getElementById('toast');el.textContent=msg;el.className='toast '+(t||'success');el.classList.add('show');setTimeout(function(){el.classList.remove('show');},3000);}
+
+function setModo(m){
+  modo=m;
+  document.getElementById('btn-time').classList.toggle('active',m==='time');
+  document.getElementById('btn-yiwu').classList.toggle('active',m==='yiwu');
+  document.getElementById('panel-time').classList.toggle('active',m==='time');
+  document.getElementById('panel-yiwu').classList.toggle('active',m==='yiwu');
+  if(m==='yiwu') carregarPedidos();
+}
+
+async function sf(path,opts){
+  var res=await fetch(SURL+path,{method:opts.method||'GET',headers:{'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY},body:opts.body?JSON.stringify(opts.body):undefined});
+  var d=null;try{d=await res.json();}catch(e){}
+  return{ok:res.ok,data:d};
+}
+
+function resize(file,cb){
+  var r=new FileReader();
+  r.onload=function(ev){
+    var img=new Image();
+    img.onload=function(){
+      var MAX=800,w=img.width,h=img.height;
+      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
+      var c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      cb(c.toDataURL('image/jpeg',0.75));
+    };
+    img.src=ev.target.result;
+  };
+  r.readAsDataURL(file);
+}
+
+function onFotoTime(e){
+  var f=e.target.files[0];if(!f)return;
+  resize(f,function(b64){
+    fotoTime=b64;
+    var p=document.getElementById('p-foto-prev');p.src=b64;p.style.display='block';
+    document.getElementById('p-foto-txt').textContent='✓ Foto adicionada';
+    document.getElementById('p-zona').classList.add('has');
+  });
+}
+
+function onFotoYiwu(e){
+  var f=e.target.files[0];if(!f)return;
+  resize(f,function(b64){
+    fotoYiwu=b64;
+    var p=document.getElementById('col-foto-prev');p.src=b64;p.style.display='block';
+    document.getElementById('col-foto-txt').textContent='✓ Foto adicionada';
+    document.getElementById('col-zona').classList.add('has');
+  });
+}
+
+async function enviarPedido(){
+  var prod=document.getElementById('p-produto').value.trim();
+  var cli=document.getElementById('p-cliente').value.trim();
+  if(!prod){showToast('Informe o produto.','error');return;}
+  if(!cli){showToast('Informe seu nome/loja.','error');return;}
+  var btn=document.getElementById('btn-enviar');
+  btn.disabled=true;btn.innerHTML='<span class="loader"></span> Enviando...';
+  try{
+    var obs=document.getElementById('p-obs').value||'';
+    var qtd=document.getElementById('p-qtd').value;
+    if(qtd) obs=(obs?obs+' | ':'')+'Qtd: '+qtd;
+    var r=await sf('/rest/v1/pedidos',{method:'POST',headers:{'Prefer':'return=minimal'},body:{produto:prod,cliente:cli,obs:obs,foto_ref_url:fotoTime||null,criado_por:document.getElementById('p-quem').value.trim()||cli,status:'procurando'}});
+    if(!r.ok) throw new Error(JSON.stringify(r.data));
+    ['p-produto','p-cliente','p-qtd','p-obs','p-quem'].forEach(function(id){document.getElementById(id).value='';});
+    fotoTime=null;
+    document.getElementById('p-foto-prev').style.display='none';
+    document.getElementById('p-foto-txt').textContent='📷 Adicionar foto do produto';
+    document.getElementById('p-zona').classList.remove('has');
+    showToast('✓ Pedido enviado!','success');
+  }catch(e){showToast('Erro: '+e.message,'error');}
+  btn.disabled=false;btn.innerHTML='📦 ENVIAR PEDIDO';
+}
+
+async function carregarPedidos(){
+  var list=document.getElementById('pedidos-list');
+  var empty=document.getElementById('pedidos-empty');
+  list.innerHTML='<div style="text-align:center;padding:32px;color:var(--t3);font-size:13px">Carregando...</div>';
+  empty.style.display='none';
+  try{
+    var r=await sf('/rest/v1/pedidos?select=*&order=created_at.desc',{method:'GET'});
+    if(!r.ok) throw new Error('Erro');
+    todos=Array.isArray(r.data)?r.data:[];
+    renderizar();
+  }catch(e){list.innerHTML='';empty.style.display='';showToast('Erro ao carregar.','error');}
+}
+
+function filtrar(f,btn){
+  filtro=f;
+  document.querySelectorAll('.ftag').forEach(function(b){b.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  renderizar();
+}
+
+function renderizar(){
+  var list=document.getElementById('pedidos-list');
+  var empty=document.getElementById('pedidos-empty');
+  var itens=filtro==='todos'?todos:todos.filter(function(p){return p.status===filtro;});
+  if(!itens.length){list.innerHTML='';empty.style.display='';return;}
+  empty.style.display='none';
+  var sc={procurando:'st-p',encontrado:'st-e',nao_encontrado:'st-n'};
+  var sl={procurando:'🔍 Procurando',encontrado:'✅ Encontrado',nao_encontrado:'❌ Não encontrado'};
+  list.innerHTML=itens.map(function(p){
+    var data=new Date(p.created_at).toLocaleDateString('pt-BR');
+    var temInfo=p.fornecedor||p.preco||p.moq||p.wechat;
+    var ps=(p.produto||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var cs=(p.cliente||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<div class="pcard">'+
+      '<div class="pc-top"><div style="flex:1"><div class="pc-nome">'+(p.produto||'—')+'</div><div class="pc-meta">👤 '+(p.cliente||'—')+' · por '+(p.criado_por||'Anônimo')+' · '+data+'</div></div>'+
+      '<span class="pc-badge '+(sc[p.status]||'st-p')+'">'+(sl[p.status]||'🔍 Procurando')+'</span></div>'+
+      ((p.foto_ref_url||p.foto_real_url)?'<div class="pc-fotos">'+
+        (p.foto_ref_url?'<div class="pc-fwrap"><div class="pc-flabel">REFERÊNCIA</div><img class="pc-fimg" src="'+p.foto_ref_url+'" alt="ref"></div>':'')+
+        (p.foto_real_url?'<div class="pc-fwrap"><div class="pc-flabel" style="color:var(--gn)">✓ ENCONTRADO</div><img class="pc-fimg ok" src="'+p.foto_real_url+'" alt="real"></div>':'')+
+      '</div>':'')+
+      (p.obs?'<div class="pc-obs">'+p.obs+'</div>':'')+
+      (temInfo?'<div class="pc-info"><div class="pc-info-t">✓ COLETADO EM YIWU</div>'+
+        (p.fornecedor?'<div class="pc-info-r">🏪 <strong>Stand:</strong> '+p.fornecedor+'</div>':'')+
+        (p.preco?'<div class="pc-info-r">💰 <strong>Preço:</strong> US$ '+parseFloat(p.preco).toFixed(2)+'/unidade</div>':'')+
+        (p.moq?'<div class="pc-info-r">📦 <strong>Mínimo:</strong> '+p.moq+'</div>':'')+
+        (p.wechat?'<div class="pc-info-r">💬 <strong>WeChat:</strong> '+p.wechat+'</div>':'')+
+      '</div>':'')+
+      '<div class="pc-acts">'+
+        '<button class="btn-col" onclick="abrirCol('+p.id+',\''+ps+'\',\''+cs+'\')">'+
+          (temInfo?'✏️ Editar coleta':'📍 Registrar o que encontrou')+'</button>'+
+        '<button class="btn-del" onclick="deletar('+p.id+')">🗑</button>'+
+      '</div></div>';
+  }).join('');
+}
+
+function abrirCol(id,prod,cli){
+  document.getElementById('col-id').value=id;
+  document.getElementById('col-title').textContent=prod;
+  document.getElementById('col-sub').textContent='Cliente: '+cli;
+  ['col-forn','col-preco','col-moq','col-wechat','col-obs'].forEach(function(i){document.getElementById(i).value='';});
+  fotoYiwu=null;
+  document.getElementById('col-foto-prev').style.display='none';
+  document.getElementById('col-foto-txt').textContent='📷 Fotografar produto';
+  document.getElementById('col-zona').classList.remove('has');
+  document.getElementById('col-status').value='encontrado';
+  document.getElementById('modal-col').classList.add('open');
+}
+function fecharCol(){document.getElementById('modal-col').classList.remove('open');}
+
+async function salvarColeta(){
+  var id=document.getElementById('col-id').value;
+  var btn=document.getElementById('btn-salvar');
+  btn.disabled=true;btn.innerHTML='<span class="loader"></span>';
+  try{
+    var r=await sf('/rest/v1/pedidos?id=eq.'+id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:{
+      fornecedor:document.getElementById('col-forn').value||null,
+      preco:parseFloat(document.getElementById('col-preco').value)||null,
+      moq:document.getElementById('col-moq').value||null,
+      wechat:document.getElementById('col-wechat').value||null,
+      obs:document.getElementById('col-obs').value||null,
+      foto_real_url:fotoYiwu||null,
+      status:document.getElementById('col-status').value,
+      updated_at:new Date().toISOString()
+    }});
+    if(!r.ok) throw new Error(JSON.stringify(r.data));
+    fecharCol();showToast('✓ Salvo!','success');carregarPedidos();
+  }catch(e){showToast('Erro: '+e.message,'error');}
+  btn.disabled=false;btn.textContent='Salvar';
+}
+
+async function deletar(id){
+  if(!confirm('Excluir este pedido?'))return;
+  var r=await sf('/rest/v1/pedidos?id=eq.'+id,{method:'DELETE'});
+  if(r.ok){showToast('Excluído.','success');carregarPedidos();}
+  else showToast('Erro ao excluir.','error');
+}
+
+function scanQR(){
+  var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.capture='environment';
+  inp.onchange=function(e){
+    var f=e.target.files[0];if(!f)return;
+    var rd=new FileReader();
+    rd.onload=function(ev){
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+        c.getContext('2d').drawImage(img,0,0);
+        var id=c.getContext('2d').getImageData(0,0,c.width,c.height);
+        if(typeof jsQR!=='undefined'){
+          var code=jsQR(id.data,id.width,id.height);
+          if(code){document.getElementById('col-wechat').value=code.data;showToast('WeChat escaneado!','success');}
+          else showToast('QR não reconhecido.','error');
+        }
+      };img.src=ev.target.result;
+    };rd.readAsDataURL(f);
+  };inp.click();
+}
+
+document.getElementById('modal-col').addEventListener('click',function(e){if(e.target===this)fecharCol();});
+</script>
+</body>
+</html>
