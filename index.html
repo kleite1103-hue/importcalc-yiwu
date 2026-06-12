@@ -1124,10 +1124,13 @@ function showApp() {
   document.getElementById('user-info').innerHTML =
     '<strong style="font-size:16px">' + nome + '</strong><br>' +
     '<span style="font-size:13px;color:var(--t3)">' + email + '</span>';
-  updateApiStatus();
-  renderYiwuMap();
-  initFrases();
-  fetchCambio();
+  // Defer calls so all functions are defined first
+  setTimeout(function() {
+    if (typeof updateApiStatus === 'function') updateApiStatus();
+    if (typeof renderYiwuMap === 'function') renderYiwuMap();
+    if (typeof initFrases === 'function') initFrases();
+    if (typeof fetchCambio === 'function') fetchCambio();
+  }, 50);
 }
 
 function openUserMenu() { document.getElementById('user-overlay').classList.add('open'); }
