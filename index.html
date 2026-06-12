@@ -763,90 +763,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
     </div>
   </div>
 
-  <!-- PEDIDOS -->
-  <div class="tab-panel" id="tab-pedidos">
-    <div class="page-title">PEDIDOS</div>
-    <div class="page-sub">Time envia pedidos · Você coleta em Yiwu</div>
-
-    <!-- NOVO PEDIDO -->
-    <div class="card">
-      <div class="ch"><div class="ci">➕</div><div class="ct">NOVO PEDIDO</div></div>
-      <div class="cb">
-        <div class="r2">
-          <div class="field"><label>Produto procurado</label><input type="text" id="p-produto" placeholder="Ex: Bolsa de couro preta" autocomplete="off"></div>
-          <div class="field"><label>Cliente / Lojista</label><input type="text" id="p-cliente" placeholder="Ex: Loja da Maria" autocomplete="off"></div>
-        </div>
-        <div class="field"><label>Observações / Especificações</label><textarea id="p-obs" placeholder="Tamanho, cor, material, quantidade desejada..." style="min-height:60px"></textarea></div>
-        <div class="field">
-          <label>Foto de referência</label>
-          <div id="p-foto-zone" style="border:2px dashed var(--b2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#fafbff;position:relative;min-height:80px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="document.getElementById('p-foto-input').click()">
-            <input type="file" id="p-foto-input" accept="image/*" style="display:none" onchange="onPedidoFoto(event)">
-            <span id="p-foto-txt" style="font-size:13px;color:var(--t3)">📷 Toque para adicionar foto de referência</span>
-          </div>
-          <img id="p-foto-prev" style="width:100%;max-height:200px;object-fit:contain;border-radius:8px;margin-top:8px;display:none" alt="preview">
-        </div>
-        <div class="field"><label>Enviado por</label><input type="text" id="p-criado-por" placeholder="Seu nome" autocomplete="off"></div>
-        <button class="btn-primary" onclick="salvarPedido()">📦 ENVIAR PEDIDO</button>
-      </div>
-    </div>
-
-    <!-- FILTROS -->
-    <div style="display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <button class="pcat active" id="pf-todos" onclick="filtrarPedidos('todos',this)">Todos</button>
-      <button class="pcat" id="pf-procurando" onclick="filtrarPedidos('procurando',this)">🔍 Procurando</button>
-      <button class="pcat" id="pf-encontrado" onclick="filtrarPedidos('encontrado',this)">✅ Encontrado</button>
-      <button class="pcat" id="pf-nao" onclick="filtrarPedidos('nao_encontrado',this)">❌ Não encontrado</button>
-    </div>
-
-    <!-- LISTA DE PEDIDOS -->
-    <div id="pedidos-empty" class="empty"><div class="empty-icon">📦</div><div class="empty-title">SEM PEDIDOS</div><div class="empty-sub">O time ainda não enviou pedidos.</div></div>
-    <div id="pedidos-list"></div>
-  </div>
-
-  <!-- MODAL COLETAR (preencher o que achou em Yiwu) -->
-  <div class="overlay" id="coletar-overlay">
-    <div class="modal" style="max-height:90vh;overflow-y:auto">
-      <div class="modal-handle"></div>
-      <div class="modal-title" id="coletar-title">COLETAR INFORMAÇÕES</div>
-      <div style="font-size:12px;color:var(--t3);margin-bottom:14px" id="coletar-sub"></div>
-      <input type="hidden" id="coletar-id">
-
-      <div class="field"><label>Fornecedor / Nome do stand</label><input type="text" id="col-fornecedor" placeholder="Ex: Stand 3A-20015 · Li Wei"></div>
-      <div class="r2">
-        <div class="field"><label>Preço unitário (US$)</label><div class="pfx"><span>$</span><input type="number" id="col-preco" placeholder="0.00" inputmode="decimal"></div></div>
-        <div class="field"><label>MOQ mínimo</label><input type="text" id="col-moq" placeholder="Ex: 100 unidades"></div>
-      </div>
-      <div class="field">
-        <label>WeChat do vendedor</label>
-        <div style="display:flex;gap:8px">
-          <input type="text" id="col-wechat" placeholder="ID do WeChat" style="flex:1">
-          <button onclick="scanWeChatColetar()" style="min-height:var(--tap);padding:0 14px;background:var(--acd);border:1px solid var(--ac);border-radius:var(--rs);color:var(--ac);font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0">📷 QR</button>
-        </div>
-      </div>
-      <div class="field"><label>Observações sobre o produto</label><textarea id="col-obs" placeholder="Qualidade, cores disponíveis, prazo de entrega..." style="min-height:70px"></textarea></div>
-      <div class="field">
-        <label>Foto do produto real</label>
-        <div id="col-foto-zone" style="border:2px dashed var(--b2);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:#fafbff;position:relative" onclick="document.getElementById('col-foto-input').click()">
-          <input type="file" id="col-foto-input" accept="image/*" capture="environment" style="display:none" onchange="onColetarFoto(event)">
-          <span id="col-foto-txt" style="font-size:13px;color:var(--t3)">📷 Fotografar produto</span>
-        </div>
-        <img id="col-foto-prev" style="width:100%;max-height:200px;object-fit:contain;border-radius:8px;margin-top:8px;display:none" alt="foto real">
-      </div>
-      <div class="field">
-        <label>Status</label>
-        <select id="col-status">
-          <option value="encontrado">✅ Encontrado</option>
-          <option value="procurando">🔍 Ainda procurando</option>
-          <option value="nao_encontrado">❌ Não encontrado</option>
-        </select>
-      </div>
-      <div class="modal-acts">
-        <button class="btn-cancel" onclick="fecharColetar()">Cancelar</button>
-        <button class="btn-confirm" onclick="confirmarColetar()">Salvar</button>
-      </div>
-    </div>
-  </div>
-
   <!-- HISTÓRICO -->
   <div class="tab-panel" id="tab-hist">
     <div class="page-title">HISTÓRICO</div>
@@ -866,9 +782,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 <nav class="bottom-nav" id="bottom-nav" style="display:none">
   <button class="bnav-btn active" onclick="switchTab('calc',this)"><span class="bnav-icon">📊</span><span class="bnav-label">Calc</span></button>
   <button class="bnav-btn" onclick="switchTab('ncm',this)"><span class="bnav-icon">📸</span><span class="bnav-label">NCM</span></button>
-  <button class="bnav-btn" onclick="switchTab('pedidos',this)"><span class="bnav-icon">📦</span><span class="bnav-label">Pedidos</span></button>
   <button class="bnav-btn" onclick="switchTab('comm',this)"><span class="bnav-icon">🇨🇳</span><span class="bnav-label">Comm</span></button>
   <button class="bnav-btn" onclick="switchTab('yiwu',this)"><span class="bnav-icon">🏪</span><span class="bnav-label">Yiwu</span></button>
+  <button class="bnav-btn" onclick="switchTab('hist',this)"><span class="bnav-icon">📋</span><span class="bnav-label">Histórico</span></button>
 </nav>
 
 <!-- MODAIS -->
@@ -1124,13 +1040,10 @@ function showApp() {
   document.getElementById('user-info').innerHTML =
     '<strong style="font-size:16px">' + nome + '</strong><br>' +
     '<span style="font-size:13px;color:var(--t3)">' + email + '</span>';
-  // Defer calls so all functions are defined first
-  setTimeout(function() {
-    if (typeof updateApiStatus === 'function') updateApiStatus();
-    if (typeof renderYiwuMap === 'function') renderYiwuMap();
-    if (typeof initFrases === 'function') initFrases();
-    if (typeof fetchCambio === 'function') fetchCambio();
-  }, 50);
+  updateApiStatus();
+  renderYiwuMap();
+  initFrases();
+  fetchCambio();
 }
 
 function openUserMenu() { document.getElementById('user-overlay').classList.add('open'); }
@@ -1301,7 +1214,6 @@ function switchTab(t, btn) {
   if (btn) btn.classList.add('active');
   if (t === 'hist') loadHistory();
   if (t === 'yiwu') loadStands();
-  if (t === 'pedidos') loadPedidos();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2415,259 +2327,6 @@ function scanWeChat() {
   inp.click();
 }
 
-
-// ═══════════════════════════════════════════════════════
-// PEDIDOS
-// ═══════════════════════════════════════════════════════
-var pedidoFotoBase64 = null;
-var coletarFotoBase64 = null;
-var pedidosFiltro = 'todos';
-
-// Upload foto para Supabase Storage via base64 em campo texto
-// (usamos o campo foto_ref_url como base64 dataURL diretamente — simples e sem storage extra)
-
-function onPedidoFoto(e) {
-  var file = e.target.files[0]; if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(ev) {
-    // Resize to 800px max
-    var img = new Image();
-    img.onload = function() {
-      var canvas = document.createElement('canvas');
-      var MAX = 800;
-      var w = img.width, h = img.height;
-      if (w > h) { if (w > MAX) { h = Math.round(h*MAX/w); w = MAX; } }
-      else { if (h > MAX) { w = Math.round(w*MAX/h); h = MAX; } }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      pedidoFotoBase64 = canvas.toDataURL('image/jpeg', 0.75);
-      var prev = document.getElementById('p-foto-prev');
-      prev.src = pedidoFotoBase64; prev.style.display = 'block';
-      document.getElementById('p-foto-txt').textContent = '✓ Foto adicionada';
-      document.getElementById('p-foto-zone').style.borderColor = 'var(--gn)';
-    };
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function onColetarFoto(e) {
-  var file = e.target.files[0]; if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(ev) {
-    var img = new Image();
-    img.onload = function() {
-      var canvas = document.createElement('canvas');
-      var MAX = 800;
-      var w = img.width, h = img.height;
-      if (w > h) { if (w > MAX) { h = Math.round(h*MAX/w); w = MAX; } }
-      else { if (h > MAX) { w = Math.round(w*MAX/h); h = MAX; } }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      coletarFotoBase64 = canvas.toDataURL('image/jpeg', 0.75);
-      var prev = document.getElementById('col-foto-prev');
-      prev.src = coletarFotoBase64; prev.style.display = 'block';
-      document.getElementById('col-foto-txt').textContent = '✓ Foto adicionada';
-    };
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-async function salvarPedido() {
-  var produto = document.getElementById('p-produto').value.trim();
-  var cliente = document.getElementById('p-cliente').value.trim();
-  if (!produto) { toast('Informe o produto.', 'error'); return; }
-  if (!cliente) { toast('Informe o cliente/lojista.', 'error'); return; }
-
-  var btn = document.querySelector('[onclick="salvarPedido()"]');
-  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Enviando...';
-
-  try {
-    var r = await supaFetch('/rest/v1/pedidos', {
-      method: 'POST',
-      headers: { 'Prefer': 'return=minimal' },
-      body: {
-        produto: produto,
-        cliente: cliente,
-        obs: document.getElementById('p-obs').value,
-        foto_ref_url: pedidoFotoBase64 || null,
-        criado_por: document.getElementById('p-criado-por').value.trim() || 'Anônimo',
-        status: 'procurando'
-      }
-    });
-    if (!r.ok) throw new Error(JSON.stringify(r.data));
-    // Reset form
-    ['p-produto','p-cliente','p-obs','p-criado-por'].forEach(function(id){ document.getElementById(id).value=''; });
-    pedidoFotoBase64 = null;
-    document.getElementById('p-foto-prev').style.display = 'none';
-    document.getElementById('p-foto-txt').textContent = '📷 Toque para adicionar foto de referência';
-    document.getElementById('p-foto-zone').style.borderColor = '';
-    toast('✓ Pedido enviado!', 'success');
-    loadPedidos();
-  } catch(e) { toast('Erro: ' + e.message, 'error'); }
-  btn.disabled = false; btn.innerHTML = '📦 ENVIAR PEDIDO';
-}
-
-async function loadPedidos() {
-  var r = await supaFetch('/rest/v1/pedidos?select=*&order=created_at.desc', { method:'GET' });
-  if (!r.ok) { toast('Erro ao carregar pedidos.','error'); return; }
-  var pedidos = Array.isArray(r.data) ? r.data : [];
-
-  // Apply filter
-  var filtrados = pedidos;
-  if (pedidosFiltro !== 'todos') filtrados = pedidos.filter(function(p){ return p.status === pedidosFiltro; });
-
-  var emptyEl = document.getElementById('pedidos-empty');
-  var listEl = document.getElementById('pedidos-list');
-
-  // Update badge counts
-  var counts = { procurando:0, encontrado:0, nao_encontrado:0 };
-  pedidos.forEach(function(p){ if(counts[p.status]!==undefined) counts[p.status]++; });
-
-  if (!filtrados.length) {
-    emptyEl.style.display = '';
-    listEl.innerHTML = '';
-    return;
-  }
-  emptyEl.style.display = 'none';
-
-  var statusConfig = {
-    procurando:   { label:'🔍 Procurando',      color:'var(--bl)', bg:'var(--bld)' },
-    encontrado:   { label:'✅ Encontrado',       color:'var(--gn)', bg:'var(--gnd)' },
-    nao_encontrado:{ label:'❌ Não encontrado',  color:'var(--rd)', bg:'var(--rdd)' }
-  };
-
-  listEl.innerHTML = filtrados.map(function(p) {
-    var sc = statusConfig[p.status] || statusConfig.procurando;
-    var data = new Date(p.created_at).toLocaleDateString('pt-BR');
-    var hasInfo = p.fornecedor || p.preco || p.moq || p.wechat;
-    return '<div style="background:#fff;border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)">' +
-
-      // Header
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">' +
-        '<div style="flex:1">' +
-          '<div style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:2px">' + p.produto + '</div>' +
-          '<div style="font-size:12px;color:var(--t3)">👤 ' + p.cliente + ' · por ' + (p.criado_por||'Anônimo') + ' · ' + data + '</div>' +
-        '</div>' +
-        '<span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:' + sc.bg + ';color:' + sc.color + ';border:1px solid ' + sc.color + ';white-space:nowrap;margin-left:8px">' + sc.label + '</span>' +
-      '</div>' +
-
-      // Fotos
-      (p.foto_ref_url || p.foto_real_url ? '<div style="display:flex;gap:8px;margin-bottom:10px">' +
-        (p.foto_ref_url ? '<div style="flex:1"><div style="font-size:10px;color:var(--t3);margin-bottom:3px">REFERÊNCIA</div><img src="' + p.foto_ref_url + '" style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--b1)"></div>' : '') +
-        (p.foto_real_url ? '<div style="flex:1"><div style="font-size:10px;color:var(--gn);margin-bottom:3px;font-weight:700">✓ ENCONTRADO</div><img src="' + p.foto_real_url + '" style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:2px solid var(--gn)"></div>' : '') +
-      '</div>' : '') +
-
-      // Obs
-      (p.obs ? '<div style="font-size:12px;color:var(--t2);margin-bottom:10px;padding:8px;background:var(--s2);border-radius:6px">' + p.obs + '</div>' : '') +
-
-      // Info coletada em Yiwu
-      (hasInfo ? '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;margin-bottom:10px">' +
-        '<div style="font-size:10px;font-weight:700;color:var(--gn);margin-bottom:6px;letter-spacing:1px">✓ INFORMAÇÕES COLETADAS EM YIWU</div>' +
-        (p.fornecedor ? '<div style="font-size:12px;color:var(--t2);margin-bottom:3px">🏪 <strong>Stand:</strong> ' + p.fornecedor + '</div>' : '') +
-        (p.preco ? '<div style="font-size:12px;color:var(--t2);margin-bottom:3px">💰 <strong>Preço:</strong> US$ ' + parseFloat(p.preco).toFixed(2) + '</div>' : '') +
-        (p.moq ? '<div style="font-size:12px;color:var(--t2);margin-bottom:3px">📦 <strong>MOQ:</strong> ' + p.moq + '</div>' : '') +
-        (p.wechat ? '<div style="font-size:12px;color:var(--t2)">💬 <strong>WeChat:</strong> ' + p.wechat + '</div>' : '') +
-      '</div>' : '') +
-
-      // Actions
-      '<div style="display:flex;gap:8px">' +
-        '<button onclick="abrirColetar(' + p.id + ','' + (p.produto||'').replace(/'/g,"\'") + '','' + (p.cliente||'').replace(/'/g,"\'") + '')" style="flex:1;min-height:40px;padding:10px;background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">' +
-          (hasInfo ? '✏️ Editar coleta' : '📍 Coletar em Yiwu') +
-        '</button>' +
-        '<button onclick="deletarPedido(' + p.id + ')" style="min-height:40px;padding:10px 14px;background:transparent;border:1px solid var(--b2);border-radius:8px;color:var(--t3);font-size:13px;cursor:pointer">🗑</button>' +
-      '</div>' +
-
-    '</div>';
-  }).join('');
-}
-
-function filtrarPedidos(filtro, btn) {
-  pedidosFiltro = filtro;
-  document.querySelectorAll('[id^="pf-"]').forEach(function(b){ b.classList.remove('active'); });
-  if (btn) btn.classList.add('active');
-  loadPedidos();
-}
-
-function abrirColetar(id, produto, cliente) {
-  document.getElementById('coletar-id').value = id;
-  document.getElementById('coletar-title').textContent = produto;
-  document.getElementById('coletar-sub').textContent = 'Cliente: ' + cliente;
-  ['col-fornecedor','col-preco','col-moq','col-wechat','col-obs'].forEach(function(i){ document.getElementById(i).value=''; });
-  coletarFotoBase64 = null;
-  document.getElementById('col-foto-prev').style.display = 'none';
-  document.getElementById('col-foto-txt').textContent = '📷 Fotografar produto';
-  document.getElementById('col-status').value = 'encontrado';
-  document.getElementById('coletar-overlay').classList.add('open');
-}
-
-function fecharColetar() {
-  document.getElementById('coletar-overlay').classList.remove('open');
-}
-
-async function confirmarColetar() {
-  var id = document.getElementById('coletar-id').value;
-  var btn = document.querySelector('[onclick="confirmarColetar()"]');
-  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
-
-  try {
-    var r = await supaFetch('/rest/v1/pedidos?id=eq.' + id, {
-      method: 'PATCH',
-      headers: { 'Prefer': 'return=minimal' },
-      body: {
-        fornecedor: document.getElementById('col-fornecedor').value,
-        preco: parseFloat(document.getElementById('col-preco').value) || null,
-        moq: document.getElementById('col-moq').value,
-        wechat: document.getElementById('col-wechat').value,
-        obs: document.getElementById('col-obs').value,
-        foto_real_url: coletarFotoBase64 || null,
-        status: document.getElementById('col-status').value,
-        updated_at: new Date().toISOString()
-      }
-    });
-    if (!r.ok) throw new Error(JSON.stringify(r.data));
-    fecharColetar();
-    toast('✓ Informações salvas!', 'success');
-    loadPedidos();
-  } catch(e) { toast('Erro: ' + e.message, 'error'); }
-  btn.disabled = false; btn.textContent = 'Salvar';
-}
-
-async function deletarPedido(id) {
-  if (!confirm('Excluir este pedido?')) return;
-  var r = await supaFetch('/rest/v1/pedidos?id=eq.' + id, { method:'DELETE' });
-  if (r.ok) { toast('Excluído.', 'success'); loadPedidos(); }
-  else toast('Erro ao excluir.', 'error');
-}
-
-function scanWeChatColetar() {
-  var inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*'; inp.capture = 'environment';
-  inp.onchange = function(e) {
-    var file = e.target.files[0]; if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(ev) {
-      var img = new Image();
-      img.onload = function() {
-        var canvas = document.createElement('canvas');
-        canvas.width = img.width; canvas.height = img.height;
-        canvas.getContext('2d').drawImage(img, 0, 0);
-        var imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
-        if (typeof jsQR !== 'undefined') {
-          var code = jsQR(imageData.data, imageData.width, imageData.height);
-          if (code) {
-            document.getElementById('col-wechat').value = code.data;
-            toast('WeChat escaneado!', 'success');
-          } else { toast('QR não reconhecido.', 'error'); }
-        }
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  };
-  inp.click();
-}
 
 // ═══════════════════════════════════════════════════════
 // INIT — sem login
