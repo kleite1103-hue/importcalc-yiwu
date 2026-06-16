@@ -1132,7 +1132,7 @@ async function callClaude(messages, maxTokens) {
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true'
     },
-    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens || 1500, messages: messages })
+    body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: maxTokens || 1500, messages: messages })
   });
   var rawText = await res.text();
   var data;
@@ -1165,7 +1165,7 @@ async function testarAPI() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens: 20,
         messages: [{ role: 'user', content: 'Say OK' }]
       })
