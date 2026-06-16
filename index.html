@@ -619,6 +619,32 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
     </div>
 
     <div class="card">
+      <div class="ch"><div class="ci">📷</div><div class="ct">ESCANEAR TELA / FOTO</div><div class="cbadge b-bl">Online</div></div>
+      <div class="cb">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:10px;line-height:1.5">Fotografe uma placa/etiqueta ou escolha um <strong style="color:var(--t2)">print</strong> (conversa do WeChat, tabela de preços) — a IA lê tudo e traduz pro português.</div>
+        <input type="file" id="scan-input" accept="image/*" capture="environment" style="display:none" onchange="onScanSelected(event)">
+        <input type="file" id="scan-input-lib" accept="image/*" style="display:none" onchange="onScanSelected(event)">
+        <div class="r2">
+          <button class="btn-ghost" onclick="document.getElementById('scan-input').click()">📸 Tirar foto</button>
+          <button class="btn-ghost" onclick="document.getElementById('scan-input-lib').click()">🖼 Escolher print</button>
+        </div>
+        <img id="scan-prev" style="display:none;width:100%;border-radius:10px;margin-top:10px;border:1px solid var(--b2)">
+        <button class="btn-primary" id="btn-scan" style="margin-top:10px;display:none" onclick="escanearTela()">TRADUZIR IMAGEM</button>
+        <div id="scan-out-wrap" style="display:none;margin-top:14px">
+          <div class="trans-out" id="scan-pt" style="white-space:pre-wrap">—</div>
+          <div id="scan-obs" style="font-size:12px;color:var(--t3);margin:8px 0;display:none"></div>
+          <div class="trans-acts">
+            <button class="tts-btn" onclick="copiarScan()">📋 Copiar</button>
+            <button class="tts-btn" id="scan-orig-btn" onclick="toggleScanOrig()">🔀 Ver original</button>
+            <button class="tts-btn" onclick="showDisp(document.getElementById('scan-pt').textContent,'','')">📱 Tela cheia</button>
+          </div>
+          <div id="scan-segs" style="display:none;margin-top:12px"></div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:8px">💡 Precisa de internet. Sem sinal? Use o Baidu Tradutor ou o Apple Tradutor com pacote offline baixado.</div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="ch"><div class="ci">💬</div><div class="ct">FRASES PRONTAS</div><div class="cbadge b-pu">Toque p/ mostrar</div></div>
       <div class="cb">
         <div class="pcats" id="pcats"></div>
@@ -2371,8 +2397,90 @@ currentUser = { id: 'guest', email: 'guest@importcalc.local', user_metadata: { n
 currentSession = { access_token: SUPA_KEY };
 showApp();
 
+// ═══════════════════════════════════════════════════════
+// ESCANEAR TELA / FOTO → TRADUÇÃO PT-BR
+// ═══════════════════════════════════════════════════════
+var scanBase64 = '';
+var scanSegsData = [];
+var scanOrigVisible = false;
+function scanEsc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+function onScanSelected(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var MAX = 1280; // telas com texto: um pouco maior preserva a leitura do OCR
+      var w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
+      else { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      var resized = canvas.toDataURL('image/jpeg', 0.85);
+      scanBase64 = resized.split(',')[1];
+      var prev = document.getElementById('scan-prev');
+      prev.src = resized; prev.style.display = 'block';
+      document.getElementById('btn-scan').style.display = 'block';
+      document.getElementById('scan-out-wrap').style.display = 'none';
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
+async function escanearTela() {
+  if (!scanBase64) return;
+  var btn = document.getElementById('btn-scan');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Lendo e traduzindo…';
+  var prompt = 'Você recebe a imagem de uma tela ou foto (placa, etiqueta, conversa de WeChat, tabela de precos, documento), provavelmente em CHINES, mas pode estar em outro idioma. '
+    + 'Faca OCR de TODO o texto visivel e traduza para PORTUGUES DO BRASIL, mantendo a ordem e a estrutura. '
+    + 'Responda APENAS em JSON valido (sem markdown):\n'
+    + '{"idioma_detectado":"chines","traducao_completa":"todo o texto traduzido em PT-BR, preservando quebras de linha com \\n","segmentos":[{"orig":"texto original","pt":"traducao"}],"observacao":"contexto util em 1 frase (ex: negociacao de preco / aviso / endereco) ou string vazia"}';
+  try {
+    var data = await callClaude([{ role:'user', content:[
+      { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:scanBase64 } },
+      { type:'text', text:prompt }
+    ]}], 2500);
+    var j = claudeJSON(data);
+    document.getElementById('scan-pt').textContent = j.traducao_completa || '—';
+    var obs = document.getElementById('scan-obs');
+    if (j.observacao && j.observacao.trim()) { obs.textContent = '💡 ' + j.observacao; obs.style.display = 'block'; }
+    else { obs.style.display = 'none'; }
+    scanSegsData = j.segmentos || [];
+    scanOrigVisible = false;
+    document.getElementById('scan-segs').style.display = 'none';
+    document.getElementById('scan-orig-btn').textContent = '🔀 Ver original';
+    document.getElementById('scan-out-wrap').style.display = 'block';
+  } catch(e) {
+    toast('Erro: ' + (e.message || 'desconhecido'), 'error');
+  }
+  btn.disabled = false; btn.textContent = 'TRADUZIR IMAGEM';
+}
+
+function toggleScanOrig() {
+  var box = document.getElementById('scan-segs');
+  scanOrigVisible = !scanOrigVisible;
+  if (scanOrigVisible) {
+    box.innerHTML = scanSegsData.map(function(s){
+      return '<div style="padding:10px 12px;border:1px solid var(--b2);border-radius:10px;margin-bottom:8px">'
+        + '<div style="font-size:14px;color:var(--t2);margin-bottom:4px">' + scanEsc(s.orig) + '</div>'
+        + '<div style="font-size:14px;color:var(--ac);font-weight:600">' + scanEsc(s.pt) + '</div></div>';
+    }).join('') || '<div style="font-size:12px;color:var(--t3)">Sem segmentos.</div>';
+    box.style.display = 'block';
+    document.getElementById('scan-orig-btn').textContent = '🔀 Ocultar original';
+  } else {
+    box.style.display = 'none';
+    document.getElementById('scan-orig-btn').textContent = '🔀 Ver original';
+  }
+}
+
+function copiarScan() {
+  var t = document.getElementById('scan-pt').textContent;
+  if (navigator.clipboard) { navigator.clipboard.writeText(t).then(function(){ toast('Copiado!', 'success'); }); }
+}
 
 </script>
 </body>
