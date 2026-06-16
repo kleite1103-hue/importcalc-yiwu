@@ -631,9 +631,29 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
         <img id="scan-prev" style="display:none;width:100%;border-radius:10px;margin-top:10px;border:1px solid var(--b2)">
         <button class="btn-primary" id="btn-scan" style="margin-top:10px;display:none" onclick="escanearTela()">TRADUZIR IMAGEM</button>
         <div id="scan-out-wrap" style="display:none;margin-top:14px">
+          <div id="scan-tipo" class="cbadge b-bl" style="display:none;margin-bottom:10px"></div>
+
+          <div id="scan-ctx-wrap" style="display:none;margin-bottom:12px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--ac);margin-bottom:5px">📌 O QUE ESTÁ ACONTECENDO</div>
+            <div id="scan-contexto" style="font-size:14px;line-height:1.55;color:var(--t1);background:var(--acd);border:1px solid var(--acg);border-radius:10px;padding:11px 13px"></div>
+          </div>
+
+          <div id="scan-pontos-wrap" style="display:none;margin-bottom:12px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--t3);margin-bottom:5px">PONTOS-CHAVE</div>
+            <div id="scan-pontos"></div>
+          </div>
+
+          <div id="scan-alertas" style="margin-bottom:12px"></div>
+
+          <div id="scan-sug-wrap" style="display:none;margin-bottom:12px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--bl);margin-bottom:5px">💬 SUGESTÃO DE RESPOSTA</div>
+            <div id="scan-sugestao" style="font-size:14px;line-height:1.55;color:var(--t1);background:var(--bld);border:1px solid rgba(37,99,235,.25);border-radius:10px;padding:11px 13px"></div>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--t3);margin-bottom:5px">TRADUÇÃO COMPLETA</div>
           <div class="trans-out" id="scan-pt" style="white-space:pre-wrap">—</div>
-          <div id="scan-obs" style="font-size:12px;color:var(--t3);margin:8px 0;display:none"></div>
-          <div class="trans-acts">
+
+          <div class="trans-acts" style="margin-top:10px">
             <button class="tts-btn" onclick="copiarScan()">📋 Copiar</button>
             <button class="tts-btn" id="scan-orig-btn" onclick="toggleScanOrig()">🔀 Ver original</button>
             <button class="tts-btn" onclick="showDisp(document.getElementById('scan-pt').textContent,'','')">📱 Tela cheia</button>
@@ -2434,21 +2454,53 @@ function onScanSelected(e) {
 async function escanearTela() {
   if (!scanBase64) return;
   var btn = document.getElementById('btn-scan');
-  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Lendo e traduzindo…';
-  var prompt = 'Você recebe a imagem de uma tela ou foto (placa, etiqueta, conversa de WeChat, tabela de precos, documento), provavelmente em CHINES, mas pode estar em outro idioma. '
-    + 'Faca OCR de TODO o texto visivel e traduza para PORTUGUES DO BRASIL, mantendo a ordem e a estrutura. '
-    + 'Responda APENAS em JSON valido (sem markdown):\n'
-    + '{"idioma_detectado":"chines","traducao_completa":"todo o texto traduzido em PT-BR, preservando quebras de linha com \\n","segmentos":[{"orig":"texto original","pt":"traducao"}],"observacao":"contexto util em 1 frase (ex: negociacao de preco / aviso / endereco) ou string vazia"}';
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Lendo e interpretando…';
+  var prompt = 'Voce e a IA de sourcing da Efeito Vendas, ajudando uma compradora brasileira que esta negociando/comprando na China (Yiwu). Recebe a imagem de uma tela ou foto (conversa de WeChat, cotacao, tabela de precos, etiqueta, placa, documento), provavelmente em CHINES.\n'
+    + 'Nao traduza apenas — LEIA E INTERPRETE. Faca OCR de todo o texto e responda APENAS em JSON valido (sem markdown):\n'
+    + '{"tipo":"rotulo curto do que e a imagem, ex: Cotacao de fornecedor / Negociacao WeChat / Tabela de precos / Etiqueta de produto / Aviso / Endereco",'
+    + '"contexto":"1 a 3 frases explicando o que esta acontecendo e o que o fornecedor quer ou oferece, do ponto de vista da compradora",'
+    + '"traducao_completa":"todo o texto traduzido em PT-BR, preservando quebras de linha com \\n",'
+    + '"pontos_chave":[{"label":"Preco unitario","valor":"Y3,5 (~US$0,48)"},{"label":"MOQ","valor":"500 un"}],'
+    + '"alertas":[{"tipo":"red|yellow|green","texto":"ponto de atencao, risco ou confirmacao importante"}],'
+    + '"sugestao":"o que responder ou perguntar em seguida, em portugues, pronto pra usar — ou string vazia se nao se aplicar",'
+    + '"segmentos":[{"orig":"texto original","pt":"traducao"}]}\n'
+    + 'Regras: extraia numeros relevantes (preco, MOQ, prazo de producao/entrega, % de sinal/deposito, condicao de pagamento, frete) nos pontos_chave quando existirem; lista vazia se nao houver. Alertas so quando fizer sentido (preco sem frete incluso, MOQ alto, pagamento 100% antecipado, prazo longo, ambiguidade). NUNCA invente dados que nao estao na imagem.';
   try {
     var data = await callClaude([{ role:'user', content:[
       { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:scanBase64 } },
       { type:'text', text:prompt }
-    ]}], 2500);
+    ]}], 3000);
     var j = claudeJSON(data);
+
+    var tipoEl = document.getElementById('scan-tipo');
+    if (j.tipo) { tipoEl.textContent = j.tipo; tipoEl.style.display = 'inline-block'; } else { tipoEl.style.display = 'none'; }
+
+    var ctxW = document.getElementById('scan-ctx-wrap');
+    if (j.contexto && j.contexto.trim()) { document.getElementById('scan-contexto').textContent = j.contexto; ctxW.style.display = 'block'; } else { ctxW.style.display = 'none'; }
+
     document.getElementById('scan-pt').textContent = j.traducao_completa || '—';
-    var obs = document.getElementById('scan-obs');
-    if (j.observacao && j.observacao.trim()) { obs.textContent = '💡 ' + j.observacao; obs.style.display = 'block'; }
-    else { obs.style.display = 'none'; }
+
+    var pts = j.pontos_chave || [];
+    var pW = document.getElementById('scan-pontos-wrap');
+    if (pts.length) {
+      document.getElementById('scan-pontos').innerHTML = pts.map(function(p){
+        return '<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 11px;border:1px solid var(--b2);border-radius:9px;margin-bottom:6px">'
+          + '<span style="font-size:13px;color:var(--t3)">' + scanEsc(p.label) + '</span>'
+          + '<span style="font-size:13px;font-weight:700;color:var(--t1);text-align:right">' + scanEsc(p.valor) + '</span></div>';
+      }).join('');
+      pW.style.display = 'block';
+    } else { pW.style.display = 'none'; }
+
+    var al = j.alertas || [];
+    var alMap = { red:['var(--rdd)','var(--rd)','rgba(220,38,38,.3)','⚠️'], yellow:['var(--ywd)','var(--yw)','rgba(234,179,8,.3)','⚠️'], green:['var(--gnd)','var(--gn)','rgba(22,163,74,.3)','✅'] };
+    document.getElementById('scan-alertas').innerHTML = al.map(function(a){
+      var c = alMap[a.tipo] || alMap.yellow;
+      return '<div style="font-size:13px;line-height:1.5;background:' + c[0] + ';color:' + c[1] + ';border:1px solid ' + c[2] + ';border-radius:9px;padding:9px 12px;margin-bottom:6px">' + c[3] + ' ' + scanEsc(a.texto) + '</div>';
+    }).join('');
+
+    var sW = document.getElementById('scan-sug-wrap');
+    if (j.sugestao && j.sugestao.trim()) { document.getElementById('scan-sugestao').textContent = j.sugestao; sW.style.display = 'block'; } else { sW.style.display = 'none'; }
+
     scanSegsData = j.segmentos || [];
     scanOrigVisible = false;
     document.getElementById('scan-segs').style.display = 'none';
