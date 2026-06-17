@@ -439,8 +439,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
       <div class="cb">
         <div class="r2">
           <div class="field">
-            <label>Preço unitário na China <span class="sigla" onclick="showSigla('FOB',event)"><span class="sigla-badge">? FOB</span></span></label>
-            <div class="pfx"><span>US$</span><input type="number" id="fob-unit" placeholder="0.00" inputmode="decimal"></div>
+            <label>Preço unitário na China (RMB ¥)</label>
+            <div class="pfx"><span>¥</span><input type="number" id="fob-unit" placeholder="0.00" inputmode="decimal"></div>
           </div>
           <div class="field">
             <label>Quantidade</label>
@@ -448,32 +448,29 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
           </div>
         </div>
         <div class="field">
-          <label>Câmbio do dia (US$ → R$)</label>
-          <div class="pfx"><span>R$</span><input type="number" id="cambio" value="5.85" inputmode="decimal"></div>
-          <div style="font-size:11px;color:var(--t3);margin-top:4px">💡 Verifique o câmbio atual no Google antes de usar</div>
+          <label>Câmbio RMB → R$</label>
+          <div class="pfx"><span>R$</span><input type="number" id="cambio" value="0.80" inputmode="decimal"></div>
+          <div style="font-size:11px;color:var(--t3);margin-top:4px">💡 Referência: ¥1 RMB ≈ R$0,80 · Ou use a fórmula rápida: Preço RMB × 1,6 = Custo BRL</div>
         </div>
       </div>
     </div>
 
     <!-- FRETE & CHENG -->
     <div class="card">
-      <div class="ch"><div class="ci">🚢</div><div class="ct">FRETE & ASSESSORIA</div></div>
+      <div class="ch"><div class="ci">🚢</div><div class="ct">FÓRMULA CHENG IMPORTA</div></div>
       <div class="cb">
-        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:14px;font-size:12px;color:#166534;line-height:1.6">
-          ✅ Você vai com a <strong>Cheng Importa</strong> — eles cuidam do frete e desembaraço. Informe apenas a estimativa de custo de frete que eles te passarem.
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;color:#166534;line-height:1.8">
+          ✅ <strong>Fórmula simplificada Cheng Importa:</strong><br>
+          Custo RMB × 1,6 = Custo final em BRL<br>
+          <span style="font-size:11px;color:#166534;opacity:.8">Inclui: produto + frete + tributos + desembaraço</span>
         </div>
-        <div class="r2">
-          <div class="field">
-            <label>Frete estimado total (US$)</label>
-            <div class="pfx"><span>$</span><input type="number" id="lcl-rate" placeholder="100" inputmode="decimal"></div>
-            <div style="font-size:11px;color:var(--t3);margin-top:4px">Referência: US$80–130 por <span class="sigla" onclick="showSigla('CBM',event)"><span class="sigla-badge">? CBM</span></span></div>
-          </div>
-          <div class="field">
-            <label>Volume estimado (<span class="sigla" onclick="showSigla('CBM',event)"><span class="sigla-badge">? CBM</span></span>)</label>
-            <input type="number" id="lcl-cbm-direto" placeholder="1" value="1" inputmode="decimal">
-            <div style="font-size:11px;color:var(--t3);margin-top:4px">Peça ao fornecedor</div>
-          </div>
+        <div style="background:#fff8f0;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin-bottom:14px;font-size:12px;color:#92400e;line-height:1.7">
+          <strong>Perguntas chave ao fornecedor:</strong><br>
+          MOQ · Material · Prazo · Embalagem · Personalização · Qtd/caixa<br>
+          <strong>"O preço é EXW ou FOB?"</strong>
         </div>
+        <input type="hidden" id="lcl-rate" value="100">
+        <input type="hidden" id="lcl-cbm-direto" value="1">
         <div class="field">
           <label>Comissão Cheng Importa (% sobre custo total)</label>
           <div class="sfx"><input type="number" id="pct-consult" value="15" inputmode="decimal"><span>%</span></div>
@@ -809,6 +806,100 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
     </div>
   </div>
 
+  <!-- REGISTRO RÁPIDO -->
+  <div class="tab-panel" id="tab-reg">
+    <div class="page-title">REGISTRO DE STAND</div>
+    <div class="page-sub">Registre produto, fornecedor e preço no stand em segundos</div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">📸</div><div class="ct">FOTO DO PRODUTO</div></div>
+      <div class="cb">
+        <div id="reg-foto-zone" style="border:2px dashed var(--b2);border-radius:10px;padding:24px;text-align:center;cursor:pointer;background:#fafbff;position:relative;display:flex;flex-direction:column;align-items:center;gap:8px" onclick="document.getElementById('reg-foto-input').click()">
+          <input type="file" id="reg-foto-input" accept="image/*" capture="environment" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer" onchange="onRegFoto(event)">
+          <div style="font-size:36px;opacity:.3">📷</div>
+          <div style="font-size:14px;color:var(--t2)">Toque para fotografar o produto</div>
+          <div id="reg-foto-info" style="font-size:11px;color:var(--t3)">ou selecione da galeria</div>
+        </div>
+        <img id="reg-foto-prev" style="width:100%;max-height:280px;object-fit:contain;border-radius:10px;margin-top:10px;display:none;border:1px solid var(--b1)" alt="produto">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">📦</div><div class="ct">PRODUTO & FORNECEDOR</div></div>
+      <div class="cb">
+        <div class="field"><label>Nome do produto</label><input type="text" id="reg-produto" placeholder="Ex: Bolsa de couro preta com alça dourada" autocomplete="off"></div>
+        <div class="r2">
+          <div class="field"><label>Nº do Stand</label><input type="text" id="reg-stand" placeholder="Ex: 1A-30025" autocomplete="off"></div>
+          <div class="field"><label>Nome do vendedor</label><input type="text" id="reg-vendedor" placeholder="Ex: Li Wei" autocomplete="off"></div>
+        </div>
+        <div class="field">
+          <label>WeChat do vendedor</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="reg-wechat" placeholder="ID do WeChat" style="flex:1">
+            <button onclick="scanRegQR()" style="min-height:var(--tap);padding:0 14px;background:var(--acd);border:1px solid var(--ac);border-radius:var(--rs);color:var(--ac);font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0">📷 QR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">💰</div><div class="ct">PREÇO & CÁLCULO RÁPIDO</div></div>
+      <div class="cb">
+        <div class="r2">
+          <div class="field">
+            <label>Preço unitário (¥ RMB)</label>
+            <div class="pfx"><span>¥</span><input type="number" id="reg-preco-rmb" placeholder="0.00" inputmode="decimal" oninput="calcRegRapido()"></div>
+          </div>
+          <div class="field">
+            <label>MOQ mínimo</label>
+            <input type="text" id="reg-moq" placeholder="Ex: 100 unid." autocomplete="off">
+          </div>
+        </div>
+        <div class="r2">
+          <div class="field">
+            <label>Quantidade que quer comprar</label>
+            <input type="number" id="reg-qtd" placeholder="0" inputmode="numeric" oninput="calcRegRapido()">
+          </div>
+          <div class="field">
+            <label>O preço é EXW ou FOB?</label>
+            <select id="reg-tipo-preco">
+              <option value="exw">EXW (saída fábrica)</option>
+              <option value="fob">FOB (inclui frete local)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- RESULTADO RÁPIDO -->
+        <div id="reg-resultado" style="display:none;margin-top:4px">
+          <div style="background:linear-gradient(135deg,#fff5f2,#fff);border:2px solid var(--ac);border-radius:12px;padding:16px;text-align:center">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--t3);margin-bottom:6px">CUSTO ESTIMADO TOTAL (fórmula Cheng × 1,6)</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--ac)" id="reg-custo-unit">—</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:2px">por unidade em BRL</div>
+            <div style="height:1px;background:var(--b1);margin:10px 0"></div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--t1)" id="reg-custo-total">—</div>
+            <div style="font-size:12px;color:var(--t3)">total do pedido</div>
+          </div>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0f7ff;border-radius:8px;font-size:12px;color:#1e40af;line-height:1.6">
+            💡 Fórmula: Preço RMB × 1,6 = custo BRL (inclui produto + frete + impostos + Cheng)
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:12px">
+          <label>Observações</label>
+          <textarea id="reg-obs" placeholder="Cores disponíveis, material, prazo de produção, embalagem..." style="min-height:65px"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="salvarRegistro()">💾 SALVAR REGISTRO</button>
+
+    <div style="margin-top:20px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--t1);margin-bottom:12px">REGISTROS SALVOS</div>
+      <div id="reg-empty" class="empty" style="padding:24px 0"><div class="empty-icon" style="font-size:28px">🏷️</div><div class="empty-sub">Nenhum registro ainda</div></div>
+      <div id="reg-list"></div>
+    </div>
+  </div>
+
   <!-- HISTÓRICO -->
   <div class="tab-panel" id="tab-hist">
     <div class="page-title">HISTÓRICO</div>
@@ -828,8 +919,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5;}
 <nav class="bottom-nav" id="bottom-nav" style="display:none">
   <button class="bnav-btn active" onclick="switchTab('calc',this)"><span class="bnav-icon">📊</span><span class="bnav-label">Calc</span></button>
   <button class="bnav-btn" onclick="switchTab('ncm',this)"><span class="bnav-icon">📸</span><span class="bnav-label">NCM</span></button>
+  <button class="bnav-btn" onclick="switchTab('reg',this)"><span class="bnav-icon">🏷️</span><span class="bnav-label">Registro</span></button>
   <button class="bnav-btn" onclick="switchTab('comm',this)"><span class="bnav-icon">🇨🇳</span><span class="bnav-label">Comm</span></button>
-  <button class="bnav-btn" onclick="switchTab('yiwu',this)"><span class="bnav-icon">🏪</span><span class="bnav-label">Yiwu</span></button>
   <button class="bnav-btn" onclick="switchTab('hist',this)"><span class="bnav-icon">📋</span><span class="bnav-label">Histórico</span></button>
 </nav>
 
@@ -1260,6 +1351,7 @@ function switchTab(t, btn) {
   if (btn) btn.classList.add('active');
   if (t === 'hist') loadHistory();
   if (t === 'yiwu') loadStands();
+  if (t === 'reg') renderRegistros();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1480,7 +1572,6 @@ async function confirmarSave() {
       method: 'POST',
       headers: { 'Prefer': 'return=minimal' },
       body: {
-        user_id: currentUser.id,
         nome: nome,
         modalidade: lastResult.modalidade,
         fob_unit: lastResult.fobUnit,
@@ -1490,8 +1581,7 @@ async function confirmarSave() {
         landed_unit: lastResult.landedUnit,
         tot_impostos: lastResult.totImp,
         margem: lastResult.margem,
-        preco_venda: lastResult.precoVenda,
-        dados_completos: lastResult
+        preco_venda: lastResult.precoVenda
       }
     });
     if (!r.ok) throw new Error('Erro ao salvar: ' + JSON.stringify(r.data));
@@ -1894,7 +1984,6 @@ async function salvarStand() {
       method: 'POST',
       headers: { 'Prefer':'return=minimal' },
       body: {
-        user_id: currentUser.id,
         num: num,
         produto: prod,
         preco: gn('s-preco') || null,
@@ -2409,6 +2498,164 @@ function scanWeChat() {
   inp.click();
 }
 
+
+// ═══════════════════════════════════════════════════════
+// REGISTRO RÁPIDO
+// ═══════════════════════════════════════════════════════
+var regFotoB64 = null;
+
+function onRegFoto(e) {
+  var file = e.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var MAX = 900, w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = Math.round(h*MAX/w); w = MAX; } }
+      else { if (h > MAX) { w = Math.round(w*MAX/h); h = MAX; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      regFotoB64 = canvas.toDataURL('image/jpeg', 0.8);
+      var prev = document.getElementById('reg-foto-prev');
+      prev.src = regFotoB64; prev.style.display = 'block';
+      document.getElementById('reg-foto-info').textContent = w + 'x' + h + 'px · foto adicionada ✓';
+      document.getElementById('reg-foto-zone').style.borderColor = 'var(--gn)';
+      document.getElementById('reg-foto-zone').style.borderStyle = 'solid';
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function calcRegRapido() {
+  var precoRmb = parseFloat(document.getElementById('reg-preco-rmb').value) || 0;
+  var qtd = parseInt(document.getElementById('reg-qtd').value) || 0;
+  var res = document.getElementById('reg-resultado');
+  if (!precoRmb) { res.style.display = 'none'; return; }
+  res.style.display = 'block';
+  var custoUnit = precoRmb * 1.6;
+  var custoTotal = custoUnit * qtd;
+  document.getElementById('reg-custo-unit').textContent = 'R$ ' + custoUnit.toFixed(2).replace('.', ',');
+  document.getElementById('reg-custo-total').textContent = qtd > 0
+    ? 'R$ ' + custoTotal.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+    : '—';
+}
+
+function getRegistros() {
+  try { return JSON.parse(localStorage.getItem('importcalc_registros') || '[]'); } catch(e) { return []; }
+}
+function saveRegistros(r) { localStorage.setItem('importcalc_registros', JSON.stringify(r)); }
+
+function salvarRegistro() {
+  var produto = document.getElementById('reg-produto').value.trim();
+  var stand = document.getElementById('reg-stand').value.trim();
+  if (!produto) { toast('Informe o nome do produto.', 'error'); return; }
+
+  var precoRmb = parseFloat(document.getElementById('reg-preco-rmb').value) || 0;
+  var qtd = parseInt(document.getElementById('reg-qtd').value) || 0;
+  var custoUnitBRL = precoRmb * 1.6;
+
+  var reg = {
+    id: Date.now(),
+    data: new Date().toLocaleDateString('pt-BR'),
+    hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    produto: produto,
+    stand: stand,
+    vendedor: document.getElementById('reg-vendedor').value.trim(),
+    wechat: document.getElementById('reg-wechat').value.trim(),
+    precoRmb: precoRmb,
+    moq: document.getElementById('reg-moq').value.trim(),
+    qtd: qtd,
+    tipoPreco: document.getElementById('reg-tipo-preco').value,
+    custoUnitBRL: custoUnitBRL,
+    obs: document.getElementById('reg-obs').value.trim(),
+    foto: regFotoB64 || null
+  };
+
+  var regs = getRegistros();
+  regs.unshift(reg);
+  saveRegistros(regs);
+
+  // Reset form
+  ['reg-produto','reg-stand','reg-vendedor','reg-wechat','reg-moq','reg-obs'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('reg-preco-rmb').value = '';
+  document.getElementById('reg-qtd').value = '';
+  regFotoB64 = null;
+  document.getElementById('reg-foto-prev').style.display = 'none';
+  document.getElementById('reg-foto-info').textContent = 'ou selecione da galeria';
+  document.getElementById('reg-foto-zone').style.borderColor = '';
+  document.getElementById('reg-foto-zone').style.borderStyle = '';
+  document.getElementById('reg-resultado').style.display = 'none';
+
+  toast('✓ Registro salvo!', 'success');
+  renderRegistros();
+}
+
+function renderRegistros() {
+  var regs = getRegistros();
+  var listEl = document.getElementById('reg-list');
+  var emptyEl = document.getElementById('reg-empty');
+  if (!regs.length) { emptyEl.style.display = ''; listEl.innerHTML = ''; return; }
+  emptyEl.style.display = 'none';
+
+  listEl.innerHTML = regs.map(function(r) {
+    return '<div style="background:#fff;border:1px solid var(--b1);border-radius:var(--r);padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">' +
+        '<div style="flex:1">' +
+          '<div style="font-size:15px;font-weight:700;color:var(--t1)">' + r.produto + '</div>' +
+          '<div style="font-size:11px;color:var(--t3);margin-top:2px">' + r.data + ' ' + r.hora + (r.stand ? ' · Stand ' + r.stand : '') + '</div>' +
+        '</div>' +
+        '<button onclick="deletarRegistro(' + r.id + ')" style="width:28px;height:28px;border-radius:6px;border:1px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;font-size:11px;flex-shrink:0">✕</button>' +
+      '</div>' +
+      (r.foto ? '<img src="' + r.foto + '" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-bottom:8px;border:1px solid var(--b1)">' : '') +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
+        (r.precoRmb ? '<div style="background:#f0f7ff;border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.5px">PREÇO RMB</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--bl)">¥' + r.precoRmb.toFixed(2) + '</div><div style="font-size:10px;color:var(--t3)">' + (r.tipoPreco === 'exw' ? 'EXW' : 'FOB') + '</div></div>' : '') +
+        (r.custoUnitBRL ? '<div style="background:#fff5f2;border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.5px">CUSTO BRL</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--ac)">R$' + r.custoUnitBRL.toFixed(2).replace('.', ',') + '</div><div style="font-size:10px;color:var(--t3)">por unidade</div></div>' : '') +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--t2);line-height:1.7">' +
+        (r.vendedor ? '👤 ' + r.vendedor + '<br>' : '') +
+        (r.wechat ? '💬 WeChat: ' + r.wechat + '<br>' : '') +
+        (r.moq ? '📦 MOQ: ' + r.moq + (r.qtd ? ' · Quero: ' + r.qtd + ' unid.' : '') + '<br>' : '') +
+        (r.obs ? '<span style="color:var(--t3)">' + r.obs + '</span>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function deletarRegistro(id) {
+  saveRegistros(getRegistros().filter(function(r){ return r.id !== id; }));
+  renderRegistros();
+  toast('Removido.', 'success');
+}
+
+function scanRegQR() {
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*'; inp.capture = 'environment';
+  inp.onchange = function(e) {
+    var file = e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var img = new Image();
+      img.onload = function() {
+        var c = document.createElement('canvas');
+        c.width = img.width; c.height = img.height;
+        c.getContext('2d').drawImage(img, 0, 0);
+        var imageData = c.getContext('2d').getImageData(0, 0, c.width, c.height);
+        if (typeof jsQR !== 'undefined') {
+          var code = jsQR(imageData.data, imageData.width, imageData.height);
+          if (code) { document.getElementById('reg-wechat').value = code.data; toast('WeChat escaneado!', 'success'); }
+          else toast('QR não reconhecido. Digite manualmente.', 'error');
+        }
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
 
 // ═══════════════════════════════════════════════════════
 // INIT — sem login
