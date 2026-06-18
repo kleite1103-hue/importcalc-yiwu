@@ -1615,7 +1615,7 @@ async function traduzir() {
     var j = claudeJSON(data);
     outEl.textContent = isPtZh ? (j.zh||'—') : (j.pt||'—');
     pyEl.textContent = j.pinyin || '';
-  } catch(e) { outEl.textContent = 'Erro. Verifique a API key.'; }
+  } catch(e) { outEl.textContent = 'Erro: ' + e.message; }
 }
 
 function speakChinese() {
@@ -2088,7 +2088,7 @@ async function traduzir() {
     // Show audio button
     var audioBtn = document.getElementById('audio-confirm-btn');
     if (audioBtn) audioBtn.style.display = 'flex';
-  } catch(e) { outEl.textContent = 'Erro. Verifique a API key.'; }
+  } catch(e) { outEl.textContent = 'Erro: ' + e.message; }
 }
 
 function speakLastTranslation() {
