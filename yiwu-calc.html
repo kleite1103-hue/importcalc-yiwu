@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ff4d1c">
+<title>Yiwu Calc — Efeito Vendas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6fa;--s1:#fff;--b1:#dde1ee;--b2:#c8cede;
+  --ac:#ff4d1c;--ac2:#ff6b3d;--acd:rgba(255,77,28,.10);
+  --gn:#16a34a;--gnd:rgba(22,163,74,.10);
+  --yw:#b45309;--ywd:rgba(180,83,9,.10);
+  --rd:#dc2626;--rdd:rgba(220,38,38,.10);
+  --bl:#2563eb;--bld:rgba(37,99,235,.10);
+  --t1:#1a1f36;--t2:#4a5380;--t3:#8892b0;
+  --r:16px;--rs:10px;--tap:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{font-size:16px;}
+body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* HEADER */
+header{background:#fff;border-bottom:1px solid var(--b1);padding:0 16px;height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 8px rgba(0,0,0,.06);position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:9px;}
+.logo-icon{width:32px;height:32px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:17px;color:#fff;}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;}
+.logo-sub{font-size:10px;color:var(--t3);letter-spacing:1px;}
+
+/* TABS */
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--b1);position:sticky;top:58px;z-index:99;}
+.tab{flex:1;padding:14px 8px;text-align:center;font-size:13px;font-weight:700;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;}
+.tab.active{color:var(--ac);border-bottom-color:var(--ac);}
+.tab-icon{font-size:18px;display:block;margin-bottom:2px;}
+
+/* APP */
+.app{max-width:560px;margin:0 auto;padding:16px 14px calc(32px + env(safe-area-inset-bottom));}
+.panel{display:none;}.panel.active{display:block;}
+
+/* SECTION TITLE */
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px;}
+.sec-sub{font-size:13px;color:var(--t3);margin-bottom:18px;line-height:1.5;}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+.ch{padding:14px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;background:#fafbff;}
+.ci{width:28px;height:28px;border-radius:7px;background:var(--acd);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ct{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;color:var(--t1);}
+.ct-zh{font-size:12px;color:var(--t3);margin-left:auto;}
+.cb{padding:16px;}
+
+/* BILINGUAL LABEL */
+.blabel{display:flex;flex-direction:column;margin-bottom:6px;}
+.blabel-pt{font-size:13px;font-weight:600;color:var(--t2);}
+.blabel-zh{font-size:12px;color:var(--t3);font-style:italic;}
+
+/* FORM */
+.field{margin-bottom:14px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+input,select,textarea{width:100%;background:#fff;border:1px solid var(--b2);border-radius:var(--rs);padding:14px 12px;color:var(--t1);font-family:'Outfit',sans-serif;font-size:16px;transition:border-color .2s;outline:none;-webkit-appearance:none;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acd);}
+input::placeholder{color:var(--t3);}
+.pfx{position:relative;display:flex;align-items:center;}
+.pfx-lbl{position:absolute;left:12px;font-size:13px;color:var(--t3);pointer-events:none;font-weight:600;}
+.pfx input{padding-left:32px;}
+.sfx{position:relative;display:flex;align-items:center;}
+.sfx-lbl{position:absolute;right:12px;font-size:13px;color:var(--t3);pointer-events:none;}
+.sfx input{padding-right:40px;}
+
+/* FOTO ZONE */
+.foto-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px;}
+.foto-slot{aspect-ratio:1;border:2px dashed var(--b2);border-radius:10px;background:#fafbff;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:all .2s;}
+.foto-slot:active{border-color:var(--ac);background:var(--acd);}
+.foto-slot.filled{border-style:solid;border-color:var(--gn);}
+.foto-slot input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;}
+.foto-slot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.foto-slot-icon{font-size:22px;opacity:.3;}
+.foto-slot-lbl{font-size:10px;color:var(--t3);margin-top:4px;}
+
+/* BUTTONS */
+.btn-primary{width:100%;min-height:var(--tap);padding:15px;background:var(--ac);border:none;border-radius:var(--rs);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;box-shadow:0 4px 16px rgba(255,77,28,.25);}
+.btn-primary:active{background:var(--ac2);transform:scale(.98);}
+.btn-primary:disabled{opacity:.5;pointer-events:none;}
+.btn-ghost{width:100%;min-height:var(--tap);padding:12px;background:transparent;border:1px solid var(--b2);border-radius:var(--rs);color:var(--t2);font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;}
+.btn-ghost:active{border-color:var(--ac);color:var(--ac);background:var(--acd);}
+.btn-sm{padding:10px 16px;min-height:44px;background:var(--acd);border:1px solid var(--ac);border-radius:var(--rs);color:var(--ac);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
+/* RESULTADO VIABILIDADE */
+.viab-card{border-radius:var(--r);padding:20px;margin-bottom:14px;text-align:center;}
+.viab-ok{background:linear-gradient(135deg,#f0fdf4,#fff);border:2px solid var(--gn);}
+.viab-aw{background:linear-gradient(135deg,#fffbeb,#fff);border:2px solid var(--yw);}
+.viab-no{background:linear-gradient(135deg,#fef2f2,#fff);border:2px solid var(--rd);}
+.viab-emoji{font-size:40px;margin-bottom:8px;}
+.viab-status{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:4px;}
+.viab-sub{font-size:13px;color:var(--t2);}
+
+/* METRICAS */
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.metric{background:#fff;border:1px solid var(--b1);border-radius:var(--rs);padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.metric.accent{border-color:var(--ac);background:var(--acd);}
+.metric-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:5px;}
+.metric-val{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;line-height:1;}
+.metric-sub{font-size:11px;color:var(--t3);margin-top:3px;}
+
+/* BREAKDOWN */
+.bk{background:#fff;border:1px solid var(--b1);border-radius:var(--rs);overflow:hidden;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.bk-row{padding:11px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b1);font-size:13px;}
+.bk-row:last-child{border-bottom:none;}
+.bk-row.tot{background:#fafbff;font-weight:700;font-size:14px;}
+.bk-name{color:var(--t2);}
+.bk-val{color:var(--t1);font-weight:600;font-variant-numeric:tabular-nums;}
+.bk-val.ac{color:var(--ac);font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;}
+
+/* PRODUTO CARD */
+.produto-card{background:#fff;border:1px solid var(--b1);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);cursor:pointer;transition:all .2s;}
+.produto-card:active{border-color:var(--ac);}
+.produto-card.selected{border-color:var(--ac);background:var(--acd);}
+.pc-top{display:flex;gap:12px;align-items:flex-start;}
+.pc-img{width:72px;height:72px;border-radius:8px;object-fit:cover;border:1px solid var(--b1);flex-shrink:0;background:var(--bg);}
+.pc-img-empty{width:72px;height:72px;border-radius:8px;background:var(--bg);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.pc-info{flex:1;}
+.pc-nome{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px;}
+.pc-meta{font-size:12px;color:var(--t3);line-height:1.6;}
+.pc-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-bl{background:var(--bld);color:var(--bl);}
+.badge-gn{background:var(--gnd);color:var(--gn);}
+
+/* TRADUTOR */
+.lang-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.lang-flag{font-size:22px;}
+.lang-lbl{font-size:13px;font-weight:700;color:var(--t2);flex:1;}
+.swap-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--b2);background:#fff;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.trans-out{background:#f8f9ff;border:1px solid var(--b1);border-radius:var(--rs);padding:14px;min-height:80px;font-size:18px;line-height:1.6;color:var(--t1);margin-top:10px;}
+.trans-py{font-size:12px;color:var(--t3);margin-top:5px;font-style:italic;}
+.trans-acts{display:flex;gap:8px;margin-top:10px;}
+.tts-btn{flex:1;min-height:44px;padding:10px;border-radius:var(--rs);border:1px solid var(--b2);background:#fff;color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+.tts-btn.playing{border-color:var(--gn);color:var(--gn);background:var(--gnd);}
+.pcats{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;-webkit-overflow-scrolling:touch;}
+.pcats::-webkit-scrollbar{display:none;}
+.pcat{padding:8px 14px;border-radius:20px;border:1px solid var(--b2);background:#fff;color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;min-height:36px;}
+.pcat.active{background:var(--ac);border-color:var(--ac);color:#fff;}
+.plist{display:flex;flex-direction:column;gap:8px;}
+.pitem{background:#fff;border:1px solid var(--b1);border-radius:var(--rs);padding:12px 14px;cursor:pointer;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.pitem:active{border-color:var(--ac);background:var(--acd);}
+.pitem-pt{font-size:12px;color:var(--t2);margin-bottom:4px;}
+.pitem-zh{font-size:15px;color:var(--t1);}
+.pitem-py{font-size:11px;color:var(--t3);margin-top:2px;font-style:italic;}
+
+/* OVERLAY */
+.overlay{position:fixed;inset:0;background:rgba(26,31,54,.65);backdrop-filter:blur(6px);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:#fff;border-radius:var(--r) var(--r) 0 0;padding:20px 16px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:560px;animation:sup .25s ease;max-height:88vh;overflow-y:auto;}
+@keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhandle{width:40px;height:4px;background:var(--b2);border-radius:2px;margin:0 auto 16px;}
+.mtitle{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:4px;}
+.msub{font-size:12px;color:var(--t3);margin-bottom:16px;}
+.macts{display:flex;gap:10px;margin-top:16px;}
+.btn-cancel{flex:1;min-height:var(--tap);padding:12px;background:transparent;border:1px solid var(--b2);border-radius:var(--rs);color:var(--t2);font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;}
+.btn-confirm{flex:1;min-height:var(--tap);padding:12px;background:var(--ac);border:none;border-radius:var(--rs);color:#fff;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+
+/* DISPLAY FULLSCREEN */
+.disp-overlay{position:fixed;inset:0;background:#000;z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;}
+.disp-overlay.open{display:flex;}
+.disp-zh{font-size:44px;color:#fff;margin-bottom:12px;line-height:1.3;text-align:center;}
+.disp-py{font-size:18px;color:#aaa;margin-bottom:6px;text-align:center;}
+.disp-pt{font-size:14px;color:#666;margin-bottom:28px;text-align:center;}
+.disp-close{min-height:var(--tap);padding:14px 32px;background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;}
+
+/* MISC */
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-80px);border-radius:var(--rs);padding:12px 20px;font-size:14px;font-weight:600;z-index:400;transition:transform .3s;white-space:nowrap;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.2);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{background:#15803d;color:#fff;}
+.toast.error{background:#b91c1c;color:#fff;}
+.empty{text-align:center;padding:48px 20px;color:var(--t3);}
+.empty-icon{font-size:44px;margin-bottom:10px;opacity:.25;}
+.empty-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:4px;}
+.empty-sub{font-size:13px;}
+.divider{height:1px;background:var(--b1);margin:14px 0;}
+.info-box{padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.6;margin-bottom:14px;}
+.info-blue{background:#f0f7ff;border:1px solid #bfdbfe;color:#1e40af;}
+.info-green{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;}
+.info-orange{background:#fff8f0;border:1px solid #fed7aa;color:#92400e;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">EV</div>
+    <div>
+      <div class="logo-text">YIWU CALC</div>
+      <div class="logo-sub">Efeito Vendas · Ferramenta de Campo</div>
+    </div>
+  </div>
+  <button class="btn-sm" onclick="openApiCfg()" id="api-btn" style="font-size:11px;padding:6px 10px">
+    <span id="api-dot" style="width:7px;height:7px;border-radius:50%;background:var(--rd);display:inline-block;margin-right:4px"></span>
+    <span id="api-lbl">API</span>
+  </button>
+</header>
+
+<div class="tabs">
+  <div class="tab active" id="tab-btn-fornecedor" onclick="setTab('fornecedor')">
+    <span class="tab-icon">📝</span>Fornecedor
+  </div>
+  <div class="tab" id="tab-btn-calcular" onclick="setTab('calcular')">
+    <span class="tab-icon">📊</span>Calcular
+  </div>
+  <div class="tab" id="tab-btn-tradutor" onclick="setTab('tradutor')">
+    <span class="tab-icon">🇨🇳</span>Tradutor
+  </div>
+  <div class="tab" id="tab-btn-historico" onclick="setTab('historico')">
+    <span class="tab-icon">📋</span>Histórico
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- ═══ FORNECEDOR ═══ -->
+  <div class="panel active" id="panel-fornecedor">
+
+    <div class="info-box info-blue" style="margin-bottom:16px">
+      <strong>📱 Entregue o celular ao fornecedor</strong><br>
+      Cada campo está em português e chinês para ele preencher.
+    </div>
+
+    <!-- FOTOS -->
+    <div class="card">
+      <div class="ch">
+        <div class="ci">📸</div>
+        <div>
+          <div class="ct">FOTOS DO PRODUTO</div>
+          <div class="ct-zh">产品图片</div>
+        </div>
+      </div>
+      <div class="cb">
+        <div class="blabel">
+          <span class="blabel-pt">Fotografe o produto (até 4 fotos)</span>
+          <span class="blabel-zh">请拍摄产品照片（最多4张）</span>
+        </div>
+        <div class="foto-grid">
+          <div class="foto-slot" id="slot-0" onclick="document.getElementById('foto-0').click()">
+            <input type="file" id="foto-0" accept="image/*" capture="environment" onchange="onFoto(0,event)" style="display:none">
+            <span class="foto-slot-icon">📷</span>
+            <span class="foto-slot-lbl">Foto 1</span>
+          </div>
+          <div class="foto-slot" id="slot-1" onclick="document.getElementById('foto-1').click()">
+            <input type="file" id="foto-1" accept="image/*" capture="environment" onchange="onFoto(1,event)" style="display:none">
+            <span class="foto-slot-icon">📷</span>
+            <span class="foto-slot-lbl">Foto 2</span>
+          </div>
+          <div class="foto-slot" id="slot-2" onclick="document.getElementById('foto-2').click()">
+            <input type="file" id="foto-2" accept="image/*" capture="environment" onchange="onFoto(2,event)" style="display:none">
+            <span class="foto-slot-icon">📷</span>
+            <span class="foto-slot-lbl">Foto 3</span>
+          </div>
+          <div class="foto-slot" id="slot-3" onclick="document.getElementById('foto-3').click()">
+            <input type="file" id="foto-3" accept="image/*" capture="environment" onchange="onFoto(3,event)" style="display:none">
+            <span class="foto-slot-icon">📷</span>
+            <span class="foto-slot-lbl">Foto 4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREÇO E CAIXA -->
+    <div class="card">
+      <div class="ch">
+        <div class="ci">💰</div>
+        <div>
+          <div class="ct">PREÇO & CAIXA</div>
+          <div class="ct-zh">价格 & 箱子信息</div>
+        </div>
+      </div>
+      <div class="cb">
+        <div class="field">
+          <div class="blabel">
+            <span class="blabel-pt">Preço unitário (¥ RMB)</span>
+            <span class="blabel-zh">单价（人民币）</span>
+          </div>
+          <div class="pfx">
+            <span class="pfx-lbl">¥</span>
+            <input type="number" id="f-preco" placeholder="0.00" inputmode="decimal">
+          </div>
+        </div>
+        <div class="r2">
+          <div class="field">
+            <div class="blabel">
+              <span class="blabel-pt">Unidades por caixa</span>
+              <span class="blabel-zh">每箱数量</span>
+            </div>
+            <input type="number" id="f-unid-cx" placeholder="Ex: 12" inputmode="numeric">
+          </div>
+          <div class="field">
+            <div class="blabel">
+              <span class="blabel-pt">Volume da caixa (m³)</span>
+              <span class="blabel-zh">箱子体积（立方米）</span>
+            </div>
+            <div class="sfx">
+              <input type="number" id="f-cbm" placeholder="0.050" inputmode="decimal" step="0.001">
+              <span class="sfx-lbl">m³</span>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="blabel">
+            <span class="blabel-pt">Nome do produto</span>
+            <span class="blabel-zh">产品名称</span>
+          </div>
+          <input type="text" id="f-produto" placeholder="Ex: Bolsa de couro / 皮包">
+        </div>
+      </div>
+    </div>
+
+    <!-- WECHAT -->
+    <div class="card">
+      <div class="ch">
+        <div class="ci">💬</div>
+        <div>
+          <div class="ct">CONTATO WECHAT</div>
+          <div class="ct-zh">微信联系方式</div>
+        </div>
+      </div>
+      <div class="cb">
+        <div class="field">
+          <div class="blabel">
+            <span class="blabel-pt">ID do WeChat</span>
+            <span class="blabel-zh">微信号</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="f-wechat" placeholder="WeChat ID / 微信号" style="flex:1">
+            <button class="btn-sm" onclick="scanQR()">📷 QR</button>
+          </div>
+        </div>
+        <div class="field">
+          <div class="blabel">
+            <span class="blabel-pt">Nº do Stand (opcional)</span>
+            <span class="blabel-zh">摊位号（可选）</span>
+          </div>
+          <input type="text" id="f-stand" placeholder="Ex: 1A-30025">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="salvarProduto()">✓ SALVAR E CALCULAR</button>
+
+  </div>
+
+  <!-- ═══ CALCULAR ═══ -->
+  <div class="panel" id="panel-calcular">
+    <div class="sec-title">CALCULAR VIABILIDADE</div>
+    <div class="sec-sub">Selecione um produto salvo e informe seus dados de venda</div>
+
+    <div id="calc-empty" class="empty">
+      <div class="empty-icon">📦</div>
+      <div class="empty-title">SEM PRODUTOS</div>
+      <div class="empty-sub">Salve um produto na aba Fornecedor primeiro.</div>
+    </div>
+
+    <div id="calc-produtos"></div>
+
+    <div id="calc-form" style="display:none">
+      <div class="card">
+        <div class="ch"><div class="ci">⚙️</div><div class="ct">PARÂMETROS DE CÁLCULO</div></div>
+        <div class="cb">
+          <div class="info-box info-green">
+            <strong>🚢 Trading Importação:</strong> US$ 900 por m³<br>
+            <span style="font-size:12px">Inclui: frete + impostos + desembaraço aduaneiro</span>
+          </div>
+          <div class="field">
+            <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Quantidade que quer pedir (unidades)</label>
+            <input type="number" id="c-qtd" placeholder="Ex: 100" inputmode="numeric" oninput="calcViab()">
+          </div>
+          <div class="r2">
+            <div class="field">
+              <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Câmbio US$/R$</label>
+              <div class="pfx"><span class="pfx-lbl">R$</span><input type="number" id="c-cambio" value="5.85" inputmode="decimal" oninput="calcViab()"></div>
+            </div>
+            <div class="field">
+              <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Câmbio RMB/R$</label>
+              <div class="pfx"><span class="pfx-lbl">R$</span><input type="number" id="c-cambio-rmb" value="0.80" inputmode="decimal" oninput="calcViab()"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Frete interno Brasil (R$) — porto até você</label>
+            <div class="pfx"><span class="pfx-lbl">R$</span><input type="number" id="c-frete-br" placeholder="Ex: 500" inputmode="decimal" oninput="calcViab()"></div>
+          </div>
+          <div class="field">
+            <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Preço de venda no Brasil (R$)</label>
+            <div class="pfx"><span class="pfx-lbl">R$</span><input type="number" id="c-venda" placeholder="Ex: 89.90" inputmode="decimal" oninput="calcViab()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTADO -->
+      <div id="calc-resultado" style="display:none">
+
+        <div id="viab-card" class="viab-card viab-ok">
+          <div class="viab-emoji" id="viab-emoji">✅</div>
+          <div class="viab-status" id="viab-status">VIÁVEL</div>
+          <div class="viab-sub" id="viab-sub">—</div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric accent">
+            <div class="metric-lbl">Custo/Unidade</div>
+            <div class="metric-val" id="m-custo-unit">—</div>
+            <div class="metric-sub">landed total</div>
+          </div>
+          <div class="metric">
+            <div class="metric-lbl">Margem Bruta</div>
+            <div class="metric-val" id="m-margem">—</div>
+            <div class="metric-sub">sobre venda</div>
+          </div>
+          <div class="metric">
+            <div class="metric-lbl">Caixas Necessárias</div>
+            <div class="metric-val" id="m-caixas">—</div>
+            <div class="metric-sub" id="m-caixas-sub">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-lbl">CBM Total</div>
+            <div class="metric-val" id="m-cbm">—</div>
+            <div class="metric-sub" id="m-cbm-sub">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-lbl">Unidades Reais</div>
+            <div class="metric-val" id="m-unid-reais">—</div>
+            <div class="metric-sub">após arredondamento</div>
+          </div>
+          <div class="metric">
+            <div class="metric-lbl">Lucro Total</div>
+            <div class="metric-val" id="m-lucro-total">—</div>
+            <div class="metric-sub">estimado</div>
+          </div>
+        </div>
+
+        <div class="bk">
+          <div class="bk-row" style="background:#fafbff;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--t3)">
+            <span>COMPOSIÇÃO DO CUSTO</span><span>POR UNIDADE</span>
+          </div>
+          <div class="bk-row"><span class="bk-name">Produto (RMB → R$)</span><span class="bk-val" id="bk-produto">—</span></div>
+          <div class="bk-row"><span class="bk-name">Importação Trading (US$900/m³)</span><span class="bk-val" id="bk-imp">—</span></div>
+          <div class="bk-row"><span class="bk-name">Frete interno Brasil</span><span class="bk-val" id="bk-frete-br">—</span></div>
+          <div class="bk-row tot"><span class="bk-name">CUSTO TOTAL/UNIDADE</span><span class="bk-val ac" id="bk-total">—</span></div>
+        </div>
+
+        <button class="btn-ghost" onclick="salvarSimulacao()" style="margin-bottom:14px">💾 Salvar esta simulação</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TRADUTOR ═══ -->
+  <div class="panel" id="panel-tradutor">
+    <div class="sec-title">COMUNICAÇÃO</div>
+    <div class="sec-sub">Tradutor ao vivo + frases prontas</div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">🔄</div><div class="ct">TRADUTOR AO VIVO</div></div>
+      <div class="cb">
+        <div class="lang-row">
+          <span class="lang-flag" id="lf-from">🇧🇷</span>
+          <span class="lang-lbl" id="ll-from">Português</span>
+          <button class="swap-btn" onclick="swapLang()">⇄</button>
+          <span class="lang-lbl" id="ll-to" style="text-align:right">Mandarim</span>
+          <span class="lang-flag" id="lf-to">🇨🇳</span>
+        </div>
+        <textarea id="trans-input" placeholder="Digite aqui…" style="min-height:80px;resize:none"></textarea>
+        <button class="btn-primary" style="margin-top:10px;font-size:15px" onclick="traduzir()">TRADUZIR</button>
+        <div id="trans-out-wrap" style="display:none">
+          <div class="trans-out" id="trans-out">—</div>
+          <div class="trans-py" id="trans-py"></div>
+          <div class="trans-acts">
+            <button class="tts-btn" id="tts-btn" onclick="speakChinese()">🔊 Ouvir</button>
+            <button class="tts-btn" onclick="showDisp()">📱 Tela cheia</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci">💬</div><div class="ct">FRASES PRONTAS</div></div>
+      <div class="cb">
+        <div class="pcats" id="pcats"></div>
+        <div class="plist" id="plist"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ HISTÓRICO ═══ -->
+  <div class="panel" id="panel-historico">
+    <div class="sec-title">HISTÓRICO</div>
+    <div class="sec-sub">Produtos e simulações salvos</div>
+    <div id="hist-empty" class="empty"><div class="empty-icon">📋</div><div class="empty-title">SEM REGISTROS</div><div class="empty-sub">Salve produtos e simulações para ver aqui.</div></div>
+    <div id="hist-list"></div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- API KEY MODAL -->
+<div class="overlay" id="api-overlay">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">🔑 API KEY ANTHROPIC</div>
+    <div class="msub">Necessária para o tradutor ao vivo. Cole sua chave abaixo.</div>
+    <div class="field">
+      <div style="position:relative">
+        <input type="password" id="api-input" placeholder="sk-ant-api03-…" style="font-size:14px;padding-right:80px">
+        <button onclick="toggleApiVis()" id="api-vis-btn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--t3);cursor:pointer;font-size:12px">mostrar</button>
+      </div>
+    </div>
+    <div class="info-box info-blue" style="font-size:12px">📍 console.anthropic.com → API Keys → Create Key</div>
+    <div id="api-test-result" style="display:none;margin-top:10px;padding:10px;border-radius:8px;font-size:12px"></div>
+    <div class="macts">
+      <button class="btn-cancel" onclick="closeApiCfg()">Cancelar</button>
+      <button class="btn-confirm" onclick="salvarApiKey()">Ativar</button>
+    </div>
+    <button class="btn-ghost" style="margin-top:10px" onclick="testarAPI()">🔍 Testar conexão</button>
+  </div>
+</div>
+
+<!-- DISPLAY FULLSCREEN -->
+<div class="disp-overlay" id="disp-overlay" onclick="closeDisp()">
+  <div class="disp-zh" id="disp-zh"></div>
+  <div class="disp-py" id="disp-py"></div>
+  <div class="disp-pt" id="disp-pt"></div>
+  <button class="disp-close" onclick="closeDisp()">✕ Fechar</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────
+var SUPA_URL = 'https://todwpfiqmvahyginrkip.supabase.co';
+var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvZHdwZmlxbXZhaHlnaW5ya2lwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MjI4MjQsImV4cCI6MjA5NjE5ODgyNH0.b-5ZhNsl3DAMbT8HAu-BaPTj_2Ubh4w0OExO7Y99grY';
+
+// ─── STATE ───────────────────────────────────────────────
+var fotos = [null, null, null, null];
+var produtoSelecionado = null;
+var langDir = 'ptZh';
+var curCat = 'Negociação';
+var produtos = [];
+
+// ─── TOAST ───────────────────────────────────────────────
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'success');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3200);
+}
+
+// ─── TABS ────────────────────────────────────────────────
+function setTab(tab) {
+  ['fornecedor','calcular','tradutor','historico'].forEach(function(t) {
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+    document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'calcular') renderProdutosCalc();
+  if (tab === 'historico') renderHistorico();
+}
+
+// ─── API KEY ─────────────────────────────────────────────
+function getKey() { return localStorage.getItem('yiwu_api_key') || ''; }
+function updateApiStatus() {
+  var key = getKey();
+  document.getElementById('api-dot').style.background = key ? 'var(--gn)' : 'var(--rd)';
+  document.getElementById('api-lbl').textContent = key ? 'IA ✓' : 'API';
+}
+function openApiCfg() {
+  document.getElementById('api-input').value = getKey();
+  document.getElementById('api-overlay').classList.add('open');
+}
+function closeApiCfg() { document.getElementById('api-overlay').classList.remove('open'); }
+function salvarApiKey() {
+  var key = document.getElementById('api-input').value.trim();
+  if (!key.startsWith('sk-ant')) { toast('Chave inválida.', 'error'); return; }
+  localStorage.setItem('yiwu_api_key', key);
+  closeApiCfg();
+  updateApiStatus();
+  toast('✓ API ativada!', 'success');
+}
+function toggleApiVis() {
+  var inp = document.getElementById('api-input');
+  var btn = document.getElementById('api-vis-btn');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? 'mostrar' : 'ocultar';
+}
+
+async function testarAPI() {
+  var res = document.getElementById('api-test-result');
+  res.style.display = 'block';
+  res.style.background = '#f0f2f8';
+  res.textContent = '⏳ Testando...';
+  var key = document.getElementById('api-input').value.trim() || getKey();
+  if (!key) { res.textContent = '❌ Nenhuma chave inserida.'; return; }
+  try {
+    var r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({ model:'claude-sonnet-4-5', max_tokens:20, messages:[{role:'user',content:'Say OK'}] })
+    });
+    var raw = await r.text();
+    if (r.ok) { res.style.background='var(--gnd)'; res.style.color='var(--gn)'; res.textContent='✅ API funcionando!'; }
+    else { res.style.background='var(--rdd)'; res.style.color='var(--rd)'; res.textContent='❌ HTTP ' + r.status + ': ' + raw.slice(0,150); }
+  } catch(e) { res.style.background='var(--rdd)'; res.style.color='var(--rd)'; res.textContent='❌ Erro de rede: ' + e.message; }
+}
+
+async function callClaude(messages) {
+  var key = getKey();
+  if (!key) { openApiCfg(); throw new Error('API key não configurada'); }
+  var res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+    body: JSON.stringify({ model:'claude-sonnet-4-5', max_tokens:1000, messages:messages })
+  });
+  var raw = await res.text();
+  var data;
+  try { data = JSON.parse(raw); } catch(e) { throw new Error('Resposta inválida: ' + raw.slice(0,100)); }
+  if (!res.ok) {
+    var msg = (data.error && data.error.message) || 'HTTP ' + res.status;
+    if (res.status === 401) msg = 'API key inválida.';
+    if (res.status === 429) msg = 'Limite atingido. Aguarde.';
+    throw new Error(msg);
+  }
+  return data;
+}
+
+function claudeJSON(data) {
+  var txt = ((data.content || []).filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('')).trim();
+  txt = txt.replace(/^```json\s*/i,'').replace(/^```/,'').replace(/```\s*$/,'').trim();
+  var s = txt.indexOf('{'), e = txt.lastIndexOf('}');
+  if (s === -1 || e === -1) throw new Error('Sem JSON: ' + txt.slice(0,80));
+  return JSON.parse(txt.slice(s, e+1));
+}
+
+// ─── FOTOS ───────────────────────────────────────────────
+function redimensionar(file, cb) {
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var img = new Image();
+    img.onload = function() {
+      var MAX = 900, w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = Math.round(h*MAX/w); w = MAX; } }
+      else { if (h > MAX) { w = Math.round(w*MAX/h); h = MAX; } }
+      var c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(c.toDataURL('image/jpeg', 0.78));
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function onFoto(idx, e) {
+  var file = e.target.files[0]; if (!file) return;
+  redimensionar(file, function(b64) {
+    fotos[idx] = b64;
+    var slot = document.getElementById('slot-' + idx);
+    slot.classList.add('filled');
+    var img = slot.querySelector('img') || document.createElement('img');
+    img.src = b64;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:8px';
+    slot.appendChild(img);
+    var icon = slot.querySelector('.foto-slot-icon');
+    var lbl = slot.querySelector('.foto-slot-lbl');
+    if (icon) icon.style.display = 'none';
+    if (lbl) lbl.style.display = 'none';
+    toast('Foto ' + (idx+1) + ' adicionada ✓', 'success');
+  });
+}
+
+// ─── SALVAR PRODUTO ──────────────────────────────────────
+function salvarProduto() {
+  var preco = parseFloat(document.getElementById('f-preco').value);
+  var unidCx = parseInt(document.getElementById('f-unid-cx').value);
+  var cbm = parseFloat(document.getElementById('f-cbm').value);
+  if (!preco) { toast('Informe o preço unitário.', 'error'); return; }
+  if (!unidCx) { toast('Informe as unidades por caixa.', 'error'); return; }
+  if (!cbm) { toast('Informe o volume da caixa (m³).', 'error'); return; }
+
+  var produto = {
+    id: Date.now(),
+    data: new Date().toLocaleDateString('pt-BR'),
+    hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}),
+    produto: document.getElementById('f-produto').value.trim() || 'Produto sem nome',
+    preco: preco,
+    unidCx: unidCx,
+    cbm: cbm,
+    wechat: document.getElementById('f-wechat').value.trim(),
+    stand: document.getElementById('f-stand').value.trim(),
+    fotos: fotos.filter(function(f){ return f !== null; })
+  };
+
+  var lista = getProdutos();
+  lista.unshift(produto);
+  localStorage.setItem('yiwu_produtos', JSON.stringify(lista));
+
+  // Reset
+  fotos = [null, null, null, null];
+  ['f-preco','f-unid-cx','f-cbm','f-produto','f-wechat','f-stand'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  [0,1,2,3].forEach(function(i){
+    var slot = document.getElementById('slot-' + i);
+    slot.classList.remove('filled');
+    var img = slot.querySelector('img');
+    if (img) img.remove();
+    var icon = slot.querySelector('.foto-slot-icon');
+    var lbl = slot.querySelector('.foto-slot-lbl');
+    if (icon) icon.style.display = '';
+    if (lbl) lbl.style.display = '';
+  });
+
+  toast('✓ Produto salvo! Calculando viabilidade…', 'success');
+  setTimeout(function(){ setTab('calcular'); }, 800);
+}
+
+function getProdutos() {
+  try { return JSON.parse(localStorage.getItem('yiwu_produtos') || '[]'); } catch(e) { return []; }
+}
+
+// ─── CALCULAR ────────────────────────────────────────────
+function renderProdutosCalc() {
+  var lista = getProdutos();
+  var el = document.getElementById('calc-produtos');
+  var empty = document.getElementById('calc-empty');
+  var form = document.getElementById('calc-form');
+  if (!lista.length) { empty.style.display=''; el.innerHTML=''; form.style.display='none'; return; }
+  empty.style.display = 'none';
+
+  el.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--t2);margin-bottom:10px">Selecione o produto:</div>' +
+    lista.map(function(p) {
+      var foto = p.fotos && p.fotos[0] ? p.fotos[0] : null;
+      var sel = produtoSelecionado && produtoSelecionado.id === p.id;
+      return '<div class="produto-card' + (sel?' selected':'') + '" id="pc-' + p.id + '" onclick="selecionarProduto(' + p.id + ')">' +
+        '<div class="pc-top">' +
+          (foto ? '<img class="pc-img" src="' + foto + '" alt="produto">' : '<div class="pc-img-empty">📦</div>') +
+          '<div class="pc-info">' +
+            '<div class="pc-nome">' + p.produto + '</div>' +
+            '<div class="pc-meta">' +
+              '¥' + p.preco.toFixed(2) + ' por unidade<br>' +
+              p.unidCx + ' unid/caixa · ' + p.cbm + ' m³/caixa<br>' +
+              (p.wechat ? '💬 ' + p.wechat : '') + (p.stand ? ' · Stand ' + p.stand : '') +
+            '</div>' +
+            '<div class="pc-badges">' +
+              '<span class="badge badge-bl">' + p.unidCx + ' unid/cx</span>' +
+              '<span class="badge badge-gn">' + p.cbm + ' m³</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+  if (produtoSelecionado) {
+    form.style.display = 'block';
+    calcViab();
+  }
+}
+
+function selecionarProduto(id) {
+  var lista = getProdutos();
+  produtoSelecionado = lista.find(function(p){ return p.id === id; });
+  document.querySelectorAll('.produto-card').forEach(function(el){ el.classList.remove('selected'); });
+  var el = document.getElementById('pc-' + id);
+  if (el) el.classList.add('selected');
+  document.getElementById('calc-form').style.display = 'block';
+  document.getElementById('calc-resultado').style.display = 'none';
+  document.getElementById('c-qtd').focus();
+}
+
+var fmt = function(n) { return 'R$ ' + n.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); };
+
+function calcViab() {
+  if (!produtoSelecionado) return;
+  var p = produtoSelecionado;
+  var qtdDesejada = parseInt(document.getElementById('c-qtd').value) || 0;
+  var cambioUSD = parseFloat(document.getElementById('c-cambio').value) || 5.85;
+  var cambioRMB = parseFloat(document.getElementById('c-cambio-rmb').value) || 0.80;
+  var freteBR = parseFloat(document.getElementById('c-frete-br').value) || 0;
+  var precoVenda = parseFloat(document.getElementById('c-venda').value) || 0;
+
+  if (!qtdDesejada) { document.getElementById('calc-resultado').style.display='none'; return; }
+
+  // Calcular caixas necessárias
+  var caixasNecessarias = Math.ceil(qtdDesejada / p.unidCx);
+  var cbmTotal = caixasNecessarias * p.cbm;
+
+  // Mínimo 1 CBM
+  if (cbmTotal < 1) {
+    var caixasMin = Math.ceil(1 / p.cbm);
+    caixasNecessarias = caixasMin;
+    cbmTotal = caixasNecessarias * p.cbm;
+  }
+
+  var unidReais = caixasNecessarias * p.unidCx;
+
+  // Custos
+  var custoProdutoUnit = p.preco * cambioRMB; // RMB → BRL por unidade
+  var custoImportUnit = (cbmTotal * 900 * cambioUSD) / unidReais; // trading US$900/m³ → BRL por unidade
+  var custoFreteBRUnit = freteBR / unidReais;
+  var custoTotalUnit = custoProdutoUnit + custoImportUnit + custoFreteBRUnit;
+  var custoTotalGeral = custoTotalUnit * unidReais;
+
+  // Margem
+  var margem = precoVenda > 0 ? ((precoVenda - custoTotalUnit) / precoVenda * 100) : 0;
+  var lucroTotal = precoVenda > 0 ? ((precoVenda - custoTotalUnit) * unidReais) : 0;
+
+  // Viabilidade
+  var viab, emoji, status, sub, cardClass;
+  if (precoVenda > 0) {
+    if (margem >= 40) { emoji='✅'; status='VIÁVEL'; sub='Margem de '+margem.toFixed(1)+'% — boa para importação'; cardClass='viab-ok'; }
+    else if (margem >= 20) { emoji='⚠️'; status='ATENÇÃO'; sub='Margem de '+margem.toFixed(1)+'% — aceitável mas baixa'; cardClass='viab-aw'; }
+    else { emoji='🚫'; status='INVIÁVEL'; sub='Margem de '+margem.toFixed(1)+'% — muito baixa para importação'; cardClass='viab-no'; }
+  } else {
+    emoji='📊'; status='PREENCHA O PREÇO'; sub='Informe o preço de venda para ver a viabilidade'; cardClass='viab-ok';
+  }
+
+  // Render
+  document.getElementById('calc-resultado').style.display = 'block';
+  var vc = document.getElementById('viab-card');
+  vc.className = 'viab-card ' + cardClass;
+  document.getElementById('viab-emoji').textContent = emoji;
+  document.getElementById('viab-status').textContent = status;
+  document.getElementById('viab-sub').textContent = sub;
+
+  document.getElementById('m-custo-unit').textContent = fmt(custoTotalUnit);
+  document.getElementById('m-margem').textContent = precoVenda > 0 ? margem.toFixed(1)+'%' : '—';
+  document.getElementById('m-caixas').textContent = caixasNecessarias;
+  document.getElementById('m-caixas-sub').textContent = cbmTotal < 1.01 ? '⚠️ Mínimo 1 m³ aplicado' : cbmTotal.toFixed(3)+' m³ total';
+  document.getElementById('m-cbm').textContent = cbmTotal.toFixed(3)+' m³';
+  document.getElementById('m-cbm-sub').textContent = 'US$ '+(cbmTotal*900).toFixed(0)+' de importação';
+  document.getElementById('m-unid-reais').textContent = unidReais;
+  document.getElementById('m-lucro-total').textContent = precoVenda > 0 ? fmt(lucroTotal) : '—';
+
+  document.getElementById('bk-produto').textContent = fmt(custoProdutoUnit);
+  document.getElementById('bk-imp').textContent = fmt(custoImportUnit);
+  document.getElementById('bk-frete-br').textContent = freteBR > 0 ? fmt(custoFreteBRUnit) : 'R$ 0,00';
+  document.getElementById('bk-total').textContent = fmt(custoTotalUnit);
+
+  // Store for save
+  window._lastCalc = {
+    produto: p.produto, preco: p.preco, unidCx: p.unidCx, cbm: p.cbm,
+    qtdDesejada: qtdDesejada, unidReais: unidReais, caixasNecessarias: caixasNecessarias,
+    cbmTotal: cbmTotal, cambioUSD: cambioUSD, cambioRMB: cambioRMB,
+    custoTotalUnit: custoTotalUnit, custoImportUnit: custoImportUnit,
+    margem: margem, precoVenda: precoVenda, lucroTotal: lucroTotal,
+    status: status, fotos: p.fotos
+  };
+}
+
+function salvarSimulacao() {
+  if (!window._lastCalc) return;
+  var sims = JSON.parse(localStorage.getItem('yiwu_sims') || '[]');
+  sims.unshift(Object.assign({}, window._lastCalc, {
+    id: Date.now(),
+    data: new Date().toLocaleDateString('pt-BR')
+  }));
+  localStorage.setItem('yiwu_sims', JSON.stringify(sims));
+  toast('✓ Simulação salva!', 'success');
+}
+
+// ─── HISTÓRICO ───────────────────────────────────────────
+function renderHistorico() {
+  var prods = getProdutos();
+  var sims = JSON.parse(localStorage.getItem('yiwu_sims') || '[]');
+  var el = document.getElementById('hist-list');
+  var empty = document.getElementById('hist-empty');
+
+  if (!prods.length && !sims.length) { empty.style.display=''; el.innerHTML=''; return; }
+  empty.style.display = 'none';
+
+  var html = '';
+
+  if (sims.length) {
+    html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:2px;color:var(--t2);margin-bottom:10px">SIMULAÇÕES SALVAS</div>';
+    html += sims.map(function(s) {
+      var color = s.margem >= 40 ? 'var(--gn)' : s.margem >= 20 ? 'var(--yw)' : 'var(--rd)';
+      return '<div style="background:#fff;border:1px solid var(--b1);border-radius:var(--r);padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05)">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+          '<div><strong>' + s.produto + '</strong><br><span style="font-size:12px;color:var(--t3)">' + s.data + '</span></div>' +
+          '<button onclick="delSim(' + s.id + ')" style="width:28px;height:28px;border-radius:6px;border:1px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;font-size:11px">✕</button>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">' +
+          '<div style="text-align:center;padding:8px;background:var(--bg);border-radius:8px"><div style="font-size:10px;color:var(--t3)">CUSTO/UN.</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--ac)">' + fmt(s.custoTotalUnit) + '</div></div>' +
+          '<div style="text-align:center;padding:8px;background:var(--bg);border-radius:8px"><div style="font-size:10px;color:var(--t3)">MARGEM</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:' + color + '">' + (s.margem||0).toFixed(1) + '%</div></div>' +
+          '<div style="text-align:center;padding:8px;background:var(--bg);border-radius:8px"><div style="font-size:10px;color:var(--t3)">UNIDADES</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px">' + s.unidReais + '</div></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  if (prods.length) {
+    html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:2px;color:var(--t2);margin:16px 0 10px">PRODUTOS REGISTRADOS</div>';
+    html += prods.map(function(p) {
+      var foto = p.fotos && p.fotos[0] ? p.fotos[0] : null;
+      return '<div style="background:#fff;border:1px solid var(--b1);border-radius:var(--r);padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;gap:12px;align-items:flex-start">' +
+        (foto ? '<img src="' + foto + '" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0">' : '<div style="width:60px;height:60px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📦</div>') +
+        '<div style="flex:1"><strong>' + p.produto + '</strong><br>' +
+        '<span style="font-size:12px;color:var(--t3)">¥' + p.preco + ' · ' + p.unidCx + ' un/cx · ' + p.cbm + ' m³</span><br>' +
+        (p.wechat ? '<span style="font-size:12px;color:var(--t3)">💬 ' + p.wechat + '</span>' : '') + '</div>' +
+        '<button onclick="delProd(' + p.id + ')" style="width:28px;height:28px;border-radius:6px;border:1px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;font-size:11px;flex-shrink:0">✕</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  el.innerHTML = html;
+}
+
+function delSim(id) {
+  var sims = JSON.parse(localStorage.getItem('yiwu_sims') || '[]').filter(function(s){ return s.id !== id; });
+  localStorage.setItem('yiwu_sims', JSON.stringify(sims));
+  renderHistorico();
+}
+
+function delProd(id) {
+  if (!confirm('Excluir este produto?')) return;
+  var lista = getProdutos().filter(function(p){ return p.id !== id; });
+  localStorage.setItem('yiwu_produtos', JSON.stringify(lista));
+  if (produtoSelecionado && produtoSelecionado.id === id) { produtoSelecionado = null; }
+  renderHistorico();
+}
+
+// ─── QR SCANNER ──────────────────────────────────────────
+function scanQR() {
+  var inp = document.createElement('input');
+  inp.type='file';inp.accept='image/*';inp.capture='environment';
+  inp.onchange=function(e){
+    var f=e.target.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(ev){
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+        c.getContext('2d').drawImage(img,0,0);
+        var id=c.getContext('2d').getImageData(0,0,c.width,c.height);
+        if(typeof jsQR!=='undefined'){
+          var code=jsQR(id.data,id.width,id.height);
+          if(code){document.getElementById('f-wechat').value=code.data;toast('WeChat escaneado!','success');}
+          else toast('QR não reconhecido.','error');
+        }
+      };img.src=ev.target.result;
+    };r.readAsDataURL(f);
+  };inp.click();
+}
+
+// ─── TRADUTOR ────────────────────────────────────────────
+function swapLang() {
+  langDir = langDir === 'ptZh' ? 'zhPt' : 'ptZh';
+  var pt = langDir === 'ptZh';
+  document.getElementById('lf-from').textContent = pt ? '🇧🇷' : '🇨🇳';
+  document.getElementById('ll-from').textContent = pt ? 'Português' : 'Mandarim';
+  document.getElementById('lf-to').textContent = pt ? '🇨🇳' : '🇧🇷';
+  document.getElementById('ll-to').textContent = pt ? 'Mandarim' : 'Português';
+  document.getElementById('trans-input').placeholder = pt ? 'Digite aqui…' : 'Digite em chinês…';
+  document.getElementById('trans-out-wrap').style.display = 'none';
+}
+
+async function traduzir() {
+  var input = document.getElementById('trans-input').value.trim();
+  if (!input) return;
+  var isPtZh = langDir === 'ptZh';
+  var outEl = document.getElementById('trans-out');
+  var pyEl = document.getElementById('trans-py');
+  var wrap = document.getElementById('trans-out-wrap');
+  outEl.textContent = '…'; pyEl.textContent = ''; wrap.style.display = 'block';
+  var prompt = isPtZh
+    ? 'Traduza para Mandarim. JSON APENAS: {"zh":"texto em chinês","pinyin":"romanização","pt":"confirmação em português"}'
+    : 'Traduza para Português Brasileiro. JSON APENAS: {"pt":"tradução","zh":"original","pinyin":"pinyin"}';
+  try {
+    var data = await callClaude([{ role:'user', content: prompt + '\nTexto: "' + input + '"' }]);
+    var j = claudeJSON(data);
+    outEl.textContent = isPtZh ? (j.zh || '—') : (j.pt || '—');
+    pyEl.textContent = j.pinyin || '';
+  } catch(e) { outEl.textContent = 'Erro: ' + e.message; }
+}
+
+function speakChinese() {
+  var txt = document.getElementById('trans-out').textContent;
+  if (!txt || txt === '—' || txt === '…') return;
+  var isPtZh = langDir === 'ptZh';
+  var lang = isPtZh ? 'zh-CN' : 'pt-BR';
+  var utt = new SpeechSynthesisUtterance(txt);
+  utt.lang = lang; utt.rate = 0.85;
+  var voices = window.speechSynthesis.getVoices();
+  var voice = voices.find(function(v){ return v.lang.startsWith(isPtZh ? 'zh' : 'pt'); });
+  if (voice) utt.voice = voice;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+  var btn = document.getElementById('tts-btn');
+  btn.classList.add('playing');
+  utt.onend = function(){ btn.classList.remove('playing'); };
+}
+
+function showDisp() {
+  var zh = document.getElementById('trans-out').textContent;
+  var py = document.getElementById('trans-py').textContent;
+  var pt = document.getElementById('trans-input').value;
+  document.getElementById('disp-zh').textContent = zh;
+  document.getElementById('disp-py').textContent = py;
+  document.getElementById('disp-pt').textContent = pt;
+  document.getElementById('disp-overlay').classList.add('open');
+}
+function closeDisp() { document.getElementById('disp-overlay').classList.remove('open'); }
+
+// ─── FRASES PRONTAS ──────────────────────────────────────
+var FRASES = {
+  'Negociação': [
+    { pt:'Qual o preço para 100 unidades?', zh:'100件的价格是多少？', py:'Yìbǎi jiàn de jiàgé shì duōshao?' },
+    { pt:'Qual o preço para 500 unidades?', zh:'500件的价格是多少？', py:'Wǔbǎi jiàn de jiàgé shì duōshao?' },
+    { pt:'Posso ter desconto?', zh:'可以给我优惠吗？', py:'Kěyǐ gěi wǒ yōuhuì ma?' },
+    { pt:'Esse é o seu melhor preço?', zh:'这是您最低的价格吗？', py:'Zhè shì nín zuìdī de jiàgé ma?' },
+    { pt:'Se eu comprar mais, o preço cai?', zh:'如果我买更多，价格会便宜吗？', py:'Rúguǒ wǒ mǎi gèng duō, jiàgé huì piányí ma?' },
+    { pt:'Qual o MOQ mínimo?', zh:'最小起订量是多少？', py:'Zuìxiǎo qǐdìng liàng shì duōshao?' },
+    { pt:'O preço é EXW ou FOB?', zh:'价格是出厂价还是离岸价？', py:'Jiàgé shì chūchǎng jià háishi líàn jià?' },
+    { pt:'Vou pensar e volto amanhã.', zh:'我考虑一下，明天再来。', py:'Wǒ kǎolǜ yīxià, míngtiān zài lái.' },
+    { pt:'Tenho interesse, vamos fechar.', zh:'我感兴趣，我们成交吧。', py:'Wǒ gǎn xìngqù, wǒmen chéngjiāo ba.' },
+    { pt:'Pode me dar uma proposta por escrito?', zh:'可以给我一个书面报价吗？', py:'Kěyǐ gěi wǒ yīgè shūmiàn bàojià ma?' },
+  ],
+  'Produto': [
+    { pt:'Qual o material?', zh:'这个材料是什么？', py:'Zhège cáiliào shì shénme?' },
+    { pt:'Quantas unidades vêm por caixa?', zh:'每箱有多少件？', py:'Měi xiāng yǒu duōshao jiàn?' },
+    { pt:'Qual o volume da caixa em m³?', zh:'纸箱体积是多少立方米？', py:'Zhǐxiāng tǐjī shì duōshao lìfāng mǐ?' },
+    { pt:'Qual o peso da caixa?', zh:'纸箱重量是多少？', py:'Zhǐxiāng zhòngliàng shì duōshao?' },
+    { pt:'Tem amostra?', zh:'有样品吗？', py:'Yǒu yàngpǐn ma?' },
+    { pt:'Pode personalizar com minha marca?', zh:'可以定制我的品牌吗？', py:'Kěyǐ dìngzhì wǒ de pǐnpái ma?' },
+    { pt:'Qual o prazo de produção?', zh:'生产周期多久？', py:'Shēngchǎn zhōuqī duō jiǔ?' },
+    { pt:'Quais cores estão disponíveis?', zh:'有哪些颜色？', py:'Yǒu nǎxiē yánsè?' },
+  ],
+  'Pagamento': [
+    { pt:'Aceita TT (transferência bancária)?', zh:'接受电汇付款吗？', py:'Jiēshòu diànhuì fùkuǎn ma?' },
+    { pt:'Aceita Alibaba Trade Assurance?', zh:'接受阿里巴巴贸易保障吗？', py:'Jiēshòu Ālǐbābā màoyì bǎozhàng ma?' },
+    { pt:'Qual a porcentagem de entrada?', zh:'定金比例是多少？', py:'Dìngjīn bǐlì shì duōshao?' },
+    { pt:'Seu WeChat é qual?', zh:'你的微信号是什么？', py:'Nǐ de Wēixìn hào shì shénme?' },
+    { pt:'Me adiciona no WeChat?', zh:'可以加我的微信吗？', py:'Kěyǐ jiā wǒ de Wēixìn ma?' },
+  ],
+  'Geral': [
+    { pt:'Bom dia!', zh:'早上好！', py:'Zǎoshang hǎo!' },
+    { pt:'Obrigada!', zh:'谢谢！', py:'Xièxiè!' },
+    { pt:'Quanto custa?', zh:'多少钱？', py:'Duōshao qián?' },
+    { pt:'Pode repetir mais devagar?', zh:'可以说慢一点吗？', py:'Kěyǐ shuō màn yīdiǎn ma?' },
+    { pt:'Posso tirar uma foto?', zh:'我可以拍照吗？', py:'Wǒ kěyǐ pāizhào ma?' },
+    { pt:'Onde fica o banheiro?', zh:'洗手间在哪里？', py:'Xǐshǒujiān zài nǎlǐ?' },
+    { pt:'Vou voltar depois.', zh:'我待会儿再来。', py:'Wǒ dāihuìr zài lái.' },
+    { pt:'Pode anotar o preço aqui?', zh:'可以把价格写在这里吗？', py:'Kěyǐ bǎ jiàgé xiě zài zhèlǐ ma?' },
+  ],
+  'Hotel': [
+    { pt:'Tem WiFi? Qual é a senha?', zh:'有WiFi吗？密码是什么？', py:'Yǒu WiFi ma? Mìmǎ shì shénme?' },
+    { pt:'Quero fazer check-in.', zh:'我要办理入住。', py:'Wǒ yào bànlǐ rùzhù.' },
+    { pt:'Quero fazer check-out.', zh:'我要退房。', py:'Wǒ yào tuìfáng.' },
+    { pt:'Pode chamar um táxi?', zh:'可以帮我叫出租车吗？', py:'Kěyǐ bāng wǒ jiào chūzūchē ma?' },
+    { pt:'O café da manhã está incluído?', zh:'早餐包含在内吗？', py:'Zǎocān bāohán zài nèi ma?' },
+  ],
+  'Alimentação': [
+    { pt:'O cardápio com foto, por favor.', zh:'请给我图片菜单。', py:'Qǐng gěi wǒ túpiàn càidān.' },
+    { pt:'Não como carne de porco.', zh:'我不吃猪肉。', py:'Wǒ bù chī zhūròu.' },
+    { pt:'Sem apimentado, por favor.', zh:'请不要放辣。', py:'Qǐng bú yào fàng là.' },
+    { pt:'A conta, por favor.', zh:'买单，谢谢。', py:'Mǎidān, xièxiè.' },
+    { pt:'Aceita WeChat Pay?', zh:'可以用微信支付吗？', py:'Kěyǐ yòng Wēixìn zhīfù ma?' },
+    { pt:'Isso está delicioso!', zh:'这个很好吃！', py:'Zhège hěn hǎochī!' },
+  ]
+};
+
+function initFrases() {
+  var cats = Object.keys(FRASES);
+  document.getElementById('pcats').innerHTML = cats.map(function(c) {
+    return '<button class="pcat' + (c === curCat ? ' active' : '') + '" onclick="setCat(\'' + c + '\')">' + c + '</button>';
+  }).join('');
+  renderFrases();
+}
+
+function setCat(c) {
+  curCat = c;
+  document.querySelectorAll('.pcat').forEach(function(b){ b.classList.toggle('active', b.textContent === c); });
+  renderFrases();
+}
+
+function renderFrases() {
+  var list = FRASES[curCat] || [];
+  document.getElementById('plist').innerHTML = list.map(function(f) {
+    var zh = f.zh.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var py = f.py.replace(/'/g,"\\'");
+    var pt = f.pt.replace(/'/g,"\\'");
+    return '<div class="pitem" onclick="showDispFrase(\'' + zh + '\',\'' + py + '\',\'' + pt + '\')">' +
+      '<div class="pitem-pt">' + f.pt + '</div>' +
+      '<div class="pitem-zh">' + f.zh + '</div>' +
+      '<div class="pitem-py">' + f.py + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function showDispFrase(zh, py, pt) {
+  document.getElementById('disp-zh').textContent = zh;
+  document.getElementById('disp-py').textContent = py;
+  document.getElementById('disp-pt').textContent = pt;
+  document.getElementById('disp-overlay').classList.add('open');
+}
+
+// ─── OVERLAYS ────────────────────────────────────────────
+document.getElementById('api-overlay').addEventListener('click', function(e){ if(e.target===this) closeApiCfg(); });
+
+// ─── CÂMBIO AUTO ─────────────────────────────────────────
+async function fetchCambio() {
+  try {
+    var res = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json');
+    if (!res.ok) return;
+    var data = await res.json();
+    var brl = data.usd && data.usd.brl;
+    var rmb = data.usd && data.usd.cny;
+    if (brl) {
+      document.getElementById('c-cambio').value = brl.toFixed(2);
+    }
+    if (rmb && brl) {
+      // RMB to BRL = BRL/RMB
+      var rmbToBrl = brl / rmb;
+      document.getElementById('c-cambio-rmb').value = rmbToBrl.toFixed(3);
+    }
+  } catch(e) {}
+}
+
+// ─── INIT ────────────────────────────────────────────────
+updateApiStatus();
+initFrases();
+fetchCambio();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+</body>
+</html>
