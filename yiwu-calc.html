@@ -371,6 +371,20 @@ input::placeholder{color:var(--t3);}
             <strong>🚢 Trading Importação:</strong> US$ 900 por m³<br>
             <span style="font-size:12px">Inclui: frete + impostos + desembaraço aduaneiro</span>
           </div>
+          <div id="cbm-alert" style="display:none;padding:12px;background:var(--ywd);border:1px solid var(--yw);border-radius:10px;font-size:13px;color:var(--yw);margin-bottom:12px">
+            ⚠️ <strong>Preencha os dados da caixa abaixo para calcular:</strong>
+          </div>
+          <div class="r2" id="cbm-edit-fields">
+            <div class="field">
+              <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Unidades por caixa</label>
+              <input type="number" id="c-unid-edit" placeholder="Ex: 12" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Volume da caixa (m³)</label>
+              <div class="sfx"><input type="number" id="c-cbm-edit" placeholder="Ex: 0.060" inputmode="decimal" step="0.001"><span class="sfx-lbl">m³</span></div>
+              <div style="font-size:11px;color:var(--t3);margin-top:3px">P≈0.012 · M≈0.060 · G≈0.120</div>
+            </div>
+          </div>
           <div class="field">
             <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Quantidade que quer pedir (unidades)</label>
             <input type="number" id="c-qtd" placeholder="Ex: 100" inputmode="numeric">
@@ -763,8 +777,12 @@ function selecionarProduto(id) {
   if (el) el.classList.add('selected');
   document.getElementById('calc-form').style.display = 'block';
   document.getElementById('calc-resultado').style.display = 'none';
+  // Pre-fill cbm and unidCx edit fields from saved product
+  var cbmEl = document.getElementById('c-cbm-edit');
+  var unidEl = document.getElementById('c-unid-edit');
+  if (cbmEl) cbmEl.value = produtoSelecionado.cbm || '';
+  if (unidEl) unidEl.value = produtoSelecionado.unidCx || '';
   document.getElementById('c-qtd').focus();
-  // Auto calc if qty already filled
   if (document.getElementById('c-qtd').value) calcViab();
 }
 
@@ -776,8 +794,21 @@ function calcViab() {
   var qtdDesejada = parseInt(document.getElementById('c-qtd').value) || 0;
   var cambioUSD = parseFloat(document.getElementById('c-cambio').value) || 5.85;
   var cambioRMB = parseFloat(document.getElementById('c-cambio-rmb').value) || 0.80;
-  var freteBR = parseFloat(document.getElementById('c-frete-br').value) || 0;
-  var precoVenda = parseFloat(document.getElementById('c-venda').value) || 0;
+  var freteBR = 0;
+  var precoVenda = 0;
+
+  // Permite editar CBM e unidCx inline se não vieram do registro
+  var cbmEl = document.getElementById('c-cbm-edit');
+  var unidEl = document.getElementById('c-unid-edit');
+  if (cbmEl && cbmEl.value) p = Object.assign({}, p, { cbm: parseFloat(cbmEl.value) });
+  if (unidEl && unidEl.value) p = Object.assign({}, p, { unidCx: parseInt(unidEl.value) });
+
+  if (!p.cbm || !p.unidCx) {
+    document.getElementById('calc-resultado').style.display = 'none';
+    document.getElementById('cbm-alert').style.display = 'block';
+    return;
+  }
+  document.getElementById('cbm-alert').style.display = 'none';
 
   if (!qtdDesejada) { document.getElementById('calc-resultado').style.display='none'; return; }
 
