@@ -373,18 +373,19 @@ input::placeholder{color:var(--t3);}
           </div>
           <div class="field">
             <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Quantidade que quer pedir (unidades)</label>
-            <input type="number" id="c-qtd" placeholder="Ex: 100" inputmode="numeric" oninput="calcViab()">
+            <input type="number" id="c-qtd" placeholder="Ex: 100" inputmode="numeric">
           </div>
           <div class="r2">
             <div class="field">
               <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Câmbio US$/R$</label>
-              <div class="pfx"><span class="pfx-lbl">R$</span><input type="number" id="c-cambio" value="5.85" inputmode="decimal" oninput="calcViab()"></div>
+              <div class="pfx"><span class="pfx-lbl">R$</span><input type="number" id="c-cambio" value="5.85" inputmode="decimal"></div>
             </div>
             <div class="field">
               <label style="font-size:13px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">Câmbio RMB/R$</label>
-              <div class="pfx"><span class="pfx-lbl">R$</span><input type="number" id="c-cambio-rmb" value="0.80" inputmode="decimal" oninput="calcViab()"></div>
+              <div class="pfx"><span class="pfx-lbl">R$</span><input type="number" id="c-cambio-rmb" value="0.80" inputmode="decimal"></div>
             </div>
           </div>
+          <button class="btn-primary" onclick="calcViab()" style="margin-top:4px">📊 CALCULAR</button>
           <input type="hidden" id="c-frete-br" value="0">
           <input type="hidden" id="c-venda" value="0">
         </div>
@@ -763,6 +764,8 @@ function selecionarProduto(id) {
   document.getElementById('calc-form').style.display = 'block';
   document.getElementById('calc-resultado').style.display = 'none';
   document.getElementById('c-qtd').focus();
+  // Auto calc if qty already filled
+  if (document.getElementById('c-qtd').value) calcViab();
 }
 
 var fmt = function(n) { return 'R$ ' + n.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); };
