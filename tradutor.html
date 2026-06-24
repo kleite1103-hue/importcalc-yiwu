@@ -231,6 +231,8 @@ Preencha "resposta_sugerida" SOMENTE se a imagem for uma conversa/mensagem que p
 
   let dir = 'pt2zh';
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  const useType = isIOS || !SR; // no iPhone o reconhecimento de voz do site não funciona
   const synth = window.speechSynthesis;
   let voices = [];
   const loadVoices = () => { voices = synth.getVoices(); };
@@ -307,7 +309,7 @@ Preencha "resposta_sugerida" SOMENTE se a imagem for uma conversa/mensagem que p
     try{rec.start();}catch(e){}
   }
   function openType(){ const b=$('typebox'); b.classList.add('on'); $('txtIn').focus(); }
-  $('mic').onclick=()=>{ if(!SR){ openType(); return; } startListen(); };
+  $('mic').onclick=()=>{ if(useType){ openType(); return; } startListen(); };
   $('typeBtn').onclick=()=>{const b=$('typebox');b.classList.toggle('on');if(b.classList.contains('on'))$('txtIn').focus();};
   $('sendBtn').onclick=()=>{handleInput($('txtIn').value);$('txtIn').value='';};
   $('txtIn').addEventListener('keydown',e=>{if(e.key==='Enter'){handleInput($('txtIn').value);$('txtIn').value='';}});
@@ -316,7 +318,7 @@ Preencha "resposta_sugerida" SOMENTE se a imagem for uma conversa/mensagem que p
   PHRASES.forEach(p=>{const c=document.createElement('button');c.className='chip';c.textContent=p.pt;c.onclick=()=>addCard(p.pt,'pt',p.zh,'zh');qrow.appendChild(c);});
 
   function showWarn(msg){const w=$('warn');w.innerHTML=msg;w.classList.add('show');}
-  if(!SR){ showWarn('No iPhone, o microfone do site não funciona (limitação da Apple). Toque no botão abaixo, depois no <b>microfone do seu teclado</b> e fale — vira texto e eu traduzo e falo em chinês.'); $('micTxt').textContent='Toque pra digitar ou ditar'; }
+  if(useType){ showWarn('No iPhone, fale pelo <b>microfone do teclado</b>: toque no campo de texto, depois no 🎤 do seu teclado (ao lado da barra de espaço) e fale em português. Eu traduzo e falo em chinês.'); $('micTxt').textContent='Toque pra falar (microfone do teclado)'; }
   applyDir();
 
   // ===================== TABS =====================
