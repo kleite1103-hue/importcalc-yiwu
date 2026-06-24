@@ -162,7 +162,7 @@
     </div>
   </div>
   <div class="quick">
-    <div class="qlabel">Frases de negociação (toque pra falar em chinês)</div>
+    <div class="qlabel">Frases do dia a dia (toque pra falar em chinês)</div>
     <div class="qrow" id="qrow"></div>
   </div>
   <div class="dock">
@@ -181,7 +181,7 @@
 <!-- ===================== FOTO ===================== -->
 <div class="view" id="viewPhoto">
   <div id="photoScroll">
-    <p class="pintro">Fotografe uma <b>mensagem, conversa ou aviso em chinês</b>. Eu traduzo, explico o que a pessoa quer dizer e te dou uma <b>resposta pronta em chinês</b> — com pinyin e voz — pra você mandar de volta.</p>
+    <p class="pintro">Fotografe <b>qualquer coisa em chinês</b> — cardápio, placa, aviso, mensagem, bula. Eu traduzo, explico o que é e o que diz. Se for uma conversa, ainda te dou uma <b>resposta pronta</b> pra mandar.</p>
     <div class="perr" id="perr"></div>
     <img class="preview" id="preview" alt="prévia">
     <div class="ploading" id="ploading"><span class="spin"></span>analisando a foto…</div>
@@ -203,22 +203,22 @@
   // ---------- Cérebro da foto: reaproveita o proxy kaia (chave Anthropic fica no Supabase) ----------
   const PHOTO_FN  = 'https://tglzziptzshwhtovoike.supabase.co/functions/v1/kaia';
   const PHOTO_KEY = 'sb_publishable_BE3sdf2BU14g-gdBxBLYlg_sRId5nOv';
-  const PHOTO_PROMPT = `Ignore qualquer contexto anterior. A imagem é uma COMUNICAÇÃO em chinês (mensagem de celular/WeChat, conversa, bilhete, aviso ou placa) que uma brasileira em Yiwu precisa entender e responder. Responda APENAS com um JSON válido, sem markdown e sem texto antes ou depois, neste formato exato:
-{"texto_detectado":"todo o texto em chinês visível (string vazia se não houver)","pinyin":"pinyin com marcas de tom do texto_detectado","traducao":"tradução clara e natural em português","interpretacao":"o que a pessoa quer dizer, a intenção e o tom, em português","resposta_sugerida":{"zh":"uma resposta natural e educada em chinês que ela pode enviar","pinyin":"pinyin da resposta","pt":"o que essa resposta diz, em português"},"termos":[{"zh":"","pinyin":"","pt":""}]}
-A "resposta_sugerida" deve ser útil e adequada ao contexto. Em "termos" coloque de 3 a 5 palavras-chave do diálogo. Seja direto e prático.`;
+  const PHOTO_PROMPT = `Ignore qualquer contexto anterior. A imagem tem texto ou uma cena em chinês que uma brasileira na China precisa entender — pode ser cardápio, placa, aviso, mensagem, bula, embalagem, instrução, QUALQUER coisa. Responda APENAS com um JSON válido, sem markdown e sem texto antes ou depois, neste formato exato:
+{"texto_detectado":"todo o texto em chinês visível (string vazia se não houver)","pinyin":"pinyin com marcas de tom do texto_detectado","traducao":"tradução clara e natural em português; se for cardápio ou lista, traduza os itens","explicacao":"o que é isso e o que significa no contexto, em português (ex: é um cardápio de sopas, é uma placa de proibido fumar, é alguém perguntando seu nome)","resposta_sugerida":{"zh":"","pinyin":"","pt":""},"termos":[{"zh":"","pinyin":"","pt":""}]}
+Preencha "resposta_sugerida" SOMENTE se a imagem for uma conversa/mensagem que peça uma resposta; caso contrário deixe os três campos vazios. Em "termos" coloque de 3 a 6 palavras-chave úteis do que aparece. Seja direto e prático.`;
 
   // ---------- Frases pré-carregadas ----------
   const PHRASES = [
-    {pt:"Quanto custa este produto?",          zh:"这个产品多少钱？"},
-    {pt:"Qual a quantidade mínima (MOQ)?",     zh:"最小起订量是多少？"},
-    {pt:"Pode me enviar uma amostra?",         zh:"可以给我寄个样品吗？"},
-    {pt:"Qual o prazo de produção?",           zh:"生产周期是多久？"},
-    {pt:"Tem desconto para pedido grande?",    zh:"大批量订购有折扣吗？"},
-    {pt:"Pode colocar a minha marca? (OEM)",   zh:"可以贴我的牌子吗？"},
-    {pt:"Peso e tamanho da caixa?",            zh:"一箱的重量和尺寸是多少？"},
-    {pt:"Pode enviar ao meu agente de carga?", zh:"可以发给我的货代吗？"},
-    {pt:"Aceita pagamento por transferência?", zh:"可以银行转账付款吗？"},
-    {pt:"Pode entregar mais rápido?",          zh:"可以快一点交货吗？"}
+    {pt:"Quanto custa?",              zh:"多少钱？"},
+    {pt:"Onde fica o banheiro?",      zh:"洗手间在哪里？"},
+    {pt:"Não entendi, pode repetir?", zh:"我没听懂，可以再说一遍吗？"},
+    {pt:"Pode escrever aqui?",        zh:"可以写下来吗？"},
+    {pt:"Sem pimenta, por favor",     zh:"不要辣，谢谢"},
+    {pt:"Aceita cartão?",             zh:"可以刷卡吗？"},
+    {pt:"Pode me ajudar?",            zh:"可以帮我一下吗？"},
+    {pt:"Onde fica o metrô?",         zh:"地铁站在哪里？"},
+    {pt:"Quanto tempo leva?",         zh:"需要多久？"},
+    {pt:"Obrigada!",                  zh:"谢谢！"}
   ];
 
   let dir = 'pt2zh';
@@ -369,13 +369,14 @@ A "resposta_sugerida" deve ser útil e adequada ao contexto. Em "termos" coloque
     const blocks=[];
     if(d.texto_detectado){
       const py=d.pinyin||toPinyin(d.texto_detectado);
-      blocks.push(`<div class="pblock"><div class="lab">Mensagem em chinês</div>
+      blocks.push(`<div class="pblock"><div class="lab">Texto em chinês</div>
         <div class="rowplay"><div class="main"><div class="zh cjk">${escapeHtml(d.texto_detectado)}</div>
         ${py?`<div class="py mono">${escapeHtml(py)}</div>`:''}</div>
         <button class="play" data-zh="${escapeHtml(d.texto_detectado)}">▶</button></div></div>`);
     }
     if(d.traducao) blocks.push(`<div class="pblock"><div class="lab">Tradução</div><div class="ptxt">${escapeHtml(d.traducao)}</div></div>`);
-    if(d.interpretacao) blocks.push(`<div class="pblock"><div class="lab">O que querem dizer</div><div class="desc">${escapeHtml(d.interpretacao)}</div></div>`);
+    const expl=d.explicacao||d.interpretacao;
+    if(expl) blocks.push(`<div class="pblock"><div class="lab">O que é / o que diz</div><div class="desc">${escapeHtml(expl)}</div></div>`);
     const rs=d.resposta_sugerida;
     if(rs && (rs.zh||rs.pt)){
       const py=rs.pinyin||toPinyin(rs.zh||'');
