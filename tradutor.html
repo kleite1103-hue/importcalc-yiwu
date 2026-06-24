@@ -90,12 +90,16 @@
   #mic .dot{width:10px;height:10px;border-radius:50%;background:#0b0c0f;}
   #mic.listening .dot{animation:blink .7s infinite;}
   @keyframes blink{50%{opacity:.25;}}
-  .typebox{display:none; gap:8px; margin-top:10px;}
+  .typebox{display:none; flex-direction:column; gap:10px; margin-top:10px;}
   .typebox.on{display:flex;}
-  #txtIn{flex:1; height:50px; border-radius:13px; border:1px solid var(--line); background:var(--bg);
-    color:var(--txt); padding:0 14px; font-size:15px; font-family:inherit;}
+  #txtIn{height:54px; border-radius:13px; border:1px solid var(--line); background:var(--bg);
+    color:var(--txt); padding:0 14px; font-size:16px; font-family:inherit; width:100%;}
   #txtIn:focus{outline:none; border-color:var(--zh);}
-  #sendBtn{height:50px; padding:0 18px; border-radius:13px; border:none; background:var(--zh); color:#0b0c0f; font-weight:700; font-size:15px; cursor:pointer;}
+  .typebtns{display:flex; gap:10px;}
+  .typebtns button{flex:1; height:54px; border-radius:13px; border:none; font-family:inherit; font-weight:700; font-size:16px; cursor:pointer;}
+  #micType{background:var(--pt); color:#0b0c0f;}
+  #sendBtn{background:var(--zh); color:#0b0c0f;}
+  #micType:active,#sendBtn:active{filter:brightness(1.1);}
   .warn{margin:10px 16px 0; padding:11px 14px; border-radius:12px; background:rgba(255,77,28,.1);
     border:1px solid rgba(255,77,28,.35); font-size:13px; line-height:1.45; color:#ffd2c4; display:none;}
   .warn.show{display:block;}
@@ -176,7 +180,10 @@
     </div>
     <div class="typebox" id="typebox">
       <input id="txtIn" placeholder="Digite e traduza…" autocomplete="off">
-      <button id="sendBtn">Traduzir</button>
+      <div class="typebtns">
+        <button id="micType">🎤 Falar</button>
+        <button id="sendBtn">Traduzir</button>
+      </div>
     </div>
   </div>
 </div>
@@ -251,20 +258,27 @@ Preencha "resposta_sugerida" SOMENTE se a imagem for uma conversa/mensagem que p
   }
   function escapeHtml(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
-  async function translate(text, from, to){
-    const pair=(from==='pt'?'pt':'zh-CN')+'|'+(to==='pt'?'pt':'zh-CN');
-    const url=`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${pair}&de=kleite1103@gmail.com`;
-    const r=await fetch(url); const d=await r.json();
-    let out=d?.responseData?.translatedText||'';
-    if(/MYMEMORY WARNING|INVALID/i.test(out)){ const m=(d.matches||[]).filter(x=>x.translation&&!/WARNING/i.test(x.translation)); if(m.length) out=m[0].translation; }
-    return out.trim();
+  async function translate(text){
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(), 25000);
+    const prompt='Você é um tradutor PT<->ZH. Traduza o texto do usuário: se estiver em português, traduza para chinês; se estiver em chinês, traduza para português. Responda APENAS com JSON válido, sem markdown: {"t":"a tradução","py":"pinyin com marcas de tom se a tradução for em chinês, senão string vazia"}\n\nTexto: '+text;
+    try{
+      const r=await fetch(PHOTO_FN,{method:'POST',signal:ctrl.signal,
+        headers:{'content-type':'application/json','Authorization':'Bearer '+PHOTO_KEY},
+        body:JSON.stringify({max_tokens:400, messages:[{role:'user',content:[{type:'text',text:prompt}]}]})});
+      if(!r.ok) throw new Error('http');
+      const resp=await r.json();
+      const txt=(resp.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+      const d=JSON.parse(txt.replace(/```json|```/g,'').trim());
+      return {t:(d.t||'').trim(), py:(d.py||'').trim()};
+    } finally { clearTimeout(timer); }
   }
 
-  function addCard(srcText, srcLang, dstText, dstLang){
+  function addCard(srcText, srcLang, dstText, dstLang, pinOverride){
     if(empty.parentNode) empty.remove();
     const card=document.createElement('div');
     card.className='card '+(dstLang==='pt'?'r-pt':'r-zh');
-    const pin = dstLang==='zh'?toPinyin(dstText):(srcLang==='zh'?toPinyin(srcText):'');
+    const pin = dstLang==='zh'?(pinOverride||toPinyin(dstText)):(srcLang==='zh'?toPinyin(srcText):'');
     card.innerHTML=`
       <div class="from"><b>${srcLang==='zh'?'🇨🇳':'🇧🇷'}</b> <span class="${srcLang==='zh'?'cjk':''}">${escapeHtml(srcText)}</span></div>
       <div class="to"><div class="main">
@@ -279,10 +293,10 @@ Preencha "resposta_sugerida" SOMENTE se a imagem for uma conversa/mensagem que p
     text=(text||'').trim(); if(!text) return;
     const from=dir==='pt2zh'?'pt':'zh', to=dir==='pt2zh'?'zh':'pt';
     interim.textContent='traduzindo…';
-    try{ const out=await translate(text,from,to); interim.textContent='';
-      if(!out){interim.textContent='não consegui traduzir, tente de novo';return;}
-      addCard(text,from,out,to);
-    }catch(e){ interim.textContent='sem conexão com o tradutor — verifique a internet'; }
+    try{ const out=await translate(text); interim.textContent='';
+      if(!out.t){interim.textContent='não consegui traduzir, tente de novo';return;}
+      addCard(text,from,out.t,to,out.py);
+    }catch(e){ interim.textContent='Não consegui conectar ao tradutor. Confira a internet — na China pode precisar do VPN ligado.'; }
   }
 
   function applyDir(){
@@ -312,6 +326,7 @@ Preencha "resposta_sugerida" SOMENTE se a imagem for uma conversa/mensagem que p
   $('mic').onclick=()=>{ if(useType){ openType(); return; } startListen(); };
   $('typeBtn').onclick=()=>{const b=$('typebox');b.classList.toggle('on');if(b.classList.contains('on'))$('txtIn').focus();};
   $('sendBtn').onclick=()=>{handleInput($('txtIn').value);$('txtIn').value='';};
+  $('micType').onclick=()=>{ $('txtIn').focus(); };
   $('txtIn').addEventListener('keydown',e=>{if(e.key==='Enter'){handleInput($('txtIn').value);$('txtIn').value='';}});
 
   const qrow=$('qrow');
@@ -321,8 +336,7 @@ Preencha "resposta_sugerida" SOMENTE se a imagem for uma conversa/mensagem que p
   if(useType){
     const ml=document.querySelector('.miclane'); if(ml) ml.style.display='none';
     $('typebox').classList.add('on');
-    $('txtIn').placeholder='Toque aqui e fale no 🎤 do teclado';
-    showWarn('Toque no campo abaixo, depois no <b>🎤 do seu teclado</b> (ao lado da barra de espaço) e fale em português. Toque na seta e eu traduzo e falo em chinês.');
+    showWarn('Toque em <b>🎤 Falar</b>, depois no <b>🎤 do seu teclado</b> (ao lado da barra de espaço) e fale em português. Em seguida toque em <b>Traduzir</b>.');
   }
   applyDir();
 
