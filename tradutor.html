@@ -100,6 +100,7 @@
   #micType{background:var(--pt); color:#0b0c0f;}
   #sendBtn{background:var(--zh); color:#0b0c0f;}
   #micType:active,#sendBtn:active{filter:brightness(1.1);}
+  #txtIn.bigfield{height:68px; font-size:18px; text-align:center; border:2px dashed var(--zh); background:var(--zh-soft);}
   .warn{margin:10px 16px 0; padding:11px 14px; border-radius:12px; background:rgba(255,77,28,.1);
     border:1px solid rgba(255,77,28,.35); font-size:13px; line-height:1.45; color:#ffd2c4; display:none;}
   .warn.show{display:block;}
@@ -307,7 +308,7 @@ Preencha "resposta_sugerida" SOMENTE se a imagem for uma conversa/mensagem que p
     $('lblDst').innerHTML=pt2zh?'中文<small>tradução</small>':'Português<small>tradução</small>';
     const mic=$('mic'); mic.classList.toggle('zh',!pt2zh);
     $('micTxt').textContent=pt2zh?'Falar em português':'说中文 · Falar em chinês';
-    $('txtIn').placeholder = useType ? (pt2zh?'Toque e fale no 🎤 do teclado':'点这里，用键盘的🎤说') : (pt2zh?'Digite em português…':'输入中文… / Digite em chinês');
+    $('txtIn').placeholder = useType ? (pt2zh?'🎤 Toque aqui e fale (português)':'🎤 点这里说话 (中文)') : (pt2zh?'Digite em português…':'输入中文… / Digite em chinês');
   }
   $('swap').onclick=()=>{ dir=dir==='pt2zh'?'zh2pt':'pt2zh'; applyDir(); };
 
@@ -336,7 +337,9 @@ Preencha "resposta_sugerida" SOMENTE se a imagem for uma conversa/mensagem que p
   if(useType){
     const ml=document.querySelector('.miclane'); if(ml) ml.style.display='none';
     $('typebox').classList.add('on');
-    showWarn('Toque em <b>🎤 Falar</b>, depois no <b>🎤 do seu teclado</b> (ao lado da barra de espaço) e fale em português. Em seguida toque em <b>Traduzir</b>.');
+    $('micType').style.display='none';
+    $('txtIn').classList.add('bigfield');
+    showWarn('No iPhone o site não pode abrir o microfone (regra da Apple). Toque no <b>campo grande abaixo</b>, depois no <b>🎤 do seu teclado</b> e fale. Depois toque em <b>Traduzir</b>.');
   }
   applyDir();
 
